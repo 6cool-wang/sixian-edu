@@ -14,6 +14,41 @@
 </head>
 <body>
   <div class="loading">正在加载管理后台</div>
+  <script>
+    window.CMS_MANUAL_INIT = true;
+  </script>
   <script src="https://unpkg.com/decap-cms@3/dist/decap-cms.js"></script>
+  <script>
+    CMS.init({
+      config: {
+        backend: {
+          name: 'github',
+          repo: 'sixian-edu/sixian-edu',
+          branch: 'master',
+          auth_type: 'pkce',
+          app_id: 'Ov23liDoCAm6hYZNxKYH'
+        },
+        site_url: 'https://sixian-edu.github.io/sixian-edu',
+        media_folder: 'images/uploads',
+        collections: [
+          {
+            name: 'pages',
+            label: '页面',
+            files: [
+              {
+                name: 'ziliao',
+                label: '资料库',
+                file: '资料库.html',
+                create: true,
+                fields: [
+                  { label: '内容', name: 'body', widget: 'text' }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    });
+  </script>
 </body>
 </html>

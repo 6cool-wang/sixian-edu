@@ -5,6 +5,7 @@ backend:
   auth_type: pkce
   app_id: Ov23liDoCAm6hYZNxKYH
 
+site_url: "https://sixian-edu.github.io/sixian-edu"
 media_folder: "images/uploads"
 
 collections:
