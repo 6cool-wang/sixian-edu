@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../images/logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算智能 · 期末复习 · 思贤学习站</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body{background:#f5f6fa}
+.hero{background:linear-gradient(135deg,#2c3e50,#34495e);color:#fff;padding:60px 20px 68px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(52,152,219,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(155,89,182,0.1) 0%,transparent 50%),radial-gradient(ellipse at 50% 80%,rgba(44,62,80,0.05) 0%,transparent 50%)}
+.hero h1{font-size:32px;font-weight:700;letter-spacing:1px;margin-bottom:8px;position:relative;z-index:1}
+.hero p{font-size:14px;color:#ccc;line-height:1.8;position:relative;z-index:1;max-width:620px;margin:0 auto}
+.container{max-width:860px;margin:0 auto;padding:0 16px 48px}
+/* sections */
+.sec{background:#fff;border-radius:16px;padding:28px 32px;margin-top:28px;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.sec h2{font-size:21px;font-weight:700;color:#2c3e50;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #3498db;display:inline-block}
+.sec h3{font-size:17px;font-weight:700;color:#2c3e50;margin:22px 0 10px;padding-left:0}
+.sec h4{font-size:15px;font-weight:600;color:#555;margin:16px 0 8px}
+.sec p,.sec li{font-size:14px;color:#444;line-height:1.9}
+.sec ul,.sec ol{padding-left:22px}
+.sec li{margin-bottom:5px}
+.sec strong{color:#2c3e50}
+/* formula box */
+.fbox{background:#f8f9fc;border-left:4px solid #3498db;padding:12px 18px;margin:12px 0;font-size:14px;line-height:1.7;font-family:'Courier New','Consolas',monospace;overflow-x:auto;border-radius:0 10px 10px 0}
+.fbox .flabel{color:#3498db;font-weight:600;font-size:12px;display:block;margin-bottom:3px;font-family:-apple-system,sans-serif}
+/* algo box */
+.abox{background:#f0f4f8;border-radius:10px;padding:14px 18px;margin:12px 0;font-size:13px;line-height:1.8}
+.abox .atitle{font-weight:700;color:#2c3e50;margin-bottom:5px;font-size:14px}
+/* toggle solution */
+.toggle-sol{margin:8px 0 14px;border:1px solid #e8e8e8;border-radius:10px;overflow:hidden}
+.toggle-sol .sol-btn{display:block;width:100%;padding:8px 16px;background:#f8f9fc;border:none;font-size:13px;color:#888;cursor:pointer;text-align:left;transition:background .2s;font-family:inherit}
+.toggle-sol .sol-btn:hover{background:#eef0f4}
+.toggle-sol .sol-btn::before{content:'💡 '}
+.toggle-sol .sol-content{display:none;padding:14px 18px;background:#fafcff;border-top:1px solid #eee;font-size:14px;line-height:1.8}
+.toggle-sol .sol-content.show{display:block}
+.toggle-sol .sol-content p{margin:4px 0}
+/* tags */
+.tg{display:inline-block;font-size:11px;padding:2px 10px;border-radius:10px;margin:0 3px 3px 0}
+.tg-blue{background:#e8f4fd;color:#2980b9}
+.tg-green{background:#e8f8e8;color:#27ae60}
+.tg-orange{background:#fef5e7;color:#e67e22}
+.tg-purple{background:#f4ecf7;color:#8e44ad}
+.tg-red{background:#fde8e8;color:#c0392b}
+/* tables */
+.tab{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.tab th,.tab td{padding:9px 12px;border:1px solid #e0e0e0;text-align:left}
+.tab th{background:#f0f4f8;font-weight:600;color:#2c3e50}
+.tab tr:nth-child(even){background:#fafbfc}
+/* warning */
+.warn{border-radius:10px;padding:12px 16px;margin:12px 0;font-size:13px;line-height:1.7}
+.warn.blue{background:#e8f4fd;border-left:4px solid #2980b9}
+.warn.green{background:#e8f8e8;border-left:4px solid #27ae60}
+.warn.yellow{background:#fef9e7;border-left:4px solid #f39c12}
+.warn h4{margin:0 0 4px;font-size:14px;font-weight:600}
+/* svg chart container */
+.svg-chart{text-align:center;margin:16px 0;overflow-x:auto}
+.svg-chart svg{max-width:100%;height:auto;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.06)}
+/* exam-tip */
+.etip{background:#1a1a2e;color:#eee;border-radius:10px;padding:14px 18px;margin:12px 0;font-size:13px;line-height:1.8}
+.etip .ett{color:#f1c40f;font-weight:600;font-size:14px;margin-bottom:4px}
+/* practice list */
+.pq{margin:8px 0;padding:10px 14px;background:#fafbfc;border-radius:8px;border-left:3px solid #8e44ad;font-size:13px;color:#555}
+@media(max-width:600px){
+  .sec{padding:18px 14px}
+  .sec h2{font-size:19px}
+  .fbox{font-size:13px;padding:10px 14px}
+}
+</style>
+<script src="../js/theme.js"></script>
+<style>
+/* nav override: 深色主题适配导航栏 */
+.nav{background:#1a1a2e}
+</style>
+</head>
+<body>
+
+<div class="nav">
+  <a href="../思贤学习站.html" class="logo-text">思贤学习站</a>
+  <a href="../学习专区.html">学习专区</a>
+  <a href="../算法助学.html">AI工具 <span class="nav-tag">免费体验</span></a>
+  <a href="../资料库.html">资源库</a>
+  <a href="../真题.html">真题库</a>
+  <a href="../关于.html">关于</a><button class="theme-btn" onclick="toggleTheme()" title="切换主题">🎨</button>
+</div>
+
+<div class="hero">
+  <h1>计算智能 · 期末复习</h1>
+  <p>神经网络 · 进化计算 · 群体智能 · 模糊系统 · 混合系统<br>知识点精讲 + 例题解析 + 习题训练 + 考前速记</p>
+</div>
+
+<div class="container">
+
+<!-- ===================== 课程总览 ===================== -->
+<div class="sec">
+  <h2>📋 课程总览</h2>
+  <p>计算智能（Computational Intelligence, CI）是人工智能的重要分支，借鉴生物智能系统的计算范式来解决复杂优化、学习与决策问题。主要包括四大核心领域：</p>
+  <table class="tab">
+    <tr><th>领域</th><th>生物原型</th><th>核心机制</th><th>典型算法</th></tr>
+    <tr><td><strong>神经网络</strong></td><td>人脑神经系统</td><td>分布式并行处理、学习与泛化</td><td>BP、Hopfield、SOM、RBF、CNN</td></tr>
+    <tr><td><strong>进化计算</strong></td><td>达尔文自然进化</td><td>选择-交叉-变异、适者生存</td><td>GA、ES、EP、GP、DE</td></tr>
+    <tr><td><strong>群体智能</strong></td><td>蚁群、鸟群等社会性生物</td><td>个体简单、群体涌现智能</td><td>PSO、ACO、ABC、鱼群算法</td></tr>
+    <tr><td><strong>模糊系统</strong></td><td>人类模糊推理能力</td><td>隶属度、模糊规则、近似推理</td><td>Mamdani、Sugeno、FCM</td></tr>
+  </table>
+  <p style="margin-top:10px;color:#888;font-size:13px">考试特点：概念辨析题（30%）+ 算法流程题（25%）+ 计算推导题（25%）+ 综合应用题（20%）。注重理解算法"为什么这样设计"而非死记硬背。</p>
+</div>
+
+<!-- ===================== 一、神经网络 ===================== -->
+<div class="sec">
+  <h2>🧠 一、神经网络</h2>
+  <p>人工神经网络（Artificial Neural Network, ANN）由大量简单处理单元（神经元）相互连接构成，通过调整连接权重实现从数据中学习。</p>
+
+  <!-- 1.1 MP神经元 -->
+  <h3>1.1 MP神经元模型</h3>
+  <p>1943年 McCulloch &amp; Pitts 提出，是所有人造神经元的鼻祖。</p>
+  <div class="svg-chart">
+    <svg width="580" height="170" viewBox="0 0 580 170" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#555"/></marker></defs>
+      <!-- inputs -->
+      <text x="20" y="40" font-size="14" fill="#2980b9" font-weight="600">x₁</text>
+      <text x="20" y="75" font-size="14" fill="#2980b9" font-weight="600">x₂</text>
+      <text x="20" y="110" font-size="14" fill="#2980b9" font-weight="600">x₃</text>
+      <text x="20" y="145" font-size="14" fill="#999">xₙ</text>
+      <!-- weights -->
+      <text x="70" y="38" font-size="12" fill="#e67e22">w₁</text>
+      <text x="70" y="73" font-size="12" fill="#e67e22">w₂</text>
+      <text x="70" y="108" font-size="12" fill="#e67e22">w₃</text>
+      <text x="70" y="143" font-size="12" fill="#e67e22">wₙ</text>
+      <!-- lines -->
+      <line x1="40" y1="38" x2="100" y2="60" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="40" y1="73" x2="100" y2="73" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="40" y1="108" x2="100" y2="85" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <line x1="40" y1="140" x2="100" y2="95" stroke="#999" stroke-width="0.8" marker-end="url(#arrow)" stroke-dasharray="3,3"/>
+      <!-- summing node -->
+      <circle cx="140" cy="73" r="32" fill="#e8f4fd" stroke="#3498db" stroke-width="2"/>
+      <text x="140" y="68" font-size="12" fill="#2c3e50" text-anchor="middle">Σ</text>
+      <text x="140" y="84" font-size="10" fill="#888" text-anchor="middle">加偏置b</text>
+      <!-- arrow to activation -->
+      <line x1="172" y1="73" x2="230" y2="73" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- activation box -->
+      <rect x="230" y="48" width="70" height="50" rx="8" fill="#fef5e7" stroke="#e67e22" stroke-width="2"/>
+      <text x="265" y="78" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">f(·)</text>
+      <!-- arrow to output -->
+      <line x1="300" y1="73" x2="360" y2="73" stroke="#999" stroke-width="1.2" marker-end="url(#arrow)"/>
+      <!-- output -->
+      <circle cx="380" cy="73" r="22" fill="#e8f8e8" stroke="#27ae60" stroke-width="2"/>
+      <text x="380" y="78" font-size="14" fill="#27ae60" text-anchor="middle" font-weight="600">y</text>
+      <!-- bias -->
+      <line x1="120" y1="105" x2="120" y2="130" stroke="#aaa" stroke-width="0.8" stroke-dasharray="3,3"/>
+      <text x="100" y="145" font-size="12" fill="#8e44ad">偏置 b</text>
+      <!-- formula bottom -->
+      <text x="210" y="155" font-size="12" fill="#555" text-anchor="middle">y = f( Σ wᵢxᵢ + b )</text>
+    </svg>
+  </div>
+  <ul>
+    <li><strong>加权求和</strong>：net = Σᵢ wᵢxᵢ + b，其中 wᵢ 为连接权重，b 为偏置（bias）</li>
+    <li><strong>激活函数</strong>：y = f(net)，引入非线性变换</li>
+    <li><strong>生物学对应</strong>：树突接收信号（输入）→ 胞体处理（求和+激活）→ 轴突输出（结果）</li>
+  </ul>
+
+  <!-- 1.2 激活函数 -->
+  <h3>1.2 常见激活函数</h3>
+  <table class="tab">
+    <tr><th>名称</th><th>公式</th><th>值域</th><th>优点</th><th>缺点</th></tr>
+    <tr><td>阶跃函数</td><td>f(x)=1 if x≥0 else 0</td><td>{0,1}</td><td>简单、二分类</td><td>不可导、无梯度</td></tr>
+    <tr><td>Sigmoid</td><td>f(x)=1/(1+e<sup>-x</sup>)</td><td>(0,1)</td><td>平滑、可导、概率解释</td><td>梯度饱和、非零中心</td></tr>
+    <tr><td>tanh</td><td>f(x)=(e<sup>x</sup>-e<sup>-x</sup>)/(e<sup>x</sup>+e<sup>-x</sup>)</td><td>(-1,1)</td><td>零中心、比Sigmoid强</td><td>仍存在梯度饱和</td></tr>
+    <tr><td>ReLU</td><td>f(x)=max(0,x)</td><td>[0,∞)</td><td>计算快、缓解梯度消失</td><td>神经元死亡（负半轴为0）</td></tr>
+    <tr><td>Leaky ReLU</td><td>f(x)=x if x&gt;0 else αx</td><td>(-∞,∞)</td><td>解决ReLU死亡</td><td>α需手工设定</td></tr>
+    <tr><td>Softmax</td><td>fᵢ(x)=e<sup>xᵢ</sup>/Σⱼe<sup>xⱼ</sup></td><td>(0,1)</td><td>多分类概率输出</td><td>计算量略大</td></tr>
+  </table>
+
+  <div class="warn blue"><h4>📌 考点</h4>Sigmoid 和 tanh 的梯度饱和问题：当 |x| 很大时，导数趋近于 0，导致深层网络梯度消失。ReLU 在 x&gt;0 时导数为 1，有效缓解了这一问题，是目前深度学习的默认选择。</div>
+
+  <div class="fbox"><span class="flabel">Sigmoid 导数</span>f'(x) = f(x)(1-f(x))&nbsp;&nbsp;&nbsp;&nbsp;最大值 0.25（x=0处），向两端迅速衰减至0</div>
+
+  <!-- 1.3 感知器 -->
+  <h3>1.3 单层感知器（Perceptron）</h3>
+  <p>1958年 Rosenblatt 提出，是最简单的神经网络——只有输入层和输出层（一个神经元），用于线性二分类。</p>
+  <div class="abox">
+    <div class="atitle">📌 感知器算法流程</div>
+    ① 初始化权重 w 和偏置 b 为小随机数<br>
+    ② 对每个训练样本 (x, d)：计算输出 y = f(w·x + b)，f 为阶跃函数<br>
+    ③ 如果 y ≠ d：更新 w ← w + η(d-y)x，b ← b + η(d-y)<br>
+    ④ 重复②-③直到所有样本正确分类或达到最大迭代次数
+  </div>
+  <p><strong>局限性</strong>：只能解决线性可分问题（如 AND、OR 可以，XOR 不可以）。</p>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 1：感知器解决 AND 问题</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：用感知器学习 AND 逻辑，初始 w=[0.2, -0.1]，b=0.1，学习率 η=0.1。</p>
+      <p><strong>训练数据</strong>：<br>
+      (0,0)→0, (0,1)→0, (1,0)→0, (1,1)→1</p>
+      <p><strong>推导</strong>：</p>
+      <p>样本① (0,0)：net = 0.2×0 + (-0.1)×0 + 0.1 = 0.1 → y=1 ≠ 0<br>
+      &nbsp;&nbsp;更新：w₁=0.2+0.1×(0-1)×0=0.2，w₂=-0.1+0.1×(0-1)×0=-0.1，b=0.1+0.1×(0-1)=0.0</p>
+      <p>样本② (0,1)：net = 0.2×0 + (-0.1)×1 + 0.0 = -0.1 → y=0 = 0，无更新</p>
+      <p>样本③ (1,0)：net = 0.2×1 + (-0.1)×0 + 0.0 = 0.2 → y=1 ≠ 0<br>
+      &nbsp;&nbsp;更新：w₁=0.2+0.1×(0-1)×1=0.1，w₂=-0.1+0.1×(0-1)×0=-0.1，b=0.0+0.1×(0-1)=-0.1</p>
+      <p>样本④ (1,1)：net = 0.1×1 + (-0.1)×1 + (-0.1) = -0.1 → y=0 ≠ 1<br>
+      &nbsp;&nbsp;更新：w₁=-0.1+0.1×(1-0)×1=0.0，w₂=-0.1+0.1×(1-0)×1=0.0，b=-0.1+0.1×(1-0)=0.0</p>
+      <p>经过多次迭代后，感知器可以收敛到正确分类 AND 问题的权重。</p>
+    </div>
+  </div>
+
+  <!-- 1.4 BP -->
+  <h3>1.4 BP 神经网络（反向传播）—— ⭐ 核心重点</h3>
+  <p>BP（Back Propagation）通过误差反向传播来训练多层前馈网络，解决了单层感知器无法处理非线性问题（如 XOR）的缺陷。</p>
+
+  <div class="svg-chart">
+    <svg width="540" height="180" viewBox="0 0 540 180" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a2" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#999"/></marker></defs>
+      <!-- input layer -->
+      <circle cx="70" cy="50" r="20" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+      <circle cx="70" cy="90" r="20" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+      <circle cx="70" cy="130" r="20" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+      <text x="70" y="55" font-size="11" fill="#2c3e50" text-anchor="middle">x₁</text>
+      <text x="70" y="95" font-size="11" fill="#2c3e50" text-anchor="middle">x₂</text>
+      <text x="70" y="135" font-size="11" fill="#2c3e50" text-anchor="middle">x₃</text>
+      <!-- hidden layer -->
+      <circle cx="220" cy="40" r="20" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <circle cx="220" cy="80" r="20" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <circle cx="220" cy="120" r="20" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <circle cx="220" cy="160" r="20" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <text x="220" y="45" font-size="11" fill="#2c3e50" text-anchor="middle">h₁</text>
+      <text x="220" y="85" font-size="11" fill="#2c3e50" text-anchor="middle">h₂</text>
+      <text x="220" y="125" font-size="11" fill="#2c3e50" text-anchor="middle">h₃</text>
+      <text x="220" y="165" font-size="11" fill="#2c3e50" text-anchor="middle">h₄</text>
+      <!-- output layer -->
+      <circle cx="380" cy="70" r="20" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+      <circle cx="380" cy="120" r="20" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="380" y="75" font-size="11" fill="#2c3e50" text-anchor="middle">y₁</text>
+      <text x="380" y="125" font-size="11" fill="#2c3e50" text-anchor="middle">y₂</text>
+      <!-- connections input-hidden (sample) -->
+      <line x1="90" y1="50" x2="200" y2="40" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="50" x2="200" y2="80" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="50" x2="200" y2="120" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="50" x2="200" y2="160" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="90" x2="200" y2="40" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="90" x2="200" y2="80" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="90" x2="200" y2="120" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="90" x2="200" y2="160" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="130" x2="200" y2="40" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="130" x2="200" y2="80" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="130" x2="200" y2="120" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="90" y1="130" x2="200" y2="160" stroke="#ccc" stroke-width="0.8"/>
+      <!-- connections hidden-output -->
+      <line x1="240" y1="40" x2="360" y2="70" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="40" x2="360" y2="120" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="80" x2="360" y2="70" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="80" x2="360" y2="120" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="120" x2="360" y2="70" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="120" x2="360" y2="120" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="160" x2="360" y2="70" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="160" x2="360" y2="120" stroke="#ccc" stroke-width="0.8"/>
+      <!-- labels -->
+      <text x="70" y="175" font-size="12" fill="#888" text-anchor="middle">输入层</text>
+      <text x="220" y="185" font-size="12" fill="#888" text-anchor="middle">隐藏层</text>
+      <text x="380" y="178" font-size="12" fill="#888" text-anchor="middle">输出层</text>
+      <!-- arrow -->
+      <line x1="420" y1="50" x2="490" y2="50" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#a2)" stroke-dasharray="5,3"/>
+      <text x="455" y="44" font-size="11" fill="#e74c3c" text-anchor="middle">误差反传</text>
+    </svg>
+  </div>
+
+  <h4>正向传播（Forward Propagation）</h4>
+  <ul>
+    <li>输入向量从输入层经隐藏层逐层计算，传至输出层</li>
+    <li>隐藏层输出：hⱼ = f( Σᵢ wⱼᵢxᵢ + bⱼ )</li>
+    <li>输出层输出：yₖ = f( Σⱼ vₖⱼhⱼ + cₖ )</li>
+  </ul>
+
+  <h4>反向传播（Back Propagation）</h4>
+  <ul>
+    <li>计算输出误差 E = ½Σₖ(yₖ - ŷₖ)²</li>
+    <li>利用链式法则（Chain Rule）求各层权重的偏导数</li>
+    <li>权重沿梯度反方向更新：w ← w - η·∂E/∂w</li>
+  </ul>
+
+  <div class="fbox"><span class="flabel">BP 权重更新通式</span>w(t+1) = w(t) - η · ∂E/∂w(t)&nbsp;&nbsp;&nbsp;η：学习率（learning rate），控制步长</div>
+
+  <div class="abox">
+    <div class="atitle">📌 BP 算法完整流程</div>
+    ① 初始化：所有权重和偏置设为小随机数（通常 [-0.5, 0.5]）<br>
+    ② 前向传播：输入训练样本，逐层计算各神经元输出<br>
+    ③ 误差计算：E = ½Σ(y - ŷ)²<br>
+    ④ 反向传播：<br>
+    &nbsp;&nbsp;&nbsp;a. 输出层：δₖ = (yₖ - ŷₖ) · f'(netₖ)<br>
+    &nbsp;&nbsp;&nbsp;b. 隐藏层：δⱼ = (Σₖ wₖⱼδₖ) · f'(netⱼ)<br>
+    ⑤ 权重更新：w ← w - η · δ · 输入<br>
+    ⑥ 重复②-⑤直到误差小于阈值或达到最大迭代
+  </div>
+
+  <div class="warn yellow"><h4>⚠️ 常见陷阱</h4>
+  <ul style="margin:4px 0 0">
+    <li>学习率太大 → 震荡不收敛；学习率太小 → 收敛过慢</li>
+    <li>隐藏层神经元太少 → 欠拟合；太多 → 过拟合</li>
+    <li>Sigmoid 在深层网络中梯度容易消失（gradient vanishing）</li>
+  </ul></div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 2：BP 单步前向计算</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：两层网络，输入 x=[1, -1]，隐藏层权重 w₁=[0.5, -0.3]，b₁=0.1，输出层权重 w₂=[0.8, 0.2]，b₂=-0.2，激活函数均为 Sigmoid。求隐藏层输出 h 和网络输出 y。</p>
+      <p><strong>解</strong>：</p>
+      <p><strong>Step 1</strong>：隐藏层净输入<br>
+      net_h = w₁ᵀ·x + b₁ = 0.5×1 + (-0.3)×(-1) + 0.1 = 0.5 + 0.3 + 0.1 = 0.9</p>
+      <p><strong>Step 2</strong>：隐藏层输出（Sigmoid）<br>
+      h = σ(0.9) = 1/(1+e<sup>-0.9</sup>) = 1/(1+0.4066) = 1/1.4066 ≈ 0.7109</p>
+      <p><strong>Step 3</strong>：输出层净输入<br>
+      net_y = w₂·h + b₂ = 0.8×0.7109 + 0.2×0.7109 + (-0.2) = 0.5687 + 0.1422 - 0.2 = 0.5109</p>
+      <p><strong>Step 4</strong>：输出层输出<br>
+      y = σ(0.5109) = 1/(1+e<sup>-0.5109</sup>) = 1/(1+0.5997) = 1/1.5997 ≈ 0.6251</p>
+      <p>若真实标签为 ŷ=1，则误差 E = ½(1-0.6251)² = ½(0.3749)² ≈ 0.0703</p>
+    </div>
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 3：BP 反向传播一步更新</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：承接上题，已知 y≈0.6251，真实标签 ŷ=1，η=0.5。求输出层权重的梯度并更新一次。</p>
+      <p><strong>解</strong>：</p>
+      <p><strong>Step 1</strong>：输出层误差项 δ<br>
+      δ = (y - ŷ) · σ'(net) = (0.6251 - 1) · y(1-y)<br>
+      = (-0.3749) · 0.6251 · 0.3749<br>
+      = (-0.3749) · 0.2343 ≈ -0.0878</p>
+      <p><strong>Step 2</strong>：权重梯度<br>
+      ∂E/∂w₂ = δ · h = (-0.0878) · 0.7109 ≈ -0.0624</p>
+      <p><strong>Step 3</strong>：更新权重<br>
+      w₂(new) = w₂ - η · ∂E/∂w₂ = 0.8 - 0.5 × (-0.0624) = 0.8 + 0.0312 = <strong>0.8312</strong></p>
+    </div>
+  </div>
+
+  <h4>BP 算法的改进</h4>
+  <ul>
+    <li><strong>动量项</strong>：Δw(t) = -η·∂E/∂w + α·Δw(t-1)，加速收敛并抑制震荡</li>
+    <li><strong>自适应学习率</strong>：误差下降时增大 η，上升时减小 η</li>
+    <li><strong>批量梯度下降 vs 随机梯度下降</strong>：BGD 全样本计算稳定但慢；SGD 单样本快但有噪声；Mini-batch 折衷方案</li>
+  </ul>
+
+  <!-- 1.5 Hopfield -->
+  <h3>1.5 Hopfield 网络</h3>
+  <p>1982年 Hopfield 提出，全连接反馈型网络，具有能量函数单调下降的特性。</p>
+  <ul>
+    <li><strong>结构</strong>：N 个神经元全连接，每个神经元的输出反馈到其他所有神经元</li>
+    <li><strong>节点状态</strong>：xᵢ ∈ {-1, +1} 或 {0, 1}</li>
+    <li><strong>更新方式</strong>：<strong>异步更新</strong>（每次只更新一个节点）保证能量单调下降</li>
+  </ul>
+  <div class="fbox"><span class="flabel">Hopfield 能量函数</span>E = -½ ΣᵢΣⱼ wᵢⱼxᵢxⱼ + Σᵢ θᵢxᵢ&nbsp;&nbsp;&nbsp;其中 wᵢⱼ = wⱼᵢ, wᵢᵢ = 0</div>
+  <p><strong>能量函数特性</strong>：系统更新过程是能量单调递减的过程，最终收敛到局部极小点（即存储的吸引子）。</p>
+  <ul>
+    <li><strong>联想记忆</strong>：从部分损坏或噪声版本恢复完整模式</li>
+    <li><strong>存储容量</strong>：连续 Hopfield 约可存储 0.15N 个模式（N 为神经元数）</li>
+  </ul>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 4：Hopfield 网络联想记忆（简单）</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：一个 4 神经元 Hopfield 网络存储模式 [1, -1, 1, -1]。当输入测试模式 [1, -1, -1, -1] 时，若采用异步更新，分析其演化过程。</p>
+      <p><strong>解</strong>：</p>
+      <p>存储模式的外积法求权重矩阵（Hebb 规则）：</p>
+      <p>W = (1/N) · s·sᵀ - (1/N)·I<br>
+      其中 s = [1, -1, 1, -1]ᵀ</p>
+      <p>s·sᵀ = [[1,-1,1,-1],[-1,1,-1,1],[1,-1,1,-1],[-1,1,-1,1]]</p>
+      <p>W = ¼ × (s·sᵀ - I) = ¼ × [[0,-1,1,-1],[-1,0,-1,1],[1,-1,0,-1],[-1,1,-1,0]]</p>
+      <p>测试 x=[1,-1,-1,-1]ᵀ，选择第3个神经元更新：<br>
+      net₃ = Σⱼ w₃ⱼxⱼ = ¼[1×1 + (-1)×(-1) + 0×(-1) + (-1)×(-1)]<br>
+      = ¼[1+1+0+1] = ¾ &gt; 0 → 新状态 x₃=+1</p>
+      <p>更新后 x=[1,-1,1,-1]ᵀ，成功恢复到存储模式！</p>
+    </div>
+  </div>
+
+  <!-- 1.6 SOM -->
+  <h3>1.6 SOM 自组织映射</h3>
+  <p>Kohonen 提出的无监督竞争学习网络，在保持输入数据拓扑结构的同时实现降维可视化。</p>
+  <ul>
+    <li><strong>竞争学习</strong>：每个输入样本只激活一个获胜神经元（Winner-Take-All）</li>
+    <li><strong>邻域更新</strong>：获胜神经元及其拓扑邻域内的神经元一起更新权重</li>
+    <li><strong>邻域函数</strong>：通常用高斯函数，且邻域半径随训练时间逐渐缩小</li>
+  </ul>
+  <div class="fbox"><span class="flabel">SOM 权重更新</span>wⱼ(t+1) = wⱼ(t) + η(t) · Λ(j, j*) · (x - wⱼ(t))<br>
+  其中 j* 为获胜神经元，Λ(j,j*) = exp(-||rⱼ-rⱼ*||²/2σ²(t)) 为邻域函数</div>
+  <p><strong>应用场景</strong>：数据聚类、高维数据可视化、图像分割、语音识别。</p>
+
+  <!-- 1.7 RBF -->
+  <h3>1.7 RBF 径向基函数网络</h3>
+  <p>RBF（Radial Basis Function）网络是一种三层前馈网络，隐藏层使用径向基函数（如高斯函数）作为激活函数。</p>
+  <ul>
+    <li><strong>隐藏层</strong>：每个神经元对应一个中心向量 cⱼ，输出 φ(||x - cⱼ||) = exp(-||x-cⱼ||²/2σ²)</li>
+    <li><strong>输出层</strong>：线性加权组合 yₖ = Σⱼ wₖⱼ · φⱼ(x)</li>
+    <li><strong>训练</strong>：两步法——先聚类确定中心（如 K-means），再最小二乘求解输出权重</li>
+    <li><strong>特点</strong>：局部逼近（输入远离中心时输出接近0），训练速度快于 BP</li>
+  </ul>
+
+  <!-- 1.8 深度学习简介 -->
+  <h3>1.8 深度学习简介</h3>
+  <table class="tab">
+    <tr><th>模型</th><th>特点</th><th>典型应用</th></tr>
+    <tr><td>CNN（卷积神经网络）</td><td>卷积层提取局部特征、池化层降维、参数共享</td><td>图像分类、目标检测</td></tr>
+    <tr><td>RNN（循环神经网络）</td><td>隐藏层有自连接，可处理序列数据</td><td>语言模型、机器翻译</td></tr>
+    <tr><td>LSTM（长短期记忆）</td><td>通过门控机制（遗忘门、输入门、输出门）解决长序列梯度问题</td><td>时间序列预测、文本生成</td></tr>
+    <tr><td>GAN（生成对抗网络）</td><td>生成器与判别器博弈训练</td><td>图像生成、数据增强</td></tr>
+    <tr><td>Transformer</td><td>自注意力机制、并行计算、位置编码</td><td>NLP、BERT、GPT</td></tr>
+  </table>
+  <div class="warn blue"><h4>📌 本科考试范围</h4>深度学习通常不是计算智能课程的重点，但 CNN 和 RNN 的基本概念、与 BP 的区别会出现在选择题或简答题中。重点记住：CNN 的局部连接+权值共享，RNN 的时序记忆能力。</div>
+
+  <!-- 神经网络练习题 -->
+  <h3>🧪 神经网络 · 练习</h3>
+  <div class="pq">1. 简述 MP 神经元模型的基本结构，写出其数学表达式。</div>
+  <div class="pq">2. 为什么 XOR 问题不能用单层感知器解决？BP 网络是如何解决这一问题的？</div>
+  <div class="pq">3. 推导 Sigmoid 函数的导数公式，并解释为什么深层 BP 网络中会出现梯度消失现象。</div>
+  <div class="pq">4. 两层 BP 网络输入 x=[0.5, 0.3]，期望输出 ŷ=0.8。已知 w₁=[0.4, -0.2]，b₁=0.05，w₂=0.6，b₂=0.1（Sigmoid激活），η=0.5。计算一次前向输出和一次反向权重更新。</div>
+  <div class="pq">5. Hopfield 网络的能量函数有什么物理意义？如何保证收敛到稳定状态？</div>
+  <div class="pq">6. SOM 中的"邻域"概念是什么？邻域半径为什么要逐渐缩小？</div>
+</div>
+
+<!-- ===================== 二、进化计算 ===================== -->
+<div class="sec">
+  <h2>🧬 二、进化计算</h2>
+  <p>进化计算（Evolutionary Computation, EC）借鉴达尔文自然选择理论——通过"适者生存"的选择压力和遗传算子（交叉、变异）驱动种群不断进化。</p>
+
+  <!-- 2.1 基本概念 -->
+  <h3>2.1 基本概念与术语</h3>
+  <table class="tab">
+    <tr><th>术语</th><th>生物类比</th><th>算法含义</th></tr>
+    <tr><td>个体（Individual）</td><td>一个生物个体</td><td>问题的一个候选解</td></tr>
+    <tr><td>染色体（Chromosome）</td><td>遗传物质载体</td><td>解的编码表示（二进制串、实数向量等）</td></tr>
+    <tr><td>基因（Gene）</td><td>遗传基本单元</td><td>解的分量/决策变量</td></tr>
+    <tr><td>种群（Population）</td><td>一群同种生物</td><td>候选解的集合</td></tr>
+    <tr><td>适应度（Fitness）</td><td>生存繁殖能力</td><td>解的质量评价函数值</td></tr>
+    <tr><td>选择（Selection）</td><td>自然选择</td><td>按适应度挑选父代</td></tr>
+    <tr><td>交叉（Crossover）</td><td>有性繁殖</td><td>交换父代基因产生子代</td></tr>
+    <tr><td>变异（Mutation）</td><td>基因突变</td><td>随机改变基因值</td></tr>
+  </table>
+
+  <!-- 2.2 GA -->
+  <h3>2.2 遗传算法（Genetic Algorithm）—— ⭐ 核心</h3>
+  <p>由 Holland 于 1975 年提出，是进化计算中最经典、应用最广泛的算法。</p>
+
+  <div class="abox">
+    <div class="atitle">📌 遗传算法标准流程</div>
+    <strong>Step 1 初始化</strong>：随机生成 N 个个体（种群），设定 T、Pc、Pm<br>
+    <strong>Step 2 适应度评价</strong>：计算每个个体的适应度 f(x)<br>
+    <strong>Step 3 选择</strong>：根据适应度选择父代（适应度越高，被选中概率越大）<br>
+    <strong>Step 4 交叉</strong>：以概率 Pc 对选中父代进行交叉操作<br>
+    <strong>Step 5 变异</strong>：以概率 Pm 对子代进行变异操作<br>
+    <strong>Step 6 替换</strong>：用新子代替换原种群（或保留精英）<br>
+    <strong>Step 7 终止判断</strong>：是否达到最大代数或适应度满足要求？若否则转 Step 2
+  </div>
+
+  <h4>3种选择算子详解</h4>
+  <table class="tab">
+    <tr><th>方法</th><th>原理</th><th>特点</th></tr>
+    <tr><td><strong>轮盘赌选择</strong></td><td>选中概率正比于适应度：Pᵢ = fᵢ/Σfⱼ</td><td>实现简单，但早熟风险高</td></tr>
+    <tr><td><strong>锦标赛选择</strong></td><td>随机选 k 个个体，挑最好的</td><td>选择压力可调（k越大压力越大）</td></tr>
+    <tr><td><strong>排序选择</strong></td><td>按适应度排序，概率由序号决定</td><td>不受适应度尺度影响</td></tr>
+  </table>
+
+  <h4>3种交叉算子</h4>
+  <table class="tab">
+    <tr><th>方法</th><th>二进制编码</th><th>实数编码</th></tr>
+    <tr><td>单点交叉</td><td>随机选一个切点，交换后面部分</td><td>对应位置交换一个分量</td></tr>
+    <tr><td>两点交叉</td><td>选两个切点，交换中间段</td><td>交换中间段分量</td></tr>
+    <tr><td>均匀交叉</td><td>每个位以 0.5 概率决定是否交换</td><td>每个分量以概率 Pc 交叉</td></tr>
+  </table>
+
+  <div class="fbox"><span class="flabel">单点交叉示例（二进制编码）</span>
+  父代 A：10110|0101 &nbsp;&nbsp;→ 子代 A'：10110|1100<br>
+  父代 B：00101|1100 &nbsp;&nbsp;→ 子代 B'：00101|0101</div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 5：遗传算法求解函数最大值</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：用 GA 求 f(x)=x² 在 [0,31] 的最大值，4位二进制编码，种群 N=4，初始化为：<br>
+      个体1: 1101 (13) f=169<br>
+      个体2: 0110 (6) f=36<br>
+      个体3: 1010 (10) f=100<br>
+      个体4: 0011 (3) f=9</p>
+      <p><strong>(a) 轮盘赌选择</strong>：总适应度 Σf = 169+36+100+9 = 314<br>
+      P₁=169/314=0.538，P₂=0.115，P₃=0.318，P₄=0.029<br>
+      假设随机数依次为 0.4, 0.7, 0.2, 0.9：<br>
+      选中：个体1（0.4&lt;0.538）、个体3（0.7&gt;0.538，减0.538=0.162&lt;0.318）、个体1（0.2&lt;0.538）、个体3（0.9→0.362&gt;0.318→0.044&lt;0.029? 不对，重新算——0.9-0.538=0.362，falls in 个体3范围 ← 哦不对，需要累计分布）</p>
+      <p>准确地说，累计概率分布：C₁=0.538, C₂=0.653, C₃=0.971, C₄=1.0<br>
+      r=0.4 → 个体1，r=0.7 → falls in C₂~C₃ → 个体3，r=0.2 → 个体1，r=0.9 → 个体3</p>
+      <p>选择结果：个体1×2 + 个体3×2</p>
+      <p><strong>(b) 单点交叉</strong>：配对 (个体1, 个体3) 和 (个体1, 个体3)，交叉点位置 2<br>
+      染色体：1101 和 1010<br>
+      切断：11|01 和 10|10 → 子代 1110 (14) 和 1001 (9)</p>
+      <p>另一对：同样的过程产生子代 1100 (12) 和 1011 (11)</p>
+      <p><strong>(c) 新种群</strong>：1110(14) f=196 ✓（优于上一代最佳169），1001(9) f=81，1100(12) f=144，1011(11) f=121</p>
+      <p>经过若干代进化，种群将收敛到最优解 11111(31)，f=961。</p>
+    </div>
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 6：简易 GA 轮盘赌计算</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：种群中有 5 个个体，适应度分别为 [5, 15, 20, 10, 0]，用轮盘赌选择，计算每个个体被选中的概率。</p>
+      <p><strong>解</strong>：</p>
+      <p>Σf = 5+15+20+10+0 = 50</p>
+      <p>P₁ = 5/50 = 0.10 (10%)<br>
+      P₂ = 15/50 = 0.30 (30%)<br>
+      P₃ = 20/50 = 0.40 (40%)<br>
+      P₄ = 10/50 = 0.20 (20%)<br>
+      P₅ = 0/50 = 0 (0%) → 适应度为0的个体不会被选中</p>
+    </div>
+  </div>
+
+  <!-- 2.3 编码讨论 -->
+  <h3>2.3 编码方式对比</h3>
+  <table class="tab">
+    <tr><th>编码方式</th><th>表示形式</th><th>适用问题</th><th>优点</th><th>缺点</th></tr>
+    <tr><td>二进制编码</td><td>0/1 字符串</td><td>组合优化、特征选择</td><td>成熟、模式定理支持</td><td>汉明悬崖、精度受限</td></tr>
+    <tr><td>实数编码</td><td>浮点向量</td><td>连续函数优化</td><td>精度高、局部搜索强</td><td>需设计专用算子</td></tr>
+    <tr><td>排列编码</td><td>元素顺序排列</td><td>TSP、调度问题</td><td>直接表示顺序</td><td>交叉需合法化</td></tr>
+    <tr><td>格雷码</td><td>相邻数只差1位</td><td>克服汉明悬崖</td><td>局部搜索特性好</td><td>编码/解码稍复杂</td></tr>
+  </table>
+  <div class="warn blue"><h4>📌 模式定理（Schema Theorem）</h4>GA 的理论基础：低阶、短定义距、高适应度的模式（有效积木块）在进化中呈指数级增长。这解释了 GA 为什么有效——积木块假设（Building Block Hypothesis）。</div>
+
+  <!-- 2.4 ES -->
+  <h3>2.4 进化策略（Evolution Strategies, ES）</h3>
+  <ul>
+    <li>1960年代由 Rechenberg 和 Schwefel 提出，主要用于连续参数优化</li>
+    <li><strong>编码</strong>：实数向量 + 策略参数（步长 σ、旋转角等）</li>
+    <li><strong>主要算子</strong>：变异（加高斯噪声）为主，交叉为辅助</li>
+    <li><strong>选择方式</strong>：
+      <ul>
+        <li>(μ+λ)-ES：父代和子代合并选择前 μ 个（精英保留）</li>
+        <li>(μ,λ)-ES：只在子代中选择前 μ 个（父代全部淘汰）</li>
+      </ul>
+    </li>
+  </ul>
+  <div class="fbox"><span class="flabel">ES 自适应变异</span>σ(t+1) = σ(t) · exp(τ·N(0,1))&nbsp;&nbsp;&nbsp;x(t+1) = x(t) + σ(t+1)·N(0,1)<br>
+  τ 为学习率，N(0,1) 为标准正态随机数</div>
+
+  <!-- 2.5 EP -->
+  <h3>2.5 进化规划（Evolutionary Programming, EP）</h3>
+  <ul>
+    <li>由 Fogel 在 1960年代提出，强调行为变异而非遗传</li>
+    <li><strong>核心</strong>：不使用交叉算子，仅依赖变异</li>
+    <li><strong>选择</strong>：常用锦标赛选择（随机选 q 个对手，比较得分）</li>
+    <li><strong>应用</strong>：数值优化、神经网络训练、时间序列预测</li>
+  </ul>
+
+  <!-- 2.6 DE -->
+  <h3>2.6 差分进化（Differential Evolution, DE）</h3>
+  <p>1995 年 Storn &amp; Price 提出，专为连续优化设计的进化算法。</p>
+  <ul>
+    <li><strong>变异</strong>：从种群中随机选三个个体，v = x₁ + F·(x₂ - x₃)，F ∈ [0,2]</li>
+    <li><strong>交叉</strong>：试验个体 u 的每位以概率 Cr 来自变异向量 v，否则来自目标 x</li>
+    <li><strong>选择</strong>：贪婪——试验个体 u 优于目标 x 才替换</li>
+  </ul>
+  <div class="fbox"><span class="flabel">DE/rand/1 变异</span>v = x<sub>r1</sub> + F · (x<sub>r2</sub> - x<sub>r3</sub>)&nbsp;&nbsp;r₁≠r₂≠r₃≠i</div>
+
+  <!-- 进化计算对比 -->
+  <h3>2.7 四大进化算法对比</h3>
+  <table class="tab">
+    <tr><th>维度</th><th>GA</th><th>ES</th><th>EP</th><th>DE</th></tr>
+    <tr><td>提出年代</td><td>1975</td><td>1960s</td><td>1960s</td><td>1995</td></tr>
+    <tr><td>编码</td><td>二进制为主</td><td>实数</td><td>问题相关</td><td>实数</td></tr>
+    <tr><td>主要算子</td><td>交叉为主</td><td>变异为主</td><td>变异（无交叉）</td><td>差分变异+交叉</td></tr>
+    <tr><td>选择</td><td>概率选择（轮盘赌等）</td><td>确定性（排名）</td><td>锦标赛</td><td>贪婪1对1</td></tr>
+    <tr><td>自适应性</td><td>低</td><td>高（自适应步长）</td><td>中</td><td>中（F, Cr参数）</td></tr>
+    <tr><td>连续优化</td><td>需实数→二进制转换</td><td>非常适合</td><td>适合</td><td>非常适合</td></tr>
+    <tr><td>组合优化</td><td>非常适合</td><td>不太适合</td><td>适合</td><td>不太适合</td></tr>
+  </table>
+
+  <!-- 进化计算练习题 -->
+  <h3>🧪 进化计算 · 练习</h3>
+  <div class="pq">1. 简述遗传算法的基本流程。为什么"选择-交叉-变异"的组合能产生更好的解？</div>
+  <div class="pq">2. 种群中 4 个个体的适应度为 [12, 8, 6, 4]，用轮盘赌选择法计算每个个体的选择概率和累计概率。若随机数为 0.35、0.85、0.12、0.62，分别选中哪些个体？</div>
+  <div class="pq">3. (μ+λ)-ES 和 (μ,λ)-ES 有什么区别？各有什么优劣？</div>
+  <div class="pq">4. 遗传算法中变异概率过大或过小会有什么后果？</div>
+  <div class="pq">5. 差分进化的"差分"体现在哪里？与 GA 的交叉操作有什么本质不同？</div>
+  <div class="pq">6. 什么是"早熟收敛"（premature convergence）？如何防止？</div>
+</div>
+
+<!-- ===================== 三、群体智能 ===================== -->
+<div class="sec">
+  <h2>🐜 三、群体智能</h2>
+  <p>群体智能（Swarm Intelligence, SI）研究由大量简单个体组成的群体通过局部交互涌现出全局智能行为。</p>
+
+  <!-- 3.1 PSO -->
+  <h3>3.1 粒子群优化（PSO）—— ⭐ 核心</h3>
+  <p>1995 年 Kennedy &amp; Eberhart 提出，模拟鸟群觅食行为。</p>
+
+  <div class="svg-chart">
+    <svg width="500" height="140" viewBox="0 0 500 140" xmlns="http://www.w3.org/2000/svg">
+      <!-- 粒子1 -->
+      <circle cx="80" cy="80" r="12" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+      <text x="80" y="84" font-size="10" fill="#2c3e50" text-anchor="middle">粒子₁</text>
+      <!-- velocity arrow -->
+      <line x1="92" y1="80" x2="120" y2="70" stroke="#e67e22" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="108" y="65" font-size="9" fill="#e67e22" text-anchor="middle">v₁</text>
+      <!-- pbest arrow -->
+      <line x1="75" y1="68" x2="55" y2="40" stroke="#27ae60" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="48" y="38" font-size="9" fill="#27ae60" text-anchor="end">pᵢ</text>
+      <!-- gbest arrow -->
+      <line x1="88" y1="85" x2="240" y2="30" stroke="#e74c3c" stroke-width="1" stroke-dasharray="3,2"/>
+      <text x="170" y="28" font-size="9" fill="#e74c3c" text-anchor="end">g</text>
+      <!-- 粒子2 -->
+      <circle cx="200" cy="50" r="12" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+      <text x="200" y="54" font-size="10" fill="#2c3e50" text-anchor="middle">粒子₂</text>
+      <line x1="212" y1="50" x2="240" y2="45" stroke="#e67e22" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="228" y="42" font-size="9" fill="#e67e22" text-anchor="middle">v₂</text>
+      <!-- 粒子3 -->
+      <circle cx="320" cy="90" r="12" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+      <text x="320" y="94" font-size="10" fill="#2c3e50" text-anchor="middle">粒子₃</text>
+      <line x1="332" y1="90" x2="360" y2="85" stroke="#e67e22" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <!-- global best -->
+      <polygon points="420,30 440,50 400,50" fill="#fde8e8" stroke="#e74c3c" stroke-width="1.5"/>
+      <text x="420" y="68" font-size="9" fill="#e74c3c" text-anchor="middle">全局最优</text>
+      <text x="420" y="80" font-size="9" fill="#e74c3c" text-anchor="middle">g</text>
+      <!-- search area -->
+      <rect x="20" y="10" width="460" height="120" fill="none" stroke="#ddd" stroke-width="1" rx="6" stroke-dasharray="4,4"/>
+      <text x="460" y="125" font-size="10" fill="#ccc" text-anchor="end">搜索空间</text>
+    </svg>
+  </div>
+
+  <p><strong>核心思想</strong>：每个粒子在搜索空间中飞行，速度由三个因素决定：</p>
+  <div class="fbox"><span class="flabel">PSO 速度更新公式</span>
+  vᵢ(t+1) = w·vᵢ(t) + c₁r₁(pᵢ - xᵢ) + c₂r₂(g - xᵢ)<br>
+  xᵢ(t+1) = xᵢ(t) + vᵢ(t+1)</div>
+
+  <table class="tab">
+    <tr><th>参数</th><th>含义</th><th>典型值</th><th>作用</th></tr>
+    <tr><td>w（惯性权重）</td><td>保持原速度的分量</td><td>0.4~0.9</td><td>平衡探索与开发</td></tr>
+    <tr><td>c₁（个体学习因子）</td><td>向个体历史最优学习的倾向</td><td>1.5~2.0</td><td>保存个体经验</td></tr>
+    <tr><td>c₂（社会学习因子）</td><td>向群体全局最优学习的倾向</td><td>1.5~2.0</td><td>加速收敛</td></tr>
+    <tr><td>r₁, r₂</td><td>[0,1] 均匀随机数</td><td>—</td><td>引入随机性</td></tr>
+  </table>
+
+  <div class="abox">
+    <div class="atitle">📌 PSO 算法流程</div>
+    ① 初始化 N 个粒子：随机位置 xᵢ 和速度 vᵢ（在搜索空间内）<br>
+    ② 计算每个粒子的适应度 f(xᵢ)<br>
+    ③ 更新个体最优：若 f(xᵢ) &gt; f(pᵢ) 则 pᵢ = xᵢ<br>
+    ④ 更新全局最优：若 f(pᵢ) &gt; f(g) 则 g = pᵢ<br>
+    ⑤ 按速度-位置公式更新所有粒子<br>
+    ⑥ 重复②-⑤直到满足终止条件
+  </div>
+
+  <h4>PSO 参数分析</h4>
+  <ul>
+    <li><strong>w 大</strong>（接近0.9）→ 全局探索能力强；<strong>w 小</strong>（接近0.4）→ 局部开发能力强</li>
+    <li><strong>w 线性递减</strong>策略：w(t) = w_max - (w_max - w_min)·t/T，先探索后开发</li>
+    <li><strong>速度钳位</strong>：v ∈ [-v_max, v_max]，防止粒子飞出搜索空间</li>
+  </ul>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 7：PSO 一步迭代计算</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：一维空间中粒子位置 x=3.0，速度 v=0.5，p=4.0，g=4.5，w=0.8，c₁=c₂=2.0，r₁=0.3，r₂=0.7。求更新后的速度和位置。</p>
+      <p><strong>解</strong>：</p>
+      <p><strong>Step 1</strong>：速度更新<br>
+      v_new = w·v + c₁r₁(p-x) + c₂r₂(g-x)<br>
+      = 0.8×0.5 + 2.0×0.3×(4.0-3.0) + 2.0×0.7×(4.5-3.0)<br>
+      = 0.4 + 0.6×1.0 + 1.4×1.5<br>
+      = 0.4 + 0.6 + 2.1 = <strong>3.1</strong></p>
+      <p><strong>Step 2</strong>：位置更新<br>
+      x_new = x + v_new = 3.0 + 3.1 = <strong>6.1</strong></p>
+      <p>粒子的新位置为 6.1，向全局最优方向移动了较大距离。</p>
+    </div>
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 8：PSO 寻优过程</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：用 PSO 求 f(x)=x² 在 [-10, 10] 的最小值。2个粒子初始位置 p₁=-8, p₂=5，初始速度 v₁=1, v₂=-0.5，w=0.7，c₁=c₂=1.5。</p>
+      <p><strong>解</strong>：</p>
+      <p>f(-8)=64, f(5)=25 → 全局最优 g=5, 个体最优 p₁=-8(64), p₂=5(25)</p>
+      <p><strong>第一次迭代</strong>（设 r₁=r₂=0.5 简化）：</p>
+      <p>粒子1：v₁ = 0.7×1 + 1.5×0.5×(-8-(-8)) + 1.5×0.5×(5-(-8)) = 0.7 + 0 + 9.75 = 10.45<br>
+      x₁ = -8 + 10.45 = 2.45, f=6.0025 ← 优于之前64，更新 p₁=2.45</p>
+      <p>粒子2：v₂ = 0.7×(-0.5) + 1.5×0.5×(5-5) + 1.5×0.5×(5-5) = -0.35 + 0 + 0 = -0.35<br>
+      x₂ = 5 + (-0.35) = 4.65, f=21.6225 ← 差于25，不更新</p>
+      <p>全局最优 g 更新为 min(6.0025, 25) = 2.45 (f=6.0025)</p>
+      <p>继续迭代，粒子将逐渐逼近最优解 x=0。</p>
+    </div>
+  </div>
+
+  <!-- 3.2 ACO -->
+  <h3>3.2 蚁群算法（Ant Colony Optimization, ACO）</h3>
+  <p>1992 年 Dorigo 提出，模拟蚂蚁觅食中通过信息素（pheromone）间接通信的行为。</p>
+
+  <p><strong>核心机制</strong>：</p>
+  <ul>
+    <li><strong>路径选择</strong>：蚂蚁在节点 i 选择下一节点 j 的概率与 τᵢⱼ^α · ηᵢⱼ^β 成正比</li>
+    <li><strong>信息素沉积</strong>：走过的路径上留下信息素，浓度与路径质量成正比</li>
+    <li><strong>信息素挥发</strong>：每轮信息素以 ρ 的速率挥发，防止陷入局部最优</li>
+  </ul>
+
+  <div class="fbox"><span class="flabel">ACO 状态转移概率（蚂蚁系统 AS）</span>
+  Pᵢⱼ = (τᵢⱼ^α · ηᵢⱼ^β) / Σ<sub>k∈allowed</sub> (τᵢₖ^α · ηᵢₖ^β)<br>
+  ηᵢⱼ = 1/dᵢⱼ（启发信息，距离的倒数）</div>
+
+  <div class="fbox"><span class="flabel">信息素全局更新</span>
+  τᵢⱼ(t+1) = (1-ρ)·τᵢⱼ(t) + Σ<sub>m</sub> Δτᵢⱼᵐ<br>
+  Δτᵢⱼᵐ = Q/Lₘ（第 m 只蚂蚁在路径上留下的信息素增量）</div>
+
+  <div class="abox">
+    <div class="atitle">📌 ACO 算法流程（以 TSP 为例）</div>
+    ① 初始化：每条边信息素 τ₀ = 常数，放置 m 只蚂蚁在随机城市<br>
+    ② 每只蚂蚁按转移概率选择下一个未访问城市，直到遍历所有城市<br>
+    ③ 计算每只蚂蚁走过的路径总长度<br>
+    ④ 更新各边信息素（挥发+沉积）<br>
+    ⑤ 记录当前最优路径<br>
+    ⑥ 重复②-⑤直到达到最大迭代次数
+  </div>
+
+  <table class="tab">
+    <tr><th>参数</th><th>含义</th><th>典型值</th><th>过大/过小的影响</th></tr>
+    <tr><td>α</td><td>信息素权重</td><td>1~2</td><td>过大→路径固化；过小→随机游走</td></tr>
+    <tr><td>β</td><td>启发信息权重</td><td>2~5</td><td>过大→贪婪；过小→忽略距离信息</td></tr>
+    <tr><td>ρ</td><td>信息素挥发率</td><td>0.1~0.5</td><td>过大→信息快速遗忘；过小→路径难收敛</td></tr>
+    <tr><td>m</td><td>蚂蚁数量</td><td>城市数</td><td>过多→计算量大；过少→搜索不充分</td></tr>
+  </table>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 9：ACO 路径选择概率计算</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：TSP 问题中，蚂蚁在城市 A，可选城市 B、C、D。信息素浓度 τ=[1.5, 0.8, 1.2]，距离 d=[10, 20, 15]，α=1，β=2。求去各城市的概率。</p>
+      <p><strong>解</strong>：</p>
+      <p>η_B = 1/10 = 0.10，η_C = 1/20 = 0.05，η_D = 1/15 ≈ 0.0667</p>
+      <p>分子：<br>
+      B: 1.5¹ × 0.10² = 1.5 × 0.01 = 0.0150<br>
+      C: 0.8¹ × 0.05² = 0.8 × 0.0025 = 0.0020<br>
+      D: 1.2¹ × 0.0667² = 1.2 × 0.00444 = 0.00533</p>
+      <p>Σ = 0.0150 + 0.0020 + 0.00533 = 0.02233</p>
+      <p>P(B) = 0.0150/0.0223 = <strong>0.671</strong> (67.1%)<br>
+      P(C) = 0.0020/0.0223 = <strong>0.090</strong> (9.0%)<br>
+      P(D) = 0.00533/0.0223 = <strong>0.239</strong> (23.9%)</p>
+      <p>由于 B 距离最短且信息素浓度最高，被选中的概率最大。</p>
+    </div>
+  </div>
+
+  <!-- 3.3 ABC -->
+  <h3>3.3 人工蜂群算法（ABC）</h3>
+  <p>2005年 Karaboga 提出，模拟蜜蜂采蜜行为。三类蜜蜂分工协作：</p>
+  <table class="tab">
+    <tr><th>蜂种</th><th>角色</th><th>行为</th></tr>
+    <tr><td>采蜜蜂（Employed）</td><td>探索已知食源</td><td>在食源邻域搜索，分享信息给观察蜂</td></tr>
+    <tr><td>观察蜂（Onlooker）</td><td>利用信息做决策</td><td>根据采蜜蜂的信息概率选择食源</td></tr>
+    <tr><td>侦察蜂（Scout）</td><td>随机探索新食源</td><td>放弃开采完的食源，随机搜索新位置</td></tr>
+  </table>
+  <div class="fbox"><span class="flabel">ABC 邻域搜索</span>vᵢⱼ = xᵢⱼ + φ·(xᵢⱼ - xₖⱼ)&nbsp;&nbsp;&nbsp;k≠i, φ∈[-1,1]</div>
+
+  <!-- 3.4 鱼群算法 -->
+  <h3>3.4 人工鱼群算法（AFSA）</h3>
+  <p>模拟鱼群的四种行为：</p>
+  <ul>
+    <li><strong>觅食</strong>：随机游走，发现食物丰富区域则向该方向移动</li>
+    <li><strong>聚群</strong>：向邻近伙伴的中心位置移动</li>
+    <li><strong>追尾</strong>：跟随发现食物的伙伴</li>
+    <li><strong>随机</strong>：自由游动扩大搜索范围</li>
+  </ul>
+
+  <!-- 群体智能对比 -->
+  <h3>3.5 群体智能算法对比</h3>
+  <table class="tab">
+    <tr><th></th><th>PSO</th><th>ACO</th><th>ABC</th><th>AFSA</th></tr>
+    <tr><td>生物原型</td><td>鸟群/鱼群</td><td>蚁群</td><td>蜂群</td><td>鱼群</td></tr>
+    <tr><td>信息传递</td><td>全局最优共享</td><td>信息素间接通信</td><td>摇摆舞/概率选择</td><td>视觉感知</td></tr>
+    <tr><td>核心算子</td><td>速度-位置更新</td><td>信息素+转移概率</td><td>邻域搜索+贪婪选择</td><td>四种行为切换</td></tr>
+    <tr><td>适用领域</td><td>连续优化</td><td>组合优化（TSP）</td><td>连续/组合</td><td>连续优化</td></tr>
+    <tr><td>收敛速度</td><td>快</td><td>慢</td><td>中</td><td>慢</td></tr>
+  </table>
+
+  <!-- 群体智能练习题 -->
+  <h3>🧪 群体智能 · 练习</h3>
+  <div class="pq">1. 简述 PSO 中"惯性权重 w"的作用。w 为什么要采用线性递减策略？</div>
+  <div class="pq">2. ACO 中 α 和 β 参数分别控制什么？若 α=0 或 β=0 会怎样？</div>
+  <div class="pq">3. 一维 PSO：粒子在 x=2，v=1.2，p=2.5，g=3.0，w=0.6，c₁=c₂=1.8，r₁=0.4，r₂=0.9。求新速度和位置。</div>
+  <div class="pq">4. ABC 算法中采蜜蜂、观察蜂、侦察蜂各自的作用是什么？为什么需要侦察蜂？</div>
+  <div class="pq">5. PSO 和 GA 在搜索机制上的本质区别是什么？各有什么优劣势？</div>
+</div>
+
+<!-- ===================== 四、模糊系统 ===================== -->
+<div class="sec">
+  <h2>🌫️ 四、模糊系统</h2>
+  <p>模糊系统基于 Zadeh 在 1965 年提出的模糊集合理论，通过隶属度函数和"IF-THEN"规则处理不确定性和模糊性信息。</p>
+
+  <!-- 4.1 模糊集合 -->
+  <h3>4.1 模糊集合基础</h3>
+  <p><strong>经典集合 vs 模糊集合</strong>：</p>
+  <table class="tab">
+    <tr><th>特性</th><th>经典集合（Crisp Set）</th><th>模糊集合（Fuzzy Set）</th></tr>
+    <tr><td>特征函数</td><td>χ(x) ∈ {0,1}</td><td>μ(x) ∈ [0,1]</td></tr>
+    <tr><td>归属关系</td><td>要么属于、要么不属于</td><td>以一定程度属于</td></tr>
+    <tr><td>逻辑基础</td><td>二值逻辑</td><td>连续逻辑</td></tr>
+    <tr><td>示例："高个子"</td><td>≥180cm 为高，否则不高</td><td>180cm 隶属度 0.9，170cm 隶属度 0.5</td></tr>
+  </table>
+
+  <div class="fbox"><span class="flabel">模糊集合的定义</span>A = { (x, μ<sub>A</sub>(x)) | x ∈ X }&nbsp;&nbsp;&nbsp;μ<sub>A</sub>: X → [0,1]</div>
+
+  <h4>常见隶属函数</h4>
+  <div class="svg-chart">
+    <svg width="520" height="200" viewBox="0 0 520 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- triangular -->
+      <text x="50" y="22" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">三角形</text>
+      <polyline points="20,165 110,25 200,165" fill="none" stroke="#3498db" stroke-width="2"/>
+      <text x="20" y="178" font-size="9" fill="#888">a</text>
+      <text x="110" y="178" font-size="9" fill="#888">b</text>
+      <text x="200" y="178" font-size="9" fill="#888">c</text>
+
+      <!-- trapezoidal -->
+      <text x="310" y="22" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">梯形</text>
+      <polyline points="230,165 275,25 365,25 410,165" fill="none" stroke="#e67e22" stroke-width="2"/>
+
+      <!-- gaussian -->
+      <text x="130" y="100" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">高斯型</text>
+      <path d="M10,50 Q70,165 130,165 Q190,165 250,50" fill="none" stroke="#27ae60" stroke-width="2"/>
+      <text x="250" y="55" font-size="12" fill="#27ae60">→</text>
+      <path d="M250,50 Q310,165 370,165 Q430,165 490,50" fill="none" stroke="#27ae60" stroke-width="2"/>
+
+      <!-- bell -->
+      <text x="370" y="100" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">钟形</text>
+      <path d="M300,150 Q335,30 370,30 Q405,30 440,150" fill="none" stroke="#8e44ad" stroke-width="2"/>
+    </svg>
+  </div>
+
+  <table class="tab">
+    <tr><th>类型</th><th>公式</th><th>特点</th></tr>
+    <tr><td>三角形</td><td>μ(x)=max(min((x-a)/(b-a),(c-x)/(c-b)),0)</td><td>简单、计算快</td></tr>
+    <tr><td>梯形</td><td>μ(x)=max(min((x-a)/(b-a),1,(d-x)/(d-c)),0)</td><td>有平坦顶部</td></tr>
+    <tr><td>高斯型</td><td>μ(x)=exp(-(x-c)²/2σ²)</td><td>平滑、无穷可微</td></tr>
+    <tr><td>钟形（广义贝尔）</td><td>μ(x)=1/(1+|(x-c)/a|²ᵇ)</td><td>灵活性高</td></tr>
+  </table>
+
+  <h4>模糊集合的运算</h4>
+  <table class="tab">
+    <tr><th>运算</th><th>Zadeh 定义</th><th>说明</th></tr>
+    <tr><td>并（Union）</td><td>μ<sub>A∪B</sub>(x) = max(μ<sub>A</sub>(x), μ<sub>B</sub>(x))</td><td>取最大值</td></tr>
+    <tr><td>交（Intersection）</td><td>μ<sub>A∩B</sub>(x) = min(μ<sub>A</sub>(x), μ<sub>B</sub>(x))</td><td>取最小值</td></tr>
+    <tr><td>补（Complement）</td><td>μ<sub>Ā</sub>(x) = 1 - μ<sub>A</sub>(x)</td><td>取补集</td></tr>
+  </table>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 10：模糊集合运算</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：设 A = { (1,0.3), (2,0.7), (3,1.0), (4,0.5) }，B = { (1,0.8), (2,0.4), (3,0.2), (4,0.9) }。求 A∪B、A∩B、Ā。</p>
+      <p><strong>解</strong>：</p>
+      <p><strong>并</strong>（取 max）：<br>
+      A∪B = { (1,0.8), (2,0.7), (3,1.0), (4,0.9) }</p>
+      <p><strong>交</strong>（取 min）：<br>
+      A∩B = { (1,0.3), (2,0.4), (3,0.2), (4,0.5) }</p>
+      <p><strong>补</strong>（1-μ）：<br>
+      Ā = { (1,0.7), (2,0.3), (3,0.0), (4,0.5) }</p>
+    </div>
+  </div>
+
+  <!-- 4.2 模糊关系与合成 -->
+  <h3>4.2 模糊关系与合成</h3>
+  <p>模糊关系 R 是笛卡尔积 X×Y 上的模糊集合，μ<sub>R</sub>(x,y) 表示 x 和 y 之间关系的强度。</p>
+  <div class="fbox"><span class="flabel">模糊关系的合成（Max-Min 合成）</span>
+  μ<sub>R∘S</sub>(x,z) = max<sub>y</sub> [ min( μ<sub>R</sub>(x,y), μ<sub>S</sub>(y,z) ) ]</div>
+
+  <!-- 4.3 模糊推理 -->
+  <h3>4.3 模糊推理系统 —— ⭐ 核心</h3>
+  <p>模糊推理系统（FIS）由四个模块组成：</p>
+
+  <div class="svg-chart">
+    <svg width="560" height="100" viewBox="0 0 560 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="a3" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#666"/></marker></defs>
+      <rect x="10" y="35" width="90" height="40" rx="8" fill="#e8f4fd" stroke="#3498db" stroke-width="1.5"/>
+      <text x="55" y="59" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">模糊化</text>
+      <line x1="100" y1="55" x2="140" y2="55" stroke="#666" stroke-width="1.2" marker-end="url(#a3)"/>
+      <rect x="140" y="35" width="90" height="40" rx="8" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <text x="185" y="59" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">规则推理</text>
+      <line x1="230" y1="55" x2="270" y2="55" stroke="#666" stroke-width="1.2" marker-end="url(#a3)"/>
+      <rect x="270" y="35" width="90" height="40" rx="8" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="315" y="59" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">去模糊化</text>
+      <line x1="360" y1="55" x2="400" y2="55" stroke="#666" stroke-width="1.2" marker-end="url(#a3)"/>
+      <rect x="400" y="35" width="70" height="40" rx="8" fill="#f4ecf7" stroke="#8e44ad" stroke-width="1.5"/>
+      <text x="435" y="59" font-size="12" fill="#2c3e50" text-anchor="middle" font-weight="600">输出</text>
+      <!-- rule base -->
+      <rect x="440" y="5" width="100" height="24" rx="6" fill="#fde8e8" stroke="#e74c3c" stroke-width="1"/>
+      <text x="490" y="21" font-size="10" fill="#c0392b" text-anchor="middle">规则库</text>
+      <line x1="490" y1="29" x2="490" y2="35" stroke="#e74c3c" stroke-width="1" stroke-dasharray="2,2" marker-end="url(#a3)"/>
+      <line x1="185" y1="35" x2="185" y2="29" stroke="#e74c3c" stroke-width="1" stroke-dasharray="2,2"/>
+      <rect x="440" y="78" width="100" height="20" rx="6" fill="#fde8e8" stroke="#e74c3c" stroke-width="1"/>
+      <text x="490" y="92" font-size="10" fill="#c0392b" text-anchor="middle">隶属函数库</text>
+      <line x1="490" y1="78" x2="490" y2="75" stroke="#e74c3c" stroke-width="1" stroke-dasharray="2,2"/>
+      <line x1="185" y1="75" x2="185" y2="78" stroke="#e74c3c" stroke-width="1" stroke-dasharray="2,2"/>
+    </svg>
+  </div>
+
+  <p><strong>两种典型推理方法</strong>：</p>
+  <table class="tab">
+    <tr><th>特性</th><th>Mamdani 型</th><th>Sugeno 型（TSK）</th></tr>
+    <tr><td>规则后件</td><td>模糊集合："y is B"</td><td>函数：y = ax + b</td></tr>
+    <tr><td>去模糊化</td><td>需要（重心法等）</td><td>不需要（直接加权平均）</td></tr>
+    <tr><td>可解释性</td><td>强</td><td>弱</td></tr>
+    <tr><td>计算效率</td><td>低</td><td>高</td></tr>
+    <tr><td>适用场景</td><td>模糊控制（人的经验建模）</td><td>函数逼近、自适应系统</td></tr>
+  </table>
+
+  <div class="abox">
+    <div class="atitle">📌 Mamdani 模糊推理流程</div>
+    ① <strong>模糊化</strong>：将精确输入映射为模糊值（隶属度）<br>
+    ② <strong>规则匹配</strong>：对每条规则计算触发强度 αᵢ = min(μ(x₁), μ(x₂), ...)<br>
+    ③ <strong>规则聚合</strong>：每条规则得到一个模糊输出，取 max 聚合所有规则的输出<br>
+    ④ <strong>去模糊化</strong>：将模糊输出转为精确值（常用重心法）
+  </div>
+
+  <div class="fbox"><span class="flabel">重心法去模糊化（连续域）</span>
+  y* = ∫ y·μ(y)dy / ∫ μ(y)dy&nbsp;&nbsp;&nbsp;&nbsp;（离散域：y* = Σyⱼ·μ(yⱼ) / Σμ(yⱼ)）</div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 11：Mamdani 模糊推理</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：空调温度控制系统，输入为当前温度（模糊集：低 0.8，中 0.2），规则库：<br>
+      R1: IF 温度低 THEN 风速高 (输出模糊集：高 {1,0.6,0.2})<br>
+      R2: IF 温度中 THEN 风速中 (输出模糊集：中 {0.3,1,0.3})</p>
+      <p>采用 Mamdani 推理，min 为模糊蕴含算子，max 为聚合算子，重心法去模糊化。求输出风速。</p>
+      <p><strong>解</strong>：</p>
+      <p><strong>Step 1 规则触发</strong>：</p>
+      <p>R1 触发强度 α₁ = min(0.8) = 0.8<br>
+      R1 输出裁剪：{min(0.8,1), min(0.8,0.6), min(0.8,0.2)} = {0.8, 0.6, 0.2}</p>
+      <p>R2 触发强度 α₂ = min(0.2) = 0.2<br>
+      R2 输出裁剪：{min(0.2,0.3), min(0.2,1), min(0.2,0.3)} = {0.2, 0.2, 0.2}</p>
+      <p><strong>Step 2 聚合</strong>（取 max）：<br>
+      聚合输出：{max(0.8,0.2), max(0.6,0.2), max(0.2,0.2)} = {0.8, 0.6, 0.2}</p>
+      <p><strong>Step 3 重心法去模糊化</strong>（假设输出论域为 {1,2,3} 对应低、中、高风速）：<br>
+      y* = (1×0.8 + 2×0.6 + 3×0.2) / (0.8+0.6+0.2)<br>
+      = (0.8 + 1.2 + 0.6) / 1.6 = 2.6 / 1.6 ≈ <strong>1.625</strong></p>
+      <p>系统输出风速为 1.625（偏中高），符合"温度略低→风速略大"的直觉。</p>
+    </div>
+  </div>
+
+  <!-- 4.4 模糊控制 -->
+  <h3>4.4 模糊控制</h3>
+  <p>模糊控制利用专家经验构建模糊规则库，适用于非线性、时变、难以建模的系统。</p>
+  <p><strong>典型设计步骤</strong>：</p>
+  <ul>
+    <li>确定输入输出变量及其论域（如误差 E、误差变化 ΔE、控制量 U）</li>
+    <li>设计模糊分割（如 NB, NS, ZE, PS, PB）和隶属函数</li>
+    <li>编写模糊规则（如 "IF E=NB AND ΔE=NS THEN U=PM"）</li>
+    <li>选择推理方法（Mamdani/Sugeno）和去模糊化方法</li>
+    <li>调整量化因子和比例因子</li>
+  </ul>
+
+  <!-- 4.5 FCM -->
+  <h3>4.5 模糊 C 均值聚类（FCM）</h3>
+  <p>FCM（Fuzzy C-Means）是模糊聚类中最经典的算法，每个样本以隶属度属于多个聚类（软聚类），而非硬性地只属于一个。</p>
+
+  <div class="fbox"><span class="flabel">FCM 目标函数</span>
+  J = ΣᵢΣⱼ uᵢⱼ<sup>m</sup> · ||xᵢ - cⱼ||²<br>
+  约束：Σⱼ uᵢⱼ = 1（每个样本对所有聚类的隶属度之和为1）</div>
+
+  <div class="fbox"><span class="flabel">隶属度 &amp; 聚类中心迭代公式</span>
+  uᵢⱼ = 1 / Σ<sub>k</sub> (||xᵢ-cⱼ||/||xᵢ-cₖ||)<sup>2/(m-1)</sup><br>
+  cⱼ = (Σᵢ uᵢⱼ<sup>m</sup> · xᵢ) / (Σᵢ uᵢⱼ<sup>m</sup>)</div>
+
+  <div class="abox">
+    <div class="atitle">📌 FCM 算法流程</div>
+    ① 设定聚类数 C、模糊指数 m（通常 m=2）、最大迭代次数 T、阈值 ε<br>
+    ② 初始化隶属度矩阵 U（随机，满足列和为1）<br>
+    ③ 计算聚类中心 cⱼ<br>
+    ④ 用新中心更新隶属度矩阵 uᵢⱼ<br>
+    ⑤ 若 ||U(t+1) - U(t)|| &lt; ε 或达到 T，停止；否则转③
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 12：FCM 隶属度更新</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：二维空间一点 x=(3,4)，两个聚类中心 c₁=(0,0)，c₂=(5,5)，m=2。求隶属度 u₁₁ 和 u₁₂。</p>
+      <p><strong>解</strong>：</p>
+      <p>d₁ = ||x-c₁|| = √(3²+4²) = √25 = 5<br>
+      d₂ = ||x-c₂|| = √((3-5)²+(4-5)²) = √(4+1) = √5 ≈ 2.236</p>
+      <p>u₁₁ = 1 / [(d₁/d₁)² + (d₁/d₂)²] = 1 / [1² + (5/2.236)²]<br>
+      = 1 / [1 + (2.236)²] = 1 / [1 + 5.0] = 1/6 ≈ <strong>0.1667</strong></p>
+      <p>u₁₂ = 1 - u₁₁ = 1 - 0.1667 = <strong>0.8333</strong></p>
+      <p>由于 x 距离 c₂ 更近，属于第2类的隶属度更高。与 K-means 的硬分配（全有或全无）不同，FCM 提供了更丰富的归属信息。</p>
+    </div>
+  </div>
+
+  <!-- 模糊系统练习题 -->
+  <h3>🧪 模糊系统 · 练习</h3>
+  <div class="pq">1. 比较经典集合与模糊集合的本质区别并举例说明。</div>
+  <div class="pq">2. 三角形隶属函数 μ(x)=max(min((x-2)/(4-2),(7-x)/(7-4)),0)。求 μ(1)、μ(3)、μ(5)、μ(8) 的值。</div>
+  <div class="pq">3. Mamdani 和 Sugeno 两种模糊推理方法有什么区别？各适用于什么场景？</div>
+  <div class="pq">4. 重心法去模糊化的物理意义是什么？写出连续域和离散域下的计算公式。</div>
+  <div class="pq">5. FCM 中模糊指数 m 对聚类结果有什么影响？m→1 和 m→∞ 分别对应什么情况？</div>
+</div>
+
+<!-- ===================== 五、混合智能系统 ===================== -->
+<div class="sec">
+  <h2>🔗 五、混合智能系统</h2>
+  <p>混合智能系统将两种或多种计算智能方法结合，取长补短，解决单一方法难以处理的问题。</p>
+
+  <h3>5.1 模糊神经网络（FNN）</h3>
+  <table class="tab">
+    <tr><th>融合方式</th><th>实现方法</th><th>优势</th></tr>
+    <tr><td>通过型</td><td>模糊系统前处理 + 神经网络后处理</td><td>先用模糊化消除噪声，再神经网络分类</td></tr>
+    <tr><td>集成型</td><td>将模糊规则编码为神经网络结构（如 ANFIS）</td><td>规则可解释 + 参数可学习</td></tr>
+    <tr><td>混合型</td><td>模糊推理与神经网络交替使用</td><td>各自处理擅长的子任务</td></tr>
+  </table>
+
+  <p><strong>ANFIS（自适应模糊神经推理系统）</strong>：将 Sugeno 型模糊系统编码为 5 层神经网络，通过 BP 和最小二乘法混合训练。结构与层含义：</p>
+  <ol>
+    <li><strong>模糊化层</strong>：计算输入对各模糊集合的隶属度</li>
+    <li><strong>规则层</strong>：计算每条规则的触发强度（取 min 或乘积）</li>
+    <li><strong>归一化层</strong>：将触发强度归一化</li>
+    <li><strong>去模糊化层</strong>：计算每条规则的加权输出</li>
+    <li><strong>输出层</strong>：求和得到系统总输出</li>
+  </ol>
+
+  <h3>5.2 进化神经网络</h3>
+  <p>用进化算法优化神经网络：</p>
+  <table class="tab">
+    <tr><th>优化目标</th><th>方法</th><th>效果</th></tr>
+    <tr><td>权重优化</td><td>GA 或 PSO 代替 BP 训练权重</td><td>避免梯度消失、全局搜索</td></tr>
+    <tr><td>结构优化</td><td>GA 搜索最优层数和神经元数</td><td>自动确定网络结构</td></tr>
+    <tr><td>联合优化</td><td>同时进化结构和权重</td><td>端到端自动设计网络</td></tr>
+    <tr><td>学习规则优化</td><td>进化 BP 的学习率、动量等超参数</td><td>自适应调参</td></tr>
+  </table>
+
+  <h3>5.3 模糊进化算法</h3>
+  <p>利用模糊系统动态调节进化算法的参数：</p>
+  <ul>
+    <li><strong>自适应 GA</strong>：输入为种群多样性指标（如适应度方差），输出为交叉率 Pc 和变异率 Pm</li>
+    <li>规则示例："IF 多样性低 THEN 增加 Pm" 防止早熟</li>
+    <li>"IF 平均适应度接近最优 THEN 减小 Pc" 加强局部搜索</li>
+  </ul>
+
+  <h3>5.4 混合系统的主要挑战</h3>
+  <ul>
+    <li><strong>计算复杂度</strong>：混合系统通常计算量更大，训练时间更长</li>
+    <li><strong>过拟合风险</strong>：参数过多时容易过拟合训练数据</li>
+    <li><strong>解释性-准确性权衡</strong>：追求高精度往往牺牲可解释性</li>
+  </ul>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 13：混合系统设计</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：设计一个模糊进化算法求解复杂多峰函数优化问题。</p>
+      <p><strong>解</strong>：</p>
+      <p><strong>方案</strong>：模糊自适应遗传算法（FAGA）</p>
+      <p><strong>输入</strong>（两个模糊变量）：<br>
+      - 种群多样性 D ∈ [0,1]（0=完全收敛，1=完全分散）<br>
+      - 进化代数比例 T = t/T_max ∈ [0,1]</p>
+      <p><strong>输出</strong>：交叉概率 Pc ∈ [0.4, 0.9]，变异概率 Pm ∈ [0.001, 0.1]</p>
+      <p><strong>模糊规则示例</strong>：</p>
+      <ul>
+        <li>IF D=低 AND T=早 THEN Pc=中(0.6), Pm=高(0.05) &nbsp;&nbsp;【多样低→加大变异】</li>
+        <li>IF D=高 AND T=早 THEN Pc=高(0.85), Pm=低(0.005) &nbsp;&nbsp;【多样高→加强交叉】</li>
+        <li>IF D=中 AND T=晚 THEN Pc=高(0.8), Pm=低(0.003) &nbsp;&nbsp;【后期精细搜索】</li>
+      </ul>
+      <p>相比固定参数的 GA，这种自适应方法在保持种群多样性和收敛速度方面有明显优势。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 六、考前速记 ===================== -->
+<div class="sec">
+  <h2>🎯 六、考前速记 &amp; 答题模板</h2>
+
+  <h3>6.1 高频名词解释</h3>
+  <table class="tab">
+    <tr><th>术语</th><th>核心要点</th></tr>
+    <tr><td>人工神经元（MP模型）</td><td>加权求和 + 偏置 + 激活函数 → 输出</td></tr>
+    <tr><td>激活函数</td><td>引入非线性，使网络能逼近任意复杂函数</td></tr>
+    <tr><td>反向传播（BP）</td><td>链式求导逐层计算梯度，沿梯度反方向更新权重</td></tr>
+    <tr><td>梯度消失</td><td>Sigmoid/tanh导数在两端趋近0，深层网络梯度衰减</td></tr>
+    <tr><td>能量函数（Hopfield）</td><td>单调递减保证收敛，局部极小对应存储模式</td></tr>
+    <tr><td>竞争学习（SOM）</td><td>Winner-Take-All，只有获胜神经元及邻域更新</td></tr>
+    <tr><td>适应度</td><td>衡量个体解优劣的指标，引导选择方向</td></tr>
+    <tr><td>选择压力</td><td>选择算子对最优个体的偏向程度</td></tr>
+    <tr><td>早熟收敛</td><td>种群多样性丧失，过早陷入局部最优</td></tr>
+    <tr><td>信息素挥发（ACO）</td><td>以 ρ 速率减少信息素浓度，避免局部最优</td></tr>
+    <tr><td>隶属函数</td><td>描述元素属于模糊集合的程度 μ(x) ∈ [0,1]</td></tr>
+    <tr><td>去模糊化</td><td>将模糊推理结果转换为精确输出值</td></tr>
+    <tr><td>FCM 模糊指数 m</td><td>控制聚类模糊程度，m→1趋近硬聚类，m→∞完全模糊</td></tr>
+  </table>
+
+  <h3>6.2 高频简答题模板</h3>
+  <div class="etip">
+    <div class="ett">BP 为什么需要反向传播？</div>
+    多层前馈网络中，隐藏层误差无法直接计算（没有真值）。反向传播利用链式求导法则，将输出层误差逐层"回传"，为每一层计算出梯度，从而更新所有权重。核心思想：输出误差 → 对各层权重求偏导 → 沿梯度反方向更新。
+  </div>
+  <div class="etip">
+    <div class="ett">GA 中为什么要引入变异算子？</div>
+    ① 维持种群多样性，防止早熟收敛；② 扩大搜索空间，探索未访问区域；③ 恢复进化过程中丢失的优良基因。若只有选择和交叉，种群会快速收敛到局部最优解，变异提供了"跳出"的能力。
+  </div>
+  <div class="etip">
+    <div class="ett">PSO vs GA 的区别与联系？</div>
+    相同：都是种群迭代搜索，适用于复杂优化问题。<br>
+    不同：① PSO 无选择/交叉/变异，靠速度-位置更新；② PSO 每个粒子保留个体最优和全局最优记忆；③ PSO 通常收敛更快但易早熟；④ GA 有扎实的模式定理理论基础。
+  </div>
+  <div class="etip">
+    <div class="ett">ACO 中信息素挥发率 ρ 的作用？</div>
+    ρ 控制信息素的遗忘速度。ρ 太大：旧信息快速消失，蚂蚁难以形成正反馈，收敛慢；ρ 太小：路径固化，蚂蚁沿着旧路径重复，容易陷入局部最优。理想的 ρ 值应在探索与开发之间取得平衡。
+  </div>
+  <div class="etip">
+    <div class="ett">模糊隶属函数有什么作用？有哪些常见类型？</div>
+    隶属函数 μ(x) ∈ [0,1] 将精确数值映射为模糊集合的隶属程度，是模糊系统的基础。常见类型：三角形（简单快速）、梯形（有平坦区）、高斯型（平滑）、钟形（灵活）。选择依据：问题特性、计算效率、可调参数数量。
+  </div>
+  <div class="etip">
+    <div class="ett">FCM 与 K-means 的核心区别？</div>
+    K-means 是硬聚类——每个样本只属于一个类别；FCM 是软聚类——每个样本以隶属度属于多个类别。FCM 能更好地处理边界模糊的数据，但计算量更大，且 m 值的选择对结果敏感。
+  </div>
+
+  <h3>6.3 计算题常考类型</h3>
+  <table class="tab">
+    <tr><th>类型</th><th>考点</th><th>复习要点</th></tr>
+    <tr><td>感知器</td><td>前向计算 + 权重更新</td><td>加权求和 → 阶跃 → 误差 → 更新</td></tr>
+    <tr><td>BP 前向/反向</td><td>逐层计算、链式求导</td><td>必考！写清公式再代数</td></tr>
+    <tr><td>GA 轮盘赌</td><td>概率 = fᵢ/Σf，累计概率</td><td>注意适应度为0的处理</td></tr>
+    <tr><td>GA 交叉/变异</td><td>单点交叉、位翻转</td><td>写清交叉点、交换片段</td></tr>
+    <tr><td>PSO 更新</td><td>速度公式→位置公式</td><td>注意 r₁, r₂ 的随机值</td></tr>
+    <tr><td>ACO 转移概率</td><td>P = τ^α · η^β / Σ</td><td>η = 1/d，分清 α 和 β</td></tr>
+    <tr><td>模糊隶属度</td><td>代入公式计算 μ(x)</td><td>注意分段函数取值范围</td></tr>
+    <tr><td>模糊集合运算</td><td>并(取max)、交(取min)、补(1-x)</td><td>逐元素计算</td></tr>
+    <tr><td>Mamdani 推理</td><td>触发强度 → 裁剪 → 聚合 → 重心</td><td>综合题，按步骤写</td></tr>
+    <tr><td>FCM 隶属度</td><td>距离平方比公式</td><td>注意 m=2 时简化计算</td></tr>
+  </table>
+
+  <h3>6.4 算法流程题模板</h3>
+  <div class="warn blue">
+    <h4>📌 作答套路</h4>
+    所有算法流程题统一用"三段式"：<br>
+    <strong>① 初始化</strong>：种群/粒子/网络/隶属度 ← 随机生成或预设<br>
+    <strong>② 迭代循环</strong>：评价适应度/计算误差 → 更新参数 → 终止判断<br>
+    <strong>③ 输出</strong>：最优解/训练好的网络/聚类结果
+  </div>
+
+  <h3>6.5 考试策略</h3>
+  <div class="warn yellow">
+    <h4>🎯 得分技巧</h4>
+    <ul style="margin:4px 0 0">
+      <li>名词解释：写公式 + 一句话解释，不要写一段</li>
+      <li>简答：分点答（① ② ③），每个点一句关键 + 一句解释</li>
+      <li>计算：先写公式再代入数值，步骤分很重要——即使最终数值算错，公式对也有分</li>
+      <li>算法流程：用"三段法"组织，画出流程草图可加分</li>
+      <li>综合设计：优缺点对比 + 改进思路 + 伪代码框架，展示理解深度</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>思贤学习站 · 济南市商河县 · <span class="contact-trigger" onclick="openShareWall()">获取联系方式</span></p>
+</div>
+
+<script>
+(function() {
+  var url = window.location.origin + window.location.pathname;
+  var shareTxt = '📚 计算智能期末复习——神经网络·进化计算·群体智能·模糊系统，知识点+例题+练习全覆盖！ ' + url;
+  var hasCopied = false;
+  var overlay = document.getElementById('shareOverlay') || (function(){
+    var el = document.createElement('div'); el.className = 'share-overlay'; el.id = 'shareOverlay';
+    el.innerHTML = '<div class="share-modal"><div class="share-icon">🔗</div><h3>分享即可获取联系方式</h3><p class="share-desc">将此网站分享给微信好友或发到朋友圈</p><div class="share-msg-box"><p id="shareText"></p></div><button class="copy-btn" id="copyBtn">📋 复制分享文案</button><p class="copy-hint" id="copyHint">复制后粘贴发送给微信好友或发到朋友圈</p><button class="shared-btn" id="sharedBtn" disabled>我已分享，查看联系方式 →</button></div>';
+    document.body.appendChild(el); return el;
+  })();
+  var shareTextEl = document.getElementById('shareText');
+  var copyBtn = document.getElementById('copyBtn');
+  var copyHint = document.getElementById('copyHint');
+  var sharedBtn = document.getElementById('sharedBtn');
+
+  if (localStorage.getItem('sx_shared')) {
+    var ts = document.querySelectorAll('.contact-trigger');
+    for (var i = 0; i < ts.length; i++) ts[i].outerHTML = '<b>155-6412-8008</b>';
+  }
+
+  window.openShareWall = function() {
+    if (localStorage.getItem('sx_shared')) return;
+    shareTextEl.textContent = shareTxt;
+    overlay.classList.add('active');
+    hasCopied = false; sharedBtn.disabled = true;
+    copyBtn.textContent = '📋 复制分享文案'; copyBtn.classList.remove('copied');
+    copyHint.textContent = '复制后粘贴发送给微信好友或发到朋友圈';
+    var t = localStorage.getItem('sx_copy_time');
+    if (t && Date.now() - Number(t) >= 10000) {
+      hasCopied = true; sharedBtn.disabled = false;
+      copyBtn.textContent = '✅ 已复制'; copyBtn.classList.add('copied');
+      copyHint.textContent = '✅ 点击下方按钮查看联系方式';
+    }
+  };
+
+  copyBtn.addEventListener('click', function() {
+    if (window._shareTimeout) clearTimeout(window._shareTimeout);
+    var text = shareTextEl.textContent;
+    function done() {
+      localStorage.setItem('sx_copy_time', Date.now());
+      copyBtn.textContent = '✅ 已复制'; copyBtn.classList.add('copied');
+      copyHint.textContent = '⏳ 检测到转发朋友圈，自动获取联系方式...';
+      window._shareTimeout = setTimeout(function() {
+        hasCopied = true; sharedBtn.disabled = false;
+        copyHint.textContent = '✅ 点击下方按钮查看联系方式';
+      }, 10000);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done);
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta); done();
+    }
+  });
+
+  sharedBtn.addEventListener('click', function() {
+    if (!hasCopied) return;
+    localStorage.setItem('sx_shared', '1');
+    overlay.classList.remove('active');
+    if (window._shareTimeout) clearTimeout(window._shareTimeout);
+    var triggers = document.querySelectorAll('.contact-trigger');
+    for (var i = 0; i < triggers.length; i++) triggers[i].outerHTML = '<b>155-6412-8008</b>';
+  });
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) { overlay.classList.remove('active'); if (window._shareTimeout) clearTimeout(window._shareTimeout); }
+  });
+})();
+</script>
+
+<button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">↑</button>
+<script>window.addEventListener('scroll',function(){document.querySelector('.back-to-top').classList.toggle('show',window.scrollY>300)});</script>
+
+<script>
+function toggleSol(btn) {
+  var content = btn.nextElementSibling;
+  if (content && content.classList) {
+    content.classList.toggle('show');
+    btn.textContent = content.classList.contains('show') ? '🙌 查看答案' : '💡 点击查看解析';
+  }
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>人体消化模型 · 思贤学习站</title><link rel="icon" href="../images/logo.png">
+<script type="importmap">{
+  "imports": {
+    "three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#0a0e1a;overflow:hidden;height:100vh;color:#ddd}
+#canvas-wrap{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+#label-renderer{position:fixed;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.controls{position:fixed;top:16px;right:16px;z-index:10;background:rgba(15,20,40,0.88);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:18px 20px;width:280px;color:#ddd;font-size:13px;backdrop-filter:blur(8px);max-height:calc(100vh - 32px);overflow-y:auto}
+.controls h2{font-size:16px;color:#fff;margin-bottom:10px;text-align:center;letter-spacing:1px}
+.controls h2 span{color:#5dade2}
+.organs-list{display:flex;flex-direction:column;gap:4px}
+.organs-list button{display:flex;align-items:center;gap:10px;padding:8px 12px;border:none;border-radius:8px;background:rgba(255,255,255,0.04);color:#ccc;font-size:13px;cursor:pointer;transition:all 0.2s;width:100%;text-align:left}
+.organs-list button:hover{background:rgba(255,255,255,0.1);color:#fff}
+.organs-list button .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.organs-list button.active{background:rgba(93,173,226,0.15);color:#fff;border:1px solid rgba(93,173,226,0.3)}
+.desc-box{background:rgba(255,255,255,0.04);border-radius:10px;padding:12px;margin-top:10px;min-height:60px}
+.desc-box .name{font-size:14px;font-weight:700}
+.desc-box .text{color:#999;font-size:12px;margin-top:4px;line-height:1.6}
+.tip{text-align:center;font-size:11px;color:#666;margin-top:8px}
+.tip kbd{background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:3px;font-size:10px}
+.footer-link{text-align:center;margin-top:10px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)}
+.footer-link a{color:#5dade2;font-size:12px;text-decoration:none}
+@media(max-width:640px){.controls{top:auto;bottom:0;right:0;left:0;width:100%;border-radius:14px 14px 0 0;max-height:55vh;padding:14px 14px 10px}.controls h2{font-size:14px}}
+</style></head><body>
+
+<div id="canvas-wrap"></div>
+<div id="label-renderer"></div>
+
+<div class="controls">
+  <h2>🧬 人体 <span>消化系统</span></h2>
+  <div class="organs-list" id="organsList"></div>
+  <div class="desc-box" id="descBox">
+    <div class="name" style="color:#888">点击器官查看详情</div>
+    <div class="text">从列表或直接在模型上点击器官</div>
+  </div>
+  <div class="tip"><kbd>拖拽</kbd>旋转 · <kbd>滚轮</kbd>缩放 · <kbd>点击</kbd>器官查看</div>
+  <div class="footer-link"><a href="../资料/生物.html">← 返回生物</a></div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0a0e1a);
+
+const camera = new THREE.PerspectiveCamera(32, window.innerWidth/window.innerHeight, 1, 500);
+camera.position.set(35, 10, 45);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+document.getElementById('canvas-wrap').appendChild(renderer.domElement);
+
+const labelRenderer = new CSS2DRenderer();
+labelRenderer.setSize(window.innerWidth, window.innerHeight);
+labelRenderer.domElement.style.position = 'absolute';
+labelRenderer.domElement.style.top = '0';
+labelRenderer.domElement.style.pointerEvents = 'none';
+document.getElementById('label-renderer').appendChild(labelRenderer.domElement);
+
+const orbit = new OrbitControls(camera, renderer.domElement);
+orbit.enableDamping = true;
+orbit.dampingFactor = 0.1;
+orbit.minDistance = 20;
+orbit.maxDistance = 100;
+orbit.target.set(0, 5, 0);
+
+scene.add(new THREE.AmbientLight(0x404060));
+const dl = new THREE.DirectionalLight(0xffffff, 1.3);
+dl.position.set(30, 50, 30);
+scene.add(dl);
+const dl2 = new THREE.DirectionalLight(0x5dade2, 0.4);
+dl2.position.set(-30, -10, -30);
+scene.add(dl2);
+
+const starGeo = new THREE.BufferGeometry();
+const sv = [];
+for (let i=0;i<1500;i++){const r=400+Math.random()*200,t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1);sv.push(r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t))}
+starGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
+scene.add(new THREE.Points(starGeo,new THREE.PointsMaterial({color:0xffffff,size:0.6,transparent:true,opacity:0.5})));
+
+const body = new THREE.Group();
+scene.add(body);
+
+// ---- Torso shell (semi-transparent body outline) ----
+function makeTorso() {
+  const profile = [];
+  const pts = [
+    [0, 24], [3.5, 24], [5, 23], [6.5, 21], [8, 18.5],
+    [8.8, 15.5], [9, 12], [8.5, 9], [7.8, 7], [7.8, 4.5],
+    [8.2, 2], [8.5, 0], [8.2, -2.5], [7, -5], [4, -7], [0, -8]
+  ];
+  for (let i = 0; i <= 40; i++) {
+    const t = i / 40;
+    const idx = t * (pts.length - 1);
+    const i0 = Math.floor(idx), i1 = Math.min(i0 + 1, pts.length - 1);
+    const f = idx - i0;
+    const x = pts[i0][0] + (pts[i1][0] - pts[i0][0]) * f;
+    const y = pts[i0][1] + (pts[i1][1] - pts[i0][1]) * f;
+    profile.push(new THREE.Vector2(x, y));
+  }
+  const geo = new THREE.LatheGeometry(profile, 24);
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, new THREE.MeshPhongMaterial({
+    color: 0x2a5a7a, transparent: true, opacity: 0.08, side: THREE.DoubleSide
+  }));
+  const wire = new THREE.Mesh(geo.clone(), new THREE.MeshBasicMaterial({
+    color: 0x4a7a9a, transparent: true, opacity: 0.05, wireframe: true
+  }));
+  const g = new THREE.Group();
+  g.add(mesh); g.add(wire);
+  g.scale.set(0.75, 1, 0.5);
+  g.position.y = -2;
+  return g;
+}
+body.add(makeTorso());
+
+// ---- Organ system ----
+const organs = [];
+let selected = null;
+
+function tube(pts, radius, color, segs=40, radSegs=8) {
+  const geo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), segs, radius, radSegs, false);
+  const mat = new THREE.MeshPhongMaterial({ color, emissive: color, emissiveIntensity: 0.08, shininess: 15 });
+  return new THREE.Mesh(geo, mat);
+}
+
+function organ(mesh, name, en, desc, color) {
+  const o = { mesh, name, en, desc, color };
+  body.add(mesh);
+  organs.push(o);
+  return o;
+}
+
+// 1. 食管
+organ(tube([
+  new THREE.Vector3(0, 19, 1.8), new THREE.Vector3(0, 16, 1.5),
+  new THREE.Vector3(-0.5, 13, 1.2), new THREE.Vector3(-1, 10.5, 0.8)
+], 0.9, 0xd4956a, 16), '食管', 'Esophagus', '连接咽和胃的肌性管道，长约25cm。通过蠕动将食物推入胃中。', '#d4956a');
+
+// 2. 胃 (J-shaped, thicker)
+organ(tube([
+  new THREE.Vector3(-1, 10.5, 0.8), new THREE.Vector3(-2.5, 9.5, 0.3),
+  new THREE.Vector3(-4.5, 8, -0.3), new THREE.Vector3(-6, 6.5, -0.5),
+  new THREE.Vector3(-6.5, 5, -0.3), new THREE.Vector3(-5.5, 3.5, 0.2),
+  new THREE.Vector3(-4, 2.5, 0.6), new THREE.Vector3(-2, 2, 0.8)
+], 2.5, 0xf0b27a, 28, 10), '胃', 'Stomach', '食物储存和初步消化的器官。分泌胃液（含盐酸和胃蛋白酶），将食物混合成食糜。', '#f0b27a');
+
+// 3. 十二指肠 (C-shaped)
+organ(tube([
+  new THREE.Vector3(-2, 2, 0.8), new THREE.Vector3(-0.5, 1.2, 1),
+  new THREE.Vector3(0.8, 0.5, 1), new THREE.Vector3(1.8, -0.2, 0.8),
+  new THREE.Vector3(2.2, -0.8, 0.5)
+], 1.0, 0xd4a574, 16), '十二指肠', 'Duodenum', '小肠起始段，长约25cm。接收胃的食糜、肝脏的胆汁和胰腺的胰液。', '#d4a574');
+
+// 4. 小肠 (coiled loops)
+const siPts = [];
+for (let i=0;i<24;i++){
+  const a=i*0.6, r=2.5+0.6*Math.sin(i*0.4);
+  siPts.push(new THREE.Vector3(-2+0.3*i, 1-i*0.22, r*0.4*Math.sin(a*0.6)));
+}
+organ(tube(siPts, 0.8, 0xe8c37a, 60, 8), '小肠', 'Small Intestine', '消化吸收的主要场所，长约5-7m。分为十二指肠、空肠和回肠，吸收大部分营养物质。', '#e8c37a');
+
+// 5. 大肠 (frame: ascending → transverse → descending → sigmoid)
+organ(tube([
+  new THREE.Vector3(3.5, -1.5, 1.2), new THREE.Vector3(4.2, 1, 0.8),
+  new THREE.Vector3(4.5, 3, 0.3), new THREE.Vector3(3.8, 5, 0),
+  new THREE.Vector3(2, 5.8, -0.3), new THREE.Vector3(-0.5, 6, -0.5),
+  new THREE.Vector3(-2.5, 5.5, -0.3), new THREE.Vector3(-4, 4.5, 0),
+  new THREE.Vector3(-4.8, 3, 0.3), new THREE.Vector3(-5, 1, 0.8),
+  new THREE.Vector3(-4.5, -1, 1.2), new THREE.Vector3(-3.5, -3, 1.5),
+  new THREE.Vector3(-2, -4.5, 1.8), new THREE.Vector3(0, -5, 2)
+], 1.3, 0xa6acaf, 45, 8), '大肠', 'Large Intestine', '吸收水分和电解质，形成并排出粪便。长约1.5m，分为盲肠、结肠和直肠。', '#a6acaf');
+
+// 6. 肝脏 (right side, wedge shape)
+const livGeo = new THREE.SphereGeometry(2.8, 20, 20);
+const lp = livGeo.attributes.position.array;
+for (let i=0;i<lp.length;i+=3){
+  const x=lp[i], y=lp[i+1], z=lp[i+2];
+  lp[i]=x*(2+0.5*(y/2.8)); lp[i+1]=y*(1+0.3*(x/2.8)); lp[i+2]=z*(1.2-0.4*(x/2.8));
+}
+livGeo.computeVertexNormals();
+const livMat=new THREE.MeshPhongMaterial({color:0x8b4513,emissive:0x5c2d0a,emissiveIntensity:0.1,shininess:12});
+const liv=new THREE.Mesh(livGeo,livMat); liv.position.set(4,10.5,0);
+organ(liv, '肝脏', 'Liver', '人体最大内脏器官，约1.2-1.5kg。分泌胆汁、代谢营养素、解毒、合成蛋白质等。', '#8b4513');
+
+// 7. 胆囊
+const gbGeo=new THREE.SphereGeometry(0.7,10,10);
+const gbP=gbGeo.attributes.position.array;
+for(let i=0;i<gbP.length;i+=3){gbP[i]*=1;gbP[i+1]*=1.4;gbP[i+2]*=0.7}
+gbGeo.computeVertexNormals();
+const gb=new THREE.Mesh(gbGeo,new THREE.MeshPhongMaterial({color:0x2ecc71,emissive:0x1a7a42,emissiveIntensity:0.1,shininess:25}));
+gb.position.set(5.5,8,1.5);
+organ(gb, '胆囊', 'Gallbladder', '储存和浓缩胆汁的梨形小囊，位于肝脏下方。进食后收缩释放胆汁帮助消化脂肪。', '#2ecc71');
+
+// 8. 胰腺 (elongated horizontal)
+organ(tube([
+  new THREE.Vector3(-1.5, 7.2, -0.5), new THREE.Vector3(0, 6.8, -0.5),
+  new THREE.Vector3(1.5, 6.3, -0.5), new THREE.Vector3(3, 5.8, -0.3),
+  new THREE.Vector3(4, 5.3, 0)
+], 0.9, 0xf7dc6f, 18, 8), '胰腺', 'Pancreas', '兼具内分泌和外分泌功能的腺体。分泌胰液消化三大营养素，分泌胰岛素和胰高血糖素调节血糖。', '#f7dc6f');
+
+// ---- Labels ----
+organs.forEach(o => {
+  const box = new THREE.Box3().setFromObject(o.mesh);
+  const c = box.getCenter(new THREE.Vector3());
+  const el = document.createElement('div');
+  el.textContent = o.name;
+  el.style.cssText = `color:#fff;font-size:12px;font-weight:600;text-shadow:0 0 8px rgba(0,0,0,0.9);background:rgba(0,0,0,0.5);padding:2px 8px;border-radius:4px;border:1px solid ${o.color}`;
+  const lbl = new CSS2DObject(el);
+  lbl.position.copy(c);
+  lbl.position.y += 1.8;
+  body.add(lbl);
+});
+
+// ---- Raycaster (click on organ) ----
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+renderer.domElement.addEventListener('click', e => {
+  const rect = renderer.domElement.getBoundingClientRect();
+  mouse.x = ((e.clientX-rect.left)/rect.width)*2-1;
+  mouse.y = -((e.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse, camera);
+  const hits = raycaster.intersectObjects(organs.map(o=>o.mesh));
+  if (hits.length > 0) {
+    const o = organs.find(o=>o.mesh===hits[0].object);
+    if (o) selectOrgan(o);
+  }
+});
+
+function selectOrgan(o) {
+  selected = o;
+  document.getElementById('descBox').innerHTML =
+    `<div class="name" style="color:${o.color}">${o.name} <span style="font-weight:400;font-size:11px;color:#888">${o.en}</span></div>`+
+    `<div class="text">${o.desc}</div>`;
+  document.querySelectorAll('.organs-list button').forEach(b=>
+    b.classList.toggle('active', b.dataset.name===o.name));
+  organs.forEach(x=>applyEmissive(x.mesh,0.08));
+  applyEmissive(o.mesh,0.5);
+}
+
+function applyEmissive(mesh, intensity) {
+  if (!mesh) return;
+  const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material];
+  mats.forEach(m => { if (m.emissiveIntensity !== undefined) m.emissiveIntensity = intensity; });
+}
+
+// ---- UI ----
+const listEl = document.getElementById('organsList');
+organs.forEach(o => {
+  const btn = document.createElement('button');
+  btn.dataset.name = o.name;
+  btn.innerHTML = `<span class="dot" style="background:${o.color}"></span>${o.name}`;
+  btn.addEventListener('click', () => selectOrgan(o));
+  listEl.appendChild(btn);
+});
+
+(function animate() {
+  requestAnimationFrame(animate);
+  orbit.update();
+  renderer.render(scene, camera);
+  labelRenderer.render(scene, camera);
+})();
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  labelRenderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+selectOrgan(organs[0]);
+</script>
+</body></html>

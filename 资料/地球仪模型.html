@@ -173,7 +173,7 @@ globe.add(pathGroup);
 function deg(r) { return r * Math.PI / 180; }
 function toXYZ(lat, lng, radius = R) {
   const phi = deg(90 - lat);
-  const theta = deg(lng);
+  const theta = -deg(lng);
   return new THREE.Vector3(
     radius * Math.sin(phi) * Math.cos(theta),
     radius * Math.cos(phi),
@@ -315,8 +315,8 @@ function addMarker(lat, lng, label, color) {
 }
 
 function drawGreatCircle(lat1, lng1, lat2, lng2) {
-  const phi1 = deg(90 - lat1), theta1 = deg(lng1);
-  const phi2 = deg(90 - lat2), theta2 = deg(lng2);
+  const phi1 = deg(90 - lat1), theta1 = -deg(lng1);
+  const phi2 = deg(90 - lat2), theta2 = -deg(lng2);
 
   const p1 = new THREE.Vector3(
     Math.sin(phi1)*Math.cos(theta1), Math.cos(phi1), Math.sin(phi1)*Math.sin(theta1)
@@ -352,17 +352,19 @@ function drawGreatCircle(lat1, lng1, lat2, lng2) {
   line.computeLineDistances();
   pathGroup.add(line);
 
-  // Direction arrow at midpoint
-  const mid = pts[Math.floor(steps/2)];
-  const dir = pts[Math.floor(steps/2)+1].clone().sub(pts[Math.floor(steps/2)-1].clone()).normalize();
-  const arrowLen = 8;
-  const arrow = new THREE.ArrowHelper(dir, mid, arrowLen, 0xff6b6b, 4, 3);
+  // Direction arrow from A to B
+  const arrowDir = p2.clone().sub(p1).normalize();
+  const arrowLen = 12;
+  const arrow = new THREE.ArrowHelper(arrowDir, p1.clone().multiplyScalar(R), arrowLen, 0xff6b6b, 5, 3);
   pathGroup.add(arrow);
 }
 
 function calcDirection(lat1, lng1, lat2, lng2) {
   const dlat = lat2 - lat1;
-  const dlng = lng2 - lng1;
+  let dlng = lng2 - lng1;
+  // 归化到 [-180, 180]，取最短路径方向
+  if (dlng > 180) dlng -= 360;
+  else if (dlng < -180) dlng += 360;
 
   let ns = '', ew = '';
   if (Math.abs(dlat) < 0.01) ns = '';
@@ -371,7 +373,7 @@ function calcDirection(lat1, lng1, lat2, lng2) {
   else ew = dlng > 0 ? '东' : '西';
 
   let dir;
-  if (ns && ew) dir = ns + ew;
+  if (ns && ew) dir = ew + ns;
   else if (ns) dir = '正' + ns;
   else if (ew) dir = '正' + ew;
   else dir = '相同位置';

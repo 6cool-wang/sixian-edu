@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../images/logo.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云计算与大数据 · 期末复习 · 思贤学习站</title>
+<link rel="stylesheet" href="../css/style.css">
+<style>
+body{background:#f5f6fa}
+.hero{background:linear-gradient(135deg,#1a2a4a,#2c5282);color:#fff;padding:60px 20px 68px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 40%,rgba(66,153,225,0.15) 0%,transparent 50%),radial-gradient(ellipse at 70% 60%,rgba(74,85,104,0.1) 0%,transparent 50%)}
+.hero h1{font-size:32px;font-weight:700;letter-spacing:1px;margin-bottom:8px;position:relative;z-index:1}
+.hero p{font-size:14px;color:#ccc;line-height:1.8;position:relative;z-index:1;max-width:620px;margin:0 auto}
+.container{max-width:860px;margin:0 auto;padding:0 16px 48px}
+.sec{background:#fff;border-radius:16px;padding:28px 32px;margin-top:28px;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.sec h2{font-size:21px;font-weight:700;color:#1a2a4a;margin-bottom:16px;padding-bottom:10px;border-bottom:3px solid #3182ce;display:inline-block}
+.sec h3{font-size:17px;font-weight:700;color:#1a2a4a;margin:22px 0 10px}
+.sec h4{font-size:15px;font-weight:600;color:#555;margin:16px 0 8px}
+.sec p,.sec li{font-size:14px;color:#444;line-height:1.9}
+.sec ul,.sec ol{padding-left:22px}
+.sec li{margin-bottom:5px}
+.sec strong{color:#1a2a4a}
+.fbox{background:#f8f9fc;border-left:4px solid #3182ce;padding:12px 18px;margin:12px 0;font-size:14px;line-height:1.7;font-family:'Courier New','Consolas',monospace;overflow-x:auto;border-radius:0 10px 10px 0}
+.fbox .flabel{color:#3182ce;font-weight:600;font-size:12px;display:block;margin-bottom:3px;font-family:-apple-system,sans-serif}
+.abox{background:#f0f4f8;border-radius:10px;padding:14px 18px;margin:12px 0;font-size:13px;line-height:1.8}
+.abox .atitle{font-weight:700;color:#1a2a4a;margin-bottom:5px;font-size:14px}
+.toggle-sol{margin:8px 0 14px;border:1px solid #e8e8e8;border-radius:10px;overflow:hidden}
+.toggle-sol .sol-btn{display:block;width:100%;padding:8px 16px;background:#f8f9fc;border:none;font-size:13px;color:#888;cursor:pointer;text-align:left;transition:background .2s;font-family:inherit}
+.toggle-sol .sol-btn:hover{background:#eef0f4}
+.toggle-sol .sol-btn::before{content:'💡 '}
+.toggle-sol .sol-content{display:none;padding:14px 18px;background:#fafcff;border-top:1px solid #eee;font-size:14px;line-height:1.8}
+.toggle-sol .sol-content.show{display:block}
+.toggle-sol .sol-content p{margin:4px 0}
+.tg{display:inline-block;font-size:11px;padding:2px 10px;border-radius:10px;margin:0 3px 3px 0}
+.tg-blue{background:#e8f4fd;color:#2980b9}
+.tg-green{background:#e8f8e8;color:#27ae60}
+.tg-orange{background:#fef5e7;color:#e67e22}
+.tg-purple{background:#f4ecf7;color:#8e44ad}
+.tg-red{background:#fde8e8;color:#c0392b}
+.tab{width:100%;border-collapse:collapse;margin:12px 0;font-size:13px}
+.tab th,.tab td{padding:9px 12px;border:1px solid #e0e0e0;text-align:left}
+.tab th{background:#f0f4f8;font-weight:600;color:#1a2a4a}
+.tab tr:nth-child(even){background:#fafbfc}
+.warn{border-radius:10px;padding:12px 16px;margin:12px 0;font-size:13px;line-height:1.7}
+.warn.blue{background:#e8f4fd;border-left:4px solid #2980b9}
+.warn.green{background:#e8f8e8;border-left:4px solid #27ae60}
+.warn.yellow{background:#fef9e7;border-left:4px solid #f39c12}
+.warn h4{margin:0 0 4px;font-size:14px;font-weight:600}
+.svg-chart{text-align:center;margin:16px 0;overflow-x:auto}
+.svg-chart svg{max-width:100%;height:auto;border-radius:8px;box-shadow:0 1px 8px rgba(0,0,0,0.06)}
+.etip{background:#1a2a4a;color:#eee;border-radius:10px;padding:14px 18px;margin:12px 0;font-size:13px;line-height:1.8}
+.etip .ett{color:#f1c40f;font-weight:600;font-size:14px;margin-bottom:4px}
+.pq{margin:8px 0;padding:10px 14px;background:#fafbfc;border-radius:8px;border-left:3px solid #8e44ad;font-size:13px;color:#555}
+@media(max-width:600px){.sec{padding:18px 14px}.sec h2{font-size:19px}.fbox{font-size:13px;padding:10px 14px}}
+</style>
+<script src="../js/theme.js"></script>
+</head>
+<body>
+
+<div class="nav">
+  <a href="../思贤学习站.html" class="logo-text">思贤学习站</a>
+  <a href="../学习专区.html">学习专区</a>
+  <a href="../算法助学.html">AI工具 <span class="nav-tag">免费体验</span></a>
+  <a href="../资料库.html">资源库</a>
+  <a href="../真题.html">真题库</a>
+  <a href="../关于.html">关于</a><button class="theme-btn" onclick="toggleTheme()" title="切换主题">🎨</button>
+</div>
+
+<div class="hero">
+  <h1>云计算与大数据 · 期末复习</h1>
+  <p>云计算架构 · 虚拟化 · 分布式计算 · Hadoop 生态 · Spark · NoSQL · 云原生<br>知识点精讲 + 例题解析 + 习题训练 + 考前速记</p>
+</div>
+
+<div class="container">
+
+<!-- ===================== 总览 ===================== -->
+<div class="sec">
+  <h2>📋 课程总览</h2>
+  <p>云计算与大数据是信息技术领域的两个核心方向。云计算提供按需交付的计算资源（网络、服务器、存储、应用），大数据关注从海量数据中提取价值的方法与技术。</p>
+  <table class="tab">
+    <tr><th>领域</th><th>核心问题</th><th>关键技术</th><th>典型系统</th></tr>
+    <tr><td><strong>云计算</strong></td><td>如何弹性、按需提供计算资源</td><td>虚拟化、容器化、资源调度</td><td>AWS、Azure、K8s、OpenStack</td></tr>
+    <tr><td><strong>大数据</strong></td><td>如何存储、处理、分析海量数据</td><td>分布式存储、分布式计算、NoSQL</td><td>Hadoop、Spark、HBase、Kafka</td></tr>
+    <tr><td><strong>云原生</strong></td><td>如何让应用生于云、长于云</td><td>微服务、容器编排、DevOps</td><td>K8s、Docker、Serverless</td></tr>
+  </table>
+  <p style="margin-top:10px;color:#888;font-size:13px">考试特点：概念辨析（25%）+ 架构理解（30%）+ 流程与原理（30%）+ 综合设计（15%）。注重理解"为什么这样设计"以及不同技术之间的对比。</p>
+</div>
+
+<!-- ===================== 一、云计算基础 ===================== -->
+<div class="sec">
+  <h2>☁️ 一、云计算基础</h2>
+
+  <h3>1.1 云计算定义与特征</h3>
+  <p><strong>NIST 定义</strong>：云计算是一种通过网络按需提供可配置计算资源（网络、服务器、存储、应用和服务）的模型，资源可以快速供给和释放，管理成本极低。</p>
+  <p><strong>五大基本特征</strong>：</p>
+  <table class="tab">
+    <tr><th>特征</th><th>说明</th></tr>
+    <tr><td>按需自助服务</td><td>用户无需人工交互即可自行配置和使用计算资源</td></tr>
+    <tr><td>广泛网络访问</td><td>通过标准协议（HTTP/HTTPS）可从各种终端设备访问</td></tr>
+    <tr><td>资源池化</td><td>计算资源以多租户模式服务于多个客户</td></tr>
+    <tr><td>快速弹性</td><td>资源可快速伸缩，对用户而言资源近乎无限</td></tr>
+    <tr><td>可计量服务</td><td>自动控制和优化资源使用，提供透明计量（Pay-as-you-go）</td></tr>
+  </table>
+
+  <h3>1.2 服务模型（3层架构）</h3>
+  <div class="svg-chart">
+    <svg width="460" height="260" viewBox="0 0 460 260" xmlns="http://www.w3.org/2000/svg">
+      <!-- stacked layers -->
+      <rect x="80" y="180" width="300" height="60" rx="10" fill="#e8f4fd" stroke="#3182ce" stroke-width="2"/>
+      <text x="230" y="206" font-size="15" fill="#1a2a4a" text-anchor="middle" font-weight="600">IaaS（基础设施即服务）</text>
+      <text x="230" y="226" font-size="11" fill="#666" text-anchor="middle">虚拟机 · 网络 · 存储 · 负载均衡</text>
+
+      <rect x="80" y="105" width="300" height="60" rx="10" fill="#fef5e7" stroke="#e67e22" stroke-width="2"/>
+      <text x="230" y="131" font-size="15" fill="#1a2a4a" text-anchor="middle" font-weight="600">PaaS（平台即服务）</text>
+      <text x="230" y="151" font-size="11" fill="#666" text-anchor="middle">运行时 · 中间件 · 数据库 · 开发工具</text>
+
+      <rect x="80" y="30" width="300" height="60" rx="10" fill="#e8f8e8" stroke="#27ae60" stroke-width="2"/>
+      <text x="230" y="56" font-size="15" fill="#1a2a4a" text-anchor="middle" font-weight="600">SaaS（软件即服务）</text>
+      <text x="230" y="76" font-size="11" fill="#666" text-anchor="middle">Web应用 · 企业软件 · 在线协作工具</text>
+
+      <!-- arrow labels -->
+      <text x="400" y="56" font-size="11" fill="#27ae60" font-weight="600">用户直接使用</text>
+      <text x="400" y="131" font-size="11" fill="#e67e22">开发者平台</text>
+      <text x="400" y="206" font-size="11" fill="#3182ce">基础设施</text>
+
+      <!-- user arrow -->
+      <path d="M420,56 L410,56" stroke="#27ae60" stroke-width="1.2"/>
+      <path d="M420,131 L410,131" stroke="#e67e22" stroke-width="1.2"/>
+      <path d="M420,206 L410,206" stroke="#3182ce" stroke-width="1.2"/>
+
+      <!-- control arrow -->
+      <text x="40" y="56" font-size="10" fill="#999">↑ 控制递增</text>
+      <text x="40" y="206" font-size="10" fill="#999">↓ 用户控制</text>
+    </svg>
+  </div>
+
+  <table class="tab">
+    <tr><th>层次</th><th>用户管理</th><th>典型场景</th><th>示例</th></tr>
+    <tr><td><strong>IaaS</strong></td><td>OS、应用、数据</td><td>IT 基础设施外包、灾备</td><td>AWS EC2、阿里云ECS、OpenStack</td></tr>
+    <tr><td><strong>PaaS</strong></td><td>应用、数据</td><td>应用开发部署、数据库托管</td><td>Google App Engine、Heroku、SAE</td></tr>
+    <tr><td><strong>SaaS</strong></td><td>仅配置和使用</td><td>企业办公、CRM、邮件</td><td>Office 365、Salesforce、Google Docs</td></tr>
+  </table>
+
+  <h3>1.3 部署模型</h3>
+  <table class="tab">
+    <tr><th>部署方式</th><th>特点</th><th>优势</th><th>适用场景</th></tr>
+    <tr><td><strong>公有云</strong></td><td>第三方提供商通过 Internet 提供资源</td><td>成本低、弹性好、免运维</td><td>初创企业、Web应用</td></tr>
+    <tr><td><strong>私有云</strong></td><td>为单一组织专用而构建</td><td>安全可控、合规</td><td>金融、政府、大型企业</td></tr>
+    <tr><td><strong>混合云</strong></td><td>公有云+私有云协同</td><td>兼顾安全与弹性</td><td>弹性扩展、灾备</td></tr>
+    <tr><td><strong>社区云</strong></td><td>多个有共同需求的组织共享</td><td>分摊成本、共享经验</td><td>科研机构联盟</td></tr>
+  </table>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 1：IaaS / PaaS / SaaS 辨析</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：判断以下场景分别属于哪种云服务模型：</p>
+      <p>(a) 某公司租用 AWS EC2 虚拟机部署自己的 Web 应用。<br>
+      (b) 开发者使用 Google Firebase 直接构建移动应用后端，不需管理服务器。<br>
+      (c) 销售团队使用 Salesforce CRM 系统管理客户关系。</p>
+      <p><strong>答</strong>：</p>
+      <p>(a) <strong>IaaS</strong> — 用户租用虚拟机（基础设施），自己安装和配置操作系统、中间件和应用。<br>
+      (b) <strong>PaaS</strong> — Firebase 提供了数据库、认证、存储等平台级服务，开发者只需关注业务代码。<br>
+      (c) <strong>SaaS</strong> — Salesforce 是完整的 CRM 软件，用户通过浏览器直接使用，无需管理任何底层设施。</p>
+      <p><strong>口诀</strong>：IaaS 给你房子（基础设施），PaaS 给你精装房（平台），SaaS 给你酒店式服务（软件）。</p>
+    </div>
+  </div>
+
+  <!-- 虚拟化 -->
+  <h3>1.4 虚拟化技术</h3>
+  <p>虚拟化是云计算的基石，将物理资源抽象为逻辑资源，实现资源隔离与共享。</p>
+
+  <table class="tab">
+    <tr><th>虚拟化类型</th><th>原理</th><th>代表技术</th></tr>
+    <tr><td><strong>服务器虚拟化</strong></td><td>一台物理服务器运行多个虚拟机</td><td>VMware ESXi、KVM、Hyper-V</td></tr>
+    <tr><td><strong>存储虚拟化</strong></td><td>抽象物理存储，提供统一存储池</td><td>Distributed Storage、SAN</td></tr>
+    <tr><td><strong>网络虚拟化</strong></td><td>将物理网络抽象为虚拟网络</td><td>VLAN、SDN、OpenFlow</td></tr>
+    <tr><td><strong>容器化</strong></td><td>操作系统级虚拟化，共享内核</td><td>Docker、containerd</td></tr>
+  </table>
+
+  <h4>虚拟机 vs 容器</h4>
+  <table class="tab">
+    <tr><th>对比维度</th><th>虚拟机（VM）</th><th>容器（Container）</th></tr>
+    <tr><td>虚拟化层次</td><td>硬件级（Hypervisor）</td><td>操作系统级（内核共享）</td></tr>
+    <tr><td>启动时间</td><td>分钟级（需启动完整 OS）</td><td>秒级/毫秒级</td></tr>
+    <tr><td>镜像大小</td><td>GB ~ 数十GB</td><td>MB ~ 数百MB</td></tr>
+    <tr><td>隔离性</td><td>强（独立内核）</td><td>弱（共享宿主机内核）</td></tr>
+    <tr><td>密度</td><td>一台物理机运行数个~数十个</td><td>一台物理机运行数百~数千个</td></tr>
+  </table>
+
+  <div class="abox">
+    <div class="atitle">📌 Hypervisor 类型</div>
+    <strong>Type 1（裸机型）</strong>：直接运行在物理硬件上，性能高，如 VMware ESXi、KVM、Xen<br>
+    <strong>Type 2（宿主型）</strong>：运行在操作系统之上，如 VirtualBox、VMware Workstation
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 2：虚拟化层次判断</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：某云计算平台使用 KVM 提供虚拟机，使用 Docker 运行微服务。请分析这两种技术在资源隔离和性能开销上的区别。</p>
+      <p><strong>答</strong>：</p>
+      <p><strong>KVM 虚拟机</strong>：Type 1 Hypervisor，每个 VM 有独立内核，通过硬件辅助虚拟化（Intel VT-x/AMD-V）实现强隔离。性能开销约 5-10%，适合需要强安全隔离的多租户场景。</p>
+      <p><strong>Docker 容器</strong>：共享宿主机内核，通过 namespace 实现资源隔离（PID、Network、Mount 等），通过 cgroups 限制资源使用。性能开销接近零，启动毫秒级，适合微服务和 CI/CD。</p>
+      <p><strong>典型组合</strong>：在 KVM 虚拟机内部运行 Docker 容器，既享受硬件隔离保障，又获得容器化的敏捷性。</p>
+    </div>
+  </div>
+
+  <h3>1.5 云计算的挑战</h3>
+  <ul>
+    <li><strong>安全与隐私</strong>：数据加密、访问控制、合规认证</li>
+    <li><strong>服务可用性</strong>：SLA（服务等级协议）、多可用区部署</li>
+    <li><strong>厂商锁定</strong>：不同云平台 API 不兼容，迁移成本高</li>
+    <li><strong>网络延迟</strong>：数据传输瓶颈，边缘计算作为补充方案</li>
+  </ul>
+
+  <h3>🧪 云计算基础 · 练习</h3>
+  <div class="pq">1. 简述云计算的 NIST 定义及其五大基本特征。</div>
+  <div class="pq">2. IaaS、PaaS、SaaS 三者的主要区别是什么？各举一个实际例子。</div>
+  <div class="pq">3. 公有云、私有云、混合云各有何优缺点？企业在什么情况下适合选择混合云？</div>
+  <div class="pq">4. 比较 Type 1 和 Type 2 Hypervisor 的区别。</div>
+  <div class="pq">5. 容器和虚拟机在隔离级别上有何不同？为什么容器启动比虚拟机快得多？</div>
+</div>
+
+<!-- ===================== 二、大数据基础 ===================== -->
+<div class="sec">
+  <h2>📊 二、大数据基础</h2>
+
+  <h3>2.1 大数据的 4V 特征</h3>
+  <table class="tab">
+    <tr><th>特征</th><th>英文</th><th>含义</th></tr>
+    <tr><td><strong>大量</strong></td><td>Volume</td><td>数据量从 TB 级到 PB 级甚至 EB 级</td></tr>
+    <tr><td><strong>多样</strong></td><td>Variety</td><td>结构化、半结构化和非结构化数据并存</td></tr>
+    <tr><td><strong>高速</strong></td><td>Velocity</td><td>数据产生和处理速度快，实时性要求高</td></tr>
+    <tr><td><strong>价值</strong></td><td>Value</td><td>数据价值密度低，需深度分析才能提取价值</td></tr>
+  </table>
+  <p>有时也增加第 5 个 V——<strong>准确性（Veracity）</strong>，指数据的质量和可信度。</p>
+
+  <h3>2.2 Hadoop 生态系统</h3>
+  <p>Apache Hadoop 是大数据处理的事实标准开源框架，核心组件包括：</p>
+
+  <div class="svg-chart">
+    <svg width="560" height="280" viewBox="0 0 560 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- ecosystem layers -->
+      <rect x="130" y="10" width="300" height="40" rx="8" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <text x="280" y="36" font-size="14" fill="#1a2a4a" text-anchor="middle" font-weight="600">数据应用层</text>
+      <text x="500" y="36" font-size="11" fill="#888">Mahout, Spark ML</text>
+
+      <rect x="60" y="65" width="440" height="40" rx="8" fill="#f0f4f8" stroke="#718096" stroke-width="1.5"/>
+      <text x="280" y="91" font-size="14" fill="#1a2a4a" text-anchor="middle" font-weight="600">数据分析层</text>
+      <text x="180" y="85" font-size="11" fill="#666">Hive (SQL)</text>
+      <text x="280" y="93" font-size="11" fill="#666">Pig (脚本)</text>
+      <text x="380" y="85" font-size="11" fill="#666">Spark</text>
+
+      <rect x="60" y="120" width="440" height="40" rx="8" fill="#e8f4fd" stroke="#3182ce" stroke-width="1.5"/>
+      <text x="280" y="146" font-size="14" fill="#1a2a4a" text-anchor="middle" font-weight="600">分布式计算层</text>
+      <text x="180" y="148" font-size="11" fill="#666">MapReduce</text>
+      <text x="340" y="148" font-size="11" fill="#666">YARN (资源调度)</text>
+
+      <rect x="60" y="175" width="440" height="40" rx="8" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="280" y="201" font-size="14" fill="#1a2a4a" text-anchor="middle" font-weight="600">分布式存储层</text>
+      <text x="200" y="203" font-size="11" fill="#666">HDFS</text>
+      <text x="340" y="203" font-size="11" fill="#666">HBase (NoSQL)</text>
+
+      <rect x="90" y="230" width="380" height="35" rx="8" fill="#fde8e8" stroke="#e53e3e" stroke-width="1.5"/>
+      <text x="280" y="253" font-size="14" fill="#1a2a4a" text-anchor="middle" font-weight="600">数据接入层</text>
+      <text x="200" y="255" font-size="11" fill="#666">Flume</text>
+      <text x="280" y="255" font-size="11" fill="#666">Sqoop</text>
+      <text x="360" y="255" font-size="11" fill="#666">Kafka</text>
+    </svg>
+  </div>
+
+  <h4>2.2.1 HDFS（分布式文件系统）</h4>
+  <ul>
+    <li><strong>架构</strong>：Master-Slave 模式，一个 <strong>NameNode</strong> 管理元数据，多个 <strong>DataNode</strong> 存储数据块</li>
+    <li><strong>数据块</strong>：默认 128MB，每个块自动复制 3 份（跨机架）</li>
+    <li><strong>设计理念</strong>：一次写入、多次读取；适合大文件、流式访问</li>
+    <li><strong>优点</strong>：高容错、高吞吐、适合批处理</li>
+    <li><strong>缺点</strong>：不适合低延迟访问、小文件多时性能差、不支持文件修改</li>
+  </ul>
+
+  <div class="fbox"><span class="flabel">HDFS 读流程</span>
+  Client → NameNode(获取块位置) → DataNode(并行读取数据块) → Client(合并)<br>
+  <span class="flabel" style="margin-top:6px">HDFS 写流程</span>
+  Client → NameNode(分配块) → 写入第一个 DataNode(流水线复制) → 第二、第三 DataNode → 确认
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 3：HDFS 数据块与复制</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：一个 512MB 的文件存储在 HDFS 中，块大小 128MB，复制因子 3。请问：</p>
+      <p>(a) 文件被分成几个数据块？<br>
+      (b) 总共占用多少物理存储空间？<br>
+      (c) 如果有 6 个 DataNode，最多可容忍几个节点同时故障而不丢失数据？</p>
+      <p><strong>答</strong>：</p>
+      <p>(a) 512 / 128 = <strong>4 个数据块</strong></p>
+      <p>(b) 4 块 × 3 副本 = <strong>12 块</strong>，物理存储 = 512MB × 3 = <strong>1.5GB</strong></p>
+      <p>(c) 每个块的 3 个副本分散在不同节点（且尽量不同机架），最多可容忍同一块的 <strong>2 个副本</strong>同时故障。如果一个块分布在 3 个不同的 DataNode 上，那么这 3 个节点中最多坏 2 个，数据仍然可读。但如果某块的 3 个副本恰好都故障，则数据永久丢失。由于副本是跨机架分布的，实际容错能力通常可以容忍 <strong>N-1 个节点故障</strong>（如果 N ≥ 3 且副本分布得当）。</p>
+    </div>
+  </div>
+
+  <h3>2.3 MapReduce 编程模型</h3>
+  <p>MapReduce 是 Google 提出的分布式编程模型，分为两个阶段：</p>
+
+  <div class="svg-chart">
+    <svg width="500" height="160" viewBox="0 0 500 160" xmlns="http://www.w3.org/2000/svg">
+      <defs><marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#666"/></marker></defs>
+      <!-- input -->
+      <rect x="20" y="60" width="60" height="40" rx="6" fill="#e8f4fd" stroke="#3182ce" stroke-width="1.5"/>
+      <text x="50" y="85" font-size="12" fill="#1a2a4a" text-anchor="middle">输入</text>
+      <!-- split -->
+      <rect x="100" y="20" width="50" height="30" rx="4" fill="#e8e8e8" stroke="#aaa" stroke-width="1"/>
+      <text x="125" y="39" font-size="10" fill="#555" text-anchor="middle">Split₁</text>
+      <rect x="100" y="65" width="50" height="30" rx="4" fill="#e8e8e8" stroke="#aaa" stroke-width="1"/>
+      <text x="125" y="84" font-size="10" fill="#555" text-anchor="middle">Split₂</text>
+      <rect x="100" y="110" width="50" height="30" rx="4" fill="#e8e8e8" stroke="#aaa" stroke-width="1"/>
+      <text x="125" y="129" font-size="10" fill="#555" text-anchor="middle">Split₃</text>
+      <line x1="80" y1="80" x2="100" y2="80" stroke="#ddd" stroke-width="1"/>
+      <!-- map -->
+      <rect x="180" y="20" width="60" height="30" rx="6" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <text x="210" y="39" font-size="10" fill="#1a2a4a" text-anchor="middle" font-weight="600">Map₁</text>
+      <rect x="180" y="65" width="60" height="30" rx="6" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <text x="210" y="84" font-size="10" fill="#1a2a4a" text-anchor="middle" font-weight="600">Map₂</text>
+      <rect x="180" y="110" width="60" height="30" rx="6" fill="#fef5e7" stroke="#e67e22" stroke-width="1.5"/>
+      <text x="210" y="129" font-size="10" fill="#1a2a4a" text-anchor="middle" font-weight="600">Map₃</text>
+      <line x1="150" y1="35" x2="175" y2="35" stroke="#999" stroke-width="0.8"/>
+      <line x1="150" y1="80" x2="175" y2="80" stroke="#999" stroke-width="0.8"/>
+      <line x1="150" y1="125" x2="175" y2="125" stroke="#999" stroke-width="0.8"/>
+      <!-- shuffle -->
+      <rect x="270" y="65" width="50" height="30" rx="4" fill="#f4ecf7" stroke="#8e44ad" stroke-width="1"/>
+      <text x="295" y="84" font-size="10" fill="#1a2a4a" text-anchor="middle">Shuffle</text>
+      <line x1="240" y1="35" x2="295" y2="65" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="80" x2="295" y2="80" stroke="#ccc" stroke-width="0.8"/>
+      <line x1="240" y1="125" x2="295" y2="95" stroke="#ccc" stroke-width="0.8"/>
+      <!-- reduce -->
+      <rect x="350" y="65" width="60" height="30" rx="6" fill="#e8f8e8" stroke="#27ae60" stroke-width="1.5"/>
+      <text x="380" y="84" font-size="10" fill="#1a2a4a" text-anchor="middle" font-weight="600">Reduce</text>
+      <line x1="320" y1="80" x2="345" y2="80" stroke="#999" stroke-width="0.8"/>
+      <!-- output -->
+      <rect x="440" y="60" width="50" height="40" rx="6" fill="#e8f4fd" stroke="#3182ce" stroke-width="1.5"/>
+      <text x="465" y="85" font-size="12" fill="#1a2a4a" text-anchor="middle">输出</text>
+      <line x1="410" y1="80" x2="435" y2="80" stroke="#999" stroke-width="1.2" marker-end="url(#ar)"/>
+    </svg>
+  </div>
+
+  <div class="fbox"><span class="flabel">MapReduce 数据处理模型</span>
+  <strong>Map 阶段</strong>：(k₁, v₁) → list(k₂, v₂) &nbsp;— 并行处理输入键值对<br>
+  <strong>Shuffle 阶段</strong>：按 key 分区、排序、合并，将相同 key 的数据发送到同一 Reduce<br>
+  <strong>Reduce 阶段</strong>：(k₂, list(v₂)) → list(k₃, v₃) &nbsp;— 聚合处理
+  </div>
+
+  <div class="abox">
+    <div class="atitle">📌 MapReduce 完整流程</div>
+    ① <strong>输入分片</strong>：将输入文件分成固定大小的 split（默认与 HDFS 块对齐）<br>
+    ② <strong>Map 阶段</strong>：每个 split 由一个 Map 任务处理，输出中间键值对<br>
+    ③ <strong>Combiner（可选）</strong>：在 Map 端本地聚合，减少网络传输<br>
+    ④ <strong>Shuffle</strong>：分区、排序、归并，将相同 key 发送到同一 Reduce<br>
+    ⑤ <strong>Reduce 阶段</strong>：对每个 key 的 value 列表进行聚合计算<br>
+    ⑥ <strong>输出</strong>：结果写回 HDFS
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 4：WordCount MapReduce 详细过程</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：用 MapReduce 实现 WordCount（单词计数），输入文件内容为 "hello world hello hadoop hello mapreduce"。请写出 Map 和 Reduce 函数的伪代码，并描述 Shuffle 后的中间结果。</p>
+      <p><strong>答</strong>：</p>
+      <p><strong>Map 函数</strong>：</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;background:#f8f9fc;padding:8px 12px;border-radius:6px">
+map(key, value):<br>
+&nbsp;&nbsp;// key: 行偏移量, value: 行内容<br>
+&nbsp;&nbsp;words = value.split()<br>
+&nbsp;&nbsp;for word in words:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;emit(word, 1)
+      </p>
+      <p><strong>Map 输出</strong>：(hello,1) (world,1) (hello,1) (hadoop,1) (hello,1) (mapreduce,1)</p>
+      <p><strong>Shuffle 后</strong>（分区+排序+分组）：</p>
+      <p>(hadoop, [1])<br>
+      (hello, [1,1,1])<br>
+      (mapreduce, [1])<br>
+      (world, [1])</p>
+      <p><strong>Reduce 函数</strong>：</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;background:#f8f9fc;padding:8px 12px;border-radius:6px">
+reduce(key, values):<br>
+&nbsp;&nbsp;sum = 0<br>
+&nbsp;&nbsp;for v in values:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;sum += v<br>
+&nbsp;&nbsp;emit(key, sum)
+      </p>
+      <p><strong>最终输出</strong>：hadoop=1, hello=3, mapreduce=1, world=1</p>
+    </div>
+  </div>
+
+  <h3>2.4 Spark</h3>
+  <p>Spark 是 UC Berkeley AMPLab 开发的新一代分布式计算框架，相比 MapReduce 的主要优势：</p>
+  <table class="tab">
+    <tr><th>对比维度</th><th>MapReduce</th><th>Spark</th></tr>
+    <tr><td>计算模式</td><td>磁盘 I/O 频繁（每个阶段写磁盘）</td><td>内存计算（RDD 缓存）</td></tr>
+    <tr><td>中间结果</td><td>必须写 HDFS</td><td>可缓存在内存中</td></tr>
+    <tr><td>迭代计算</td><td>慢（反复读写磁盘）</td><td>快（内存迭代）</td></tr>
+    <tr><td>延迟</td><td>高（批处理）</td><td>低（支持流处理）</td></tr>
+    <tr><td>API 简洁性</td><td>仅 Map/Reduce 抽象</td><td>RDD/DataFrame/Dataset 丰富</td></tr>
+    <tr><td>性能（典型）</td><td>基线</td><td>快 10~100x</td></tr>
+  </table>
+
+  <div class="fbox"><span class="flabel">Spark RDD（弹性分布式数据集）</span>
+  RDD 是 Spark 的核心抽象——不可变、分区、可并行操作的数据集合。<br>
+  <strong>创建方式</strong>：从 HDFS 读取 / 从集合并行化 / 从其他 RDD 转换<br>
+  <strong>操作类型</strong>：<br>
+  &nbsp;&nbsp;Transformation（惰性求值）：map, filter, flatMap, reduceByKey, join<br>
+  &nbsp;&nbsp;Action（触发计算）：count, collect, reduce, saveAsTextFile
+  </div>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 5：Spark RDD 转换与行动</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：有如下 Spark 代码片段：</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;background:#f8f9fc;padding:8px 12px;border-radius:6px">
+rdd = sc.textFile("hdfs://data.txt")&nbsp;&nbsp;&nbsp;&nbsp;# RDD[String]<br>
+rdd2 = rdd.flatMap(lambda l: l.split())&nbsp;&nbsp;&nbsp;&nbsp;# RDD[String]<br>
+rdd3 = rdd2.map(lambda w: (w, 1))&nbsp;&nbsp;&nbsp;&nbsp;# RDD[(String, Int)]<br>
+rdd4 = rdd3.reduceByKey(lambda a,b: a+b)&nbsp;&nbsp;# RDD[(String, Int)]<br>
+result = rdd4.collect()&nbsp;&nbsp;&nbsp;&nbsp;# Action: 触发计算
+      </p>
+      <p>(a) 指出哪些是 Transformation，哪些是 Action。<br>
+      (b) Spark 为什么能比 MapReduce 快？</p>
+      <p><strong>答</strong>：</p>
+      <p>(a) Transformation：flatMap、map、reduceByKey（惰性求值，不立即计算）<br>
+      Action：collect（触发实际计算）</p>
+      <p>(b) Spark 比 MapReduce 快的主要原因：<br>
+      ① <strong>内存计算</strong>：中间结果缓存于内存而非磁盘；<br>
+      ② <strong>DAG 调度</strong>：Spark 构建有向无环图（DAG）优化执行计划，减少不必要的 Shuffle；<br>
+      ③ <strong>惰性求值</strong>：只有 Action 才触发计算，有机会做整体优化（如流水线执行）；<br>
+      ④ <strong>Task 启动快</strong>：基于线程而非进程。</p>
+    </div>
+  </div>
+
+  <h3>2.5 YARN 资源调度</h3>
+  <p>YARN（Yet Another Resource Negotiator）是 Hadoop 的资源管理层，将资源管理和作业调度分离：</p>
+  <ul>
+    <li><strong>ResourceManager（RM）</strong>：全局资源管理和调度</li>
+    <li><strong>NodeManager（NM）</strong>：每个节点上的代理，管理容器</li>
+    <li><strong>ApplicationMaster（AM）</strong>：每个应用一个，负责任务调度和监控</li>
+    <li><strong>Container</strong>：资源抽象（CPU + 内存）</li>
+  </ul>
+
+  <h3>🧪 大数据基础 · 练习</h3>
+  <div class="pq">1. 简述大数据的 4V 特征，各举一个实际例子。</div>
+  <div class="pq">2. NameNode 和 DataNode 在 HDFS 中各自承担什么角色？NameNode 单点故障如何解决？</div>
+  <div class="pq">3. 画图描述 MapReduce 的完整执行流程，包括 Split、Map、Shuffle、Reduce 各阶段。</div>
+  <div class="pq">4. 为什么 Spark 比 MapReduce 更适合迭代式算法（如机器学习）？</div>
+  <div class="pq">5. YARN 中 ResourceManager、NodeManager、ApplicationMaster 三者的职责分别是什么？</div>
+</div>
+
+<!-- ===================== 三、数据存储 ===================== -->
+<div class="sec">
+  <h2>💾 三、数据存储与管理</h2>
+
+  <h3>3.1 NoSQL 数据库</h3>
+  <p>NoSQL（Not Only SQL）是为解决关系型数据库在大数据场景下的扩展性瓶颈而发展出的非关系型数据库。</p>
+  <table class="tab">
+    <tr><th>类型</th><th>数据模型</th><th>特点</th><th>典型系统</th></tr>
+    <tr><td><strong>键值存储</strong></td><td>Key-Value 对</td><td>简单、高性能、水平扩展</td><td>Redis、DynamoDB</td></tr>
+    <tr><td><strong>文档型</strong></td><td>JSON/BSON 文档</td><td>Schema-less、嵌套结构</td><td>MongoDB、CouchDB</td></tr>
+    <tr><td><strong>列族型</strong></td><td>行键+列族+列限定符</td><td>适合宽表、稀疏数据</td><td>HBase、BigTable、Cassandra</td></tr>
+    <tr><td><strong>图数据库</strong></td><td>节点+边+属性</td><td>关联关系查询高效</td><td>Neo4j、JanusGraph</td></tr>
+  </table>
+
+  <h4>关系数据库 vs NoSQL</h4>
+  <table class="tab">
+    <tr><th>维度</th><th>RDBMS</th><th>NoSQL</th></tr>
+    <tr><td>数据模型</td><td>严格 Schema（表、行、列）</td><td>灵活 Schema 或 Schema-less</td></tr>
+    <tr><td>事务</td><td>ACID 事务保证</td><td>BASE（最终一致性）</td></tr>
+    <tr><td>扩展方式</td><td>垂直扩展为主</td><td>水平扩展（分布式）</td></tr>
+    <tr><td>查询语言</td><td>SQL 标准</td><td>各系统自定义 API</td></tr>
+    <tr><td>一致性</td><td>强一致性</td><td>最终一致性或可调一致性</td></tr>
+  </table>
+
+  <h3>3.2 HBase</h3>
+  <p>HBase 是 Google BigTable 的开源实现，运行在 HDFS 之上的分布式列族数据库。</p>
+  <ul>
+    <li><strong>表结构</strong>：Row Key + Column Family + Column Qualifier + Timestamp + Value</li>
+    <li><strong>架构组件</strong>：HMaster（管理）、RegionServer（数据服务）、ZooKeeper（协调）</li>
+    <li><strong>Region</strong>：表的水平分区，每个 RegionServer 服务多个 Region</li>
+    <li><strong>特点</strong>：稀疏存储、多版本（时间戳）、可扩展、随机读写</li>
+  </ul>
+
+  <div class="fbox"><span class="flabel">HBase 数据模型示例</span>
+  RowKey | ColumnFamily:Info | ColumnFamily:Score<br>
+  "001" | Info:name="张三", Info:age=18 | Score:math=95, Score:english=88<br>
+  "002" | Info:name="李四" | Score:math=87
+  </div>
+
+  <h3>3.3 数据仓库与 Hive</h3>
+  <ul>
+    <li><strong>数据仓库</strong>：面向主题的、集成的、非易失的、随时间变化的数据集合，用于决策支持</li>
+    <li><strong>Hive</strong>：建立在 Hadoop 上的数据仓库工具，将 SQL 转换为 MapReduce/Spark 作业</li>
+    <li><strong>HiveQL</strong>：类 SQL 查询语言，支持 SELECT、JOIN、GROUP BY、窗口函数等</li>
+  </ul>
+
+  <table class="tab">
+    <tr><th>对比</th><th>数据仓库（Hive）</th><th>数据库（MySQL）</th></tr>
+    <tr><td>用途</td><td>分析型（OLAP）</td><td>事务型（OLTP）</td></tr>
+    <tr><td>数据更新</td><td>批量导入、不频繁更新</td><td>频繁增删改查</td></tr>
+    <tr><td>响应时间</td><td>秒~分钟级</td><td>毫秒级</td></tr>
+    <tr><td>数据量</td><td>TB~PB 级</td><td>GB~TB 级</td></tr>
+  </table>
+
+  <div class="toggle-sol">
+    <button class="sol-btn" onclick="toggleSol(this)">例题 6：HBase RowKey 设计</button>
+    <div class="sol-content">
+      <p><strong>问题</strong>：某物联网平台需要存储百万级设备每秒钟上报的传感器数据（设备ID、时间戳、温度、湿度）。请设计 HBase 表结构，重点说明 RowKey 的设计策略。</p>
+      <p><strong>答</strong>：</p>
+      <p><strong>RowKey 设计</strong>：device_id + timestamp（反转）</p>
+      <p>原始方案：device_id + timestamp → 同一设备的所有数据连续存储，热点问题严重。</p>
+      <p>优化方案：<strong>device_id_hash(前缀) + device_id + timestamp</strong>。计算 device_id 的 MD5 前 2 位作为前缀，打散数据分布，避免 Region 热点。</p>
+      <p><strong>表结构</strong>：</p>
+      <p style="font-family:'Courier New',monospace;font-size:13px;background:#f8f9fc;padding:8px 12px;border-radius:6px">
+RowKey: md5_prefix(2) + device_id(8) + timestamp(8)<br>
+Column Family: "data"<br>
+&nbsp;&nbsp;data:temp = 25.6<br>
+&nbsp;&nbsp;data:humidity = 68
+      </p>
+      <p><strong>设计原则</strong>：</p>
+      <ul>
+        <li>加盐（Salting）：前缀散列消除热点</li>
+        <li>尽量短：RowKey 在 HBase 中随数据一起存储，过长浪费空间</li>
+        <li>时间戳反转：同设备最新数据在前（如果经常查询最新数据）</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>3.4 消息队列与 Kafka</h3>
+  <ul>
+    <li><strong>Kafka</strong>：分布式消息队列系统，高吞吐、持久化、可分区</li>
+    <li><strong>核心概念</strong>：Producer（生产者）、Consumer（消费者）、Topic（主题）、Partition（分区）、Broker（代理节点）</li>
+    <li><strong>特点</strong>：消息持久化到磁盘、支持多订阅者、顺序保证（分区内）</li>
+  </ul>
+
+  <h3>🧪 数据存储 · 练习</h3>
+  <div class="pq">1. NoSQL 数据库的四种类型分别是什么？各适合什么场景？</div>
+  <div class="pq">2. 关系数据库的 ACID 和 NoSQL 的 BASE 分别代表什么含义？</div>
+  <div class="pq">3. HBase 中的 RowKey 设计为什么要避免"热点"？有哪些常用的打散策略？</div>
+  <div class="pq">4. 数据仓库和传统数据库在用途上有何不同？Hive 将 SQL 转换为 MapReduce 执行的优缺点是什么？</div>
+  <div class="pq">5. Kafka 中 Topic 和 Partition 的关系是什么？Partition 的作用是什么？</div>
+</div>
+
+<!-- ===================== 四、流处理与实时计算 ===================== -->
+<div class="sec">
+  <h2>⚡ 四、流处理与实时计算</h2>
+
+  <h3>4.1 批处理 vs 流处理</h3>
+  <table class="tab">
+    <tr><th>维度</th><th>批处理（Batch）</th><th>流处理（Stream）</th></tr>
+    <tr><td>数据处理方式</td><td>对静态数据集批量处理</td><td>数据到达即处理</td></tr>
+    <tr><td>延迟</td><td>分钟~小时级</td><td>毫秒~秒级</td></tr>
+    <tr><td>数据范围</td><td>全量数据</td><td>当前窗口数据</td></tr>
+    <tr><td>典型框架</td><td>MapReduce、Spark Batch</td><td>Spark Streaming、Flink、Storm</td></tr>
+    <tr><td>适用场景</td><td>报表生成、数据清洗</td><td>实时监控、欺诈检测</td></tr>
+  </table>
+
+  <h3>4.2 Spark Streaming</h3>
+  <ul>
+    <li><strong>微批次架构</strong>：将实时流切分为小批次（如每秒一批），用 Spark 引擎处理</li>
+    <li><strong>DStream</strong>：离散化流，本质上是一系列连续的 RDD</li>
+    <li><strong>窗口操作</strong>：滑动窗口（window）、滚动窗口（tumbling）</li>
+  </ul>
+
+  <h3>4.3 Flink</h3>
+  <ul>
+    <li><strong>真正的流处理</strong>：每条数据到达即处理，而非微批次</li>
+    <li><strong>事件时间（Event Time）</strong>：支持乱序事件处理，通过 Watermark 机制</li>
+    <li><strong>Exactly-Once 语义</strong>：精确一次处理保证</li>
+    <li><strong>有状态计算</strong>：维护算子状态，支持故障恢复</li>
+  </ul>
+
+  <table class="tab">
+    <tr><th>对比</th><th>Spark Streaming</th><th>Flink</th></tr>
+    <tr><td>架构</td><td>微批次（Micro-batch）</td><td>真流（True Streaming）</td></tr>
+    <tr><td>延迟</td><td>秒级（取决于批次间隔）</td><td>亚秒级</td></tr>
+    <tr><td>Exactly-Once</td><td>支持（通过 WAL 和事务输出）</td><td>原生支持</td></tr>
+    <tr><td>事件时间处理</td><td>支持（1.2+）</td><td>原生支持，Watermark 完善</td></tr>
+    <tr><td>状态管理</td><td>基于 RDD 的 Checkpoint</td><td>分布式快照</td></tr>
+  </table>
+
+  <h3>🧪 流处理 · 练习</h3>
+  <div class="pq">1. 批处理与流处理的核心区别是什么？分别适用于什么场景？</div>
+  <div class="pq">2. Spark Streaming 的微批次架构有什么优缺点？</div>
+  <div class="pq">3. Flink 中的 Watermark 机制解决了什么问题？</div>
+</div>
+
+<!-- ===================== 五、云原生 ===================== -->
+<div class="sec">
+  <h2>🚢 五、云原生技术</h2>
+
+  <h3>5.1 云原生定义</h3>
+  <p>云原生（Cloud Native）是一种构建和运行充分利用云计算模型优势的应用的方法论。核心包括：</p>
+  <ul>
+    <li><strong>微服务（Microservices）</strong>：将单体应用拆分为小型独立服务</li>
+    <li><strong>容器化（Containerization）</strong>：用容器封装服务及其依赖</li>
+    <li><strong>容器编排（Orchestration）</strong>：自动部署、扩展和管理容器</li>
+    <li><strong>DevOps</strong>：开发与运维一体化，CI/CD 自动化</li>
+    <li><strong>声明式 API</strong>：用描述性配置而非命令式操作</li>
+  </ul>
+
+  <h3>5.2 Kubernetes（K8s）</h3>
+  <p>Kubernetes 是 Google 开源的容器编排平台，已成为云原生的事实标准。</p>
+  <table class="tab">
+    <tr><th>核心概念</th><th>作用</th></tr>
+    <tr><td>Pod</td><td>最小的调度单位，包含一个或多个容器</td></tr>
+    <tr><td>Service</td><td>为 Pod 提供稳定的网络访问入口</td></tr>
+    <tr><td>Deployment</td><td>声明式管理 Pod 的副本数和更新策略</td></tr>
+    <tr><td>ConfigMap / Secret</td><td>配置管理和敏感信息管理</td></tr>
+    <tr><td>Node / Cluster</td><td>节点（物理/虚拟机）和集群</td></tr>
+  </table>
+
+  <div class="abox">
+    <div class="atitle">📌 K8s 架构</div>
+    <strong>控制平面（Control Plane）</strong>：<br>
+    &nbsp;&nbsp;• API Server — 集群入口，REST API<br>
+    &nbsp;&nbsp;• Scheduler — 调度 Pod 到 Node<br>
+    &nbsp;&nbsp;• Controller Manager — 维护集群期望状态<br>
+    &nbsp;&nbsp;• etcd — 分布式键值存储，保存集群状态<br>
+    <strong>工作节点（Worker Node）</strong>：<br>
+    &nbsp;&nbsp;• Kubelet — 节点代理，管理 Pod<br>
+    &nbsp;&nbsp;• Kube-proxy — 网络代理与服务发现<br>
+    &nbsp;&nbsp;• Container Runtime — 容器运行时（Docker/containerd）
+  </div>
+
+  <h3>5.3 Serverless</h3>
+  <ul>
+    <li><strong>函数即服务（FaaS）</strong>：开发者只需编写函数代码，平台自动管理伸缩</li>
+    <li><strong>按需付费</strong>：按实际执行时间和资源计费，不运行不计费</li>
+    <li><strong>典型产品</strong>：AWS Lambda、Google Cloud Functions、阿里云函数计算</li>
+    <li><strong>适用场景</strong>：事件驱动型任务、Webhook、数据处理管道</li>
+  </ul>
+
+  <h3>🧪 云原生 · 练习</h3>
+  <div class="pq">1. 云原生应用与传统单体应用在设计理念上有哪些主要区别？</div>
+  <div class="pq">2. Kubernetes 中 Pod 和 Service 的关系是什么？Service 提供了哪些功能？</div>
+  <div class="pq">3. Serverless 架构的优缺点是什么？适合哪些类型的应用？</div>
+</div>
+
+<!-- ===================== 六、考前速记 ===================== -->
+<div class="sec">
+  <h2>🎯 六、考前速记 &amp; 答题模板</h2>
+
+  <h3>6.1 高频名词解释</h3>
+  <table class="tab">
+    <tr><th>术语</th><th>核心要点</th></tr>
+    <tr><td>云计算</td><td>按需提供可配置计算资源的模型，特征：按需、广泛网络、资源池、弹性、可计量</td></tr>
+    <tr><td>虚拟化</td><td>将物理资源抽象为逻辑资源，实现隔离与共享。Type1 裸机 / Type2 宿主</td></tr>
+    <tr><td>Hypervisor</td><td>虚拟机监视器，管理和隔离多个虚拟机</td></tr>
+    <tr><td>HDFS</td><td>分布式文件系统，NameNode(元数据) + DataNode(数据块)，默认3副本</td></tr>
+    <tr><td>MapReduce</td><td>分布式计算模型，Map(并行处理)+Shuffle(排序分组)+Reduce(聚合)</td></tr>
+    <tr><td>RDD</td><td>弹性分布式数据集，Spark核心抽象，不可变、分区、可并行操作</td></tr>
+    <tr><td>NoSQL</td><td>非关系型数据库：KV / 文档 / 列族 / 图，追求水平扩展和灵活Schema</td></tr>
+    <tr><td>HBase</td><td>列族式 NoSQL 数据库，RowKey+CF+Qualifier+Timestamp+Value</td></tr>
+    <tr><td>YARN</td><td>资源调度框架，RM(全局)+NM(节点)+AM(应用)三层架构</td></tr>
+    <tr><td>Kafka</td><td>分布式消息队列，Topic分区+持久化+高吞吐</td></tr>
+    <tr><td>Docker</td><td>容器引擎，OS级虚拟化，秒级启动</td></tr>
+    <tr><td>Kubernetes</td><td>容器编排平台，Pod+Service+Deployment 核心抽象</td></tr>
+    <tr><td>微服务</td><td>将单体拆分为独立部署的小服务，每个服务专注单一功能</td></tr>
+    <tr><td>Serverless</td><td>开发者无需关心服务器，FaaS + BaaS</td></tr>
+  </table>
+
+  <h3>6.2 高频简答题模板</h3>
+  <div class="etip">
+    <div class="ett">IaaS / PaaS / SaaS 三者的区别？</div>
+    从用户管理的层次区分：IaaS 提供虚拟机、存储等基础设施，用户管理 OS 以上所有内容；PaaS 提供运行时和中间件平台，用户只管理应用和数据；SaaS 提供完整软件服务，用户仅使用。口诀：IaaS 是租房，PaaS 是精装房，SaaS 是酒店。
+  </div>
+  <div class="etip">
+    <div class="ett">MapReduce 的 Shuffle 阶段做了什么？</div>
+    Shuffle 是连接 Map 和 Reduce 的关键阶段：① <strong>分区</strong>（Partition）：根据 key 的哈希值将数据分到不同的 Reduce 任务；② <strong>排序</strong>（Sort）：每个分区内按 key 排序；③ <strong>归并</strong>（Merge）：将 Map 输出的多个溢写文件合并为一个；④ <strong>复制</strong>（Copy）：Reduce 从各个 Map 节点拉取对应分区的数据。
+  </div>
+  <div class="etip">
+    <div class="ett">Spark 为什么比 MapReduce 快？</div>
+    ① 内存计算：中间结果缓存于内存，减少磁盘 I/O；② DAG 优化：构建有向无环图，优化执行计划，减少不必要的 Shuffle；③ 惰性求值：Action 才触发计算，有机会做全局优化；④ 线程级 Task：启动开销远小于 MapReduce 的进程级 Task。
+  </div>
+  <div class="etip">
+    <div class="ett">什么是 CAP 定理？NoSQL 如何权衡？</div>
+    CAP 定理指出分布式系统最多同时满足三个中的两个：<strong>一致性</strong>（Consistency）、<strong>可用性</strong>（Availability）、<strong>分区容忍性</strong>（Partition Tolerance）。由于网络分区必然发生，实际是在 CP 和 AP 之间选择。HBase 选 CP（强一致），Cassandra 选 AP（最终一致），MongoDB 默认 CP（可配置）。
+  </div>
+  <div class="etip">
+    <div class="ett">容器和虚拟机的区别？</div>
+    容器共享宿主机内核（OS 级虚拟化），无需模拟硬件和启动完整 OS，因此启动快（秒级）、镜像小（MB级）、密度高。虚拟机通过 Hypervisor 模拟完整硬件，拥有独立内核，隔离性强但开销大（启动分钟级、镜像 GB 级）。安全要求高的多租户场景用 VM，微服务和 CI/CD 场景用容器。
+  </div>
+  <div class="etip">
+    <div class="ett">HDFS 小文件问题及解决方案？</div>
+    小文件过多会导致：① NameNode 内存压力大（每个文件/块元数据约 150B）；② MapReduce 任务过多（每个文件一个 split）。解决方案：① 合并小文件（SequenceFile / HAR 归档）；② 使用 HBase 管理小文件；③ 调整块大小和分片策略。
+  </div>
+
+  <h3>6.3 简答题作答套路</h3>
+  <div class="warn blue">
+    <h4>📌 答题结构</h4>
+    <strong>概念题</strong>：定义 + 特征/组成 + 举例<br>
+    <strong>对比题</strong>：分维度对比（每个维度一句话）+ 适用场景总结<br>
+    <strong>原理题</strong>：核心机制 + 流程步骤 + 为什么这样设计<br>
+    <strong>设计题</strong>：需求分析 → 技术选型 → 架构设计 → 优缺点分析
+  </div>
+
+  <h3>6.4 考试策略</h3>
+  <div class="warn yellow">
+    <h4>🎯 得分技巧</h4>
+    <ul style="margin:4px 0 0">
+      <li>Hadoop 生态题必考：HDFS/MapReduce/YARN 的架构和流程一定要能画图</li>
+      <li>对比题高频：Spark vs MapReduce、虚拟机 vs 容器、SQL vs NoSQL、批处理 vs 流处理</li>
+      <li>设计题注意：读写比例、数据量级、一致性要求决定技术选型</li>
+      <li>名词解释写出英文全称更显专业（如 HDFS = Hadoop Distributed File System）</li>
+    </ul>
+  </div>
+</div>
+
+</div>
+
+<div class="footer">
+  <p>思贤学习站 · 济南市商河县 · <span class="contact-trigger" onclick="openShareWall()">获取联系方式</span></p>
+</div>
+
+<script>
+(function() {
+  var url = window.location.origin + window.location.pathname;
+  var shareTxt = '📚 云计算与大数据期末复习——Hadoop·Spark·HDFS·NoSQL·K8s，知识点+例题+练习全覆盖！ ' + url;
+  var hasCopied = false;
+  var overlay = document.getElementById('shareOverlay') || (function(){
+    var el = document.createElement('div'); el.className = 'share-overlay'; el.id = 'shareOverlay';
+    el.innerHTML = '<div class="share-modal"><div class="share-icon">🔗</div><h3>分享即可获取联系方式</h3><p class="share-desc">将此网站分享给微信好友或发到朋友圈</p><div class="share-msg-box"><p id="shareText"></p></div><button class="copy-btn" id="copyBtn">📋 复制分享文案</button><p class="copy-hint" id="copyHint">复制后粘贴发送给微信好友或发到朋友圈</p><button class="shared-btn" id="sharedBtn" disabled>我已分享，查看联系方式 →</button></div>';
+    document.body.appendChild(el); return el;
+  })();
+  var shareTextEl = document.getElementById('shareText');
+  var copyBtn = document.getElementById('copyBtn');
+  var copyHint = document.getElementById('copyHint');
+  var sharedBtn = document.getElementById('sharedBtn');
+  if (localStorage.getItem('sx_shared')) {
+    var ts = document.querySelectorAll('.contact-trigger');
+    for (var i = 0; i < ts.length; i++) ts[i].outerHTML = '<b>155-6412-8008</b>';}
+  window.openShareWall = function() {
+    if (localStorage.getItem('sx_shared')) return;
+    shareTextEl.textContent = shareTxt;
+    overlay.classList.add('active');
+    hasCopied = false; sharedBtn.disabled = true;
+    copyBtn.textContent = '📋 复制分享文案'; copyBtn.classList.remove('copied');
+    copyHint.textContent = '复制后粘贴发送给微信好友或发到朋友圈';
+    var t = localStorage.getItem('sx_copy_time');
+    if (t && Date.now() - Number(t) >= 10000) { hasCopied = true; sharedBtn.disabled = false;
+      copyBtn.textContent = '✅ 已复制'; copyBtn.classList.add('copied');
+      copyHint.textContent = '✅ 点击下方按钮查看联系方式'; }};
+  copyBtn.addEventListener('click', function() {
+    if (window._shareTimeout) clearTimeout(window._shareTimeout);
+    var text = shareTextEl.textContent;
+    function done() {
+      localStorage.setItem('sx_copy_time', Date.now());
+      copyBtn.textContent = '✅ 已复制'; copyBtn.classList.add('copied');
+      copyHint.textContent = '⏳ 检测到转发朋友圈，自动获取联系方式...';
+      window._shareTimeout = setTimeout(function() { hasCopied = true; sharedBtn.disabled = false;
+        copyHint.textContent = '✅ 点击下方按钮查看联系方式'; }, 10000); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done);
+    } else {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta); done(); }});
+  sharedBtn.addEventListener('click', function() {
+    if (!hasCopied) return;
+    localStorage.setItem('sx_shared', '1');
+    overlay.classList.remove('active');
+    if (window._shareTimeout) clearTimeout(window._shareTimeout);
+    var triggers = document.querySelectorAll('.contact-trigger');
+    for (var i = 0; i < triggers.length; i++) triggers[i].outerHTML = '<b>155-6412-8008</b>';});
+  overlay.addEventListener('click', function(e) {
+    if (e.target === this) { overlay.classList.remove('active'); if (window._shareTimeout) clearTimeout(window._shareTimeout); }});
+})();
+</script>
+
+<button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="回到顶部">↑</button>
+<script>window.addEventListener('scroll',function(){document.querySelector('.back-to-top').classList.toggle('show',window.scrollY>300)});</script>
+
+<script>
+function toggleSol(btn) {
+  var content = btn.nextElementSibling;
+  if (content && content.classList) {
+    content.classList.toggle('show');
+    btn.textContent = content.classList.contains('show') ? '🙌 查看答案' : '💡 点击查看解析';
+  }
+}
+</script>
+
+</body>
+</html>

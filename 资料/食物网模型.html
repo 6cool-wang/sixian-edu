@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>食物网模型 · 思贤学习站</title><link rel="icon" href="../images/logo.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#0a0e1a;overflow:hidden;height:100vh;color:#ddd}
+canvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
+#tip{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:5;font-size:12px;color:#555;background:rgba(10,14,26,0.85);padding:6px 16px;border-radius:20px;border:1px solid rgba(255,255,255,0.06);pointer-events:none;white-space:nowrap}
+#tip kbd{background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:3px;font-size:10px;color:#777}
+.controls{position:fixed;top:16px;right:16px;z-index:10;background:rgba(15,20,40,0.9);border:1px solid rgba(255,255,255,0.1);border-radius:14px;padding:16px 18px;width:270px;color:#ddd;font-size:13px;backdrop-filter:blur(8px);max-height:calc(100vh - 32px);overflow-y:auto}
+.controls h2{font-size:15px;color:#fff;margin-bottom:10px;text-align:center;letter-spacing:1px}
+.controls h2 span{color:#5dade2}
+.legend{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;justify-content:center}
+.legend span{padding:2px 10px;border-radius:10px;font-size:11px;white-space:nowrap}
+.info-box{background:rgba(255,255,255,0.04);border-radius:10px;padding:12px;min-height:80px;margin-bottom:10px}
+.info-box .sname{font-size:15px;font-weight:700}
+.info-box .sen{font-size:11px;color:#888;font-weight:400}
+.info-box .sdesc{font-size:12px;color:#999;margin-top:6px;line-height:1.6}
+.info-box .seats{font-size:11px;color:#666;margin-top:6px}
+.info-box .seats span{display:inline-block;margin:2px 4px 2px 0;padding:1px 8px;border-radius:8px;font-size:10px}
+.level-btns{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.level-btns button{padding:4px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.04);color:#999;font-size:11px;cursor:pointer;transition:all 0.2s}
+.level-btns button:hover{background:rgba(255,255,255,0.1);color:#fff}
+.level-btns button.on{background:rgba(93,173,226,0.15);color:#5dade2;border-color:rgba(93,173,226,0.3)}
+.footer-link{text-align:center;margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.06)}
+.footer-link a{color:#5dade2;font-size:12px;text-decoration:none}
+.footer-link a:hover{text-decoration:underline}
+@media(max-width:700px){.controls{top:auto;bottom:0;right:0;left:0;width:100%;border-radius:14px 14px 0 0;max-height:45vh;padding:12px 14px 8px}.controls h2{font-size:14px}#tip{bottom:46vh}}
+</style></head><body>
+<canvas id="c"></canvas>
+<div id="tip"><kbd>悬停</kbd>高亮食物链 · <kbd>点击</kbd>查看详情</div>
+<div class="controls">
+  <h2>🕸️ 食物网 <span>生态模型</span></h2>
+  <div class="legend">
+    <span style="background:rgba(46,204,113,0.2);color:#2ecc71">生产者</span>
+    <span style="background:rgba(93,173,226,0.2);color:#5dade2">初级消费者</span>
+    <span style="background:rgba(241,196,15,0.2);color:#f1c40f">次级消费者</span>
+    <span style="background:rgba(231,76,60,0.2);color:#e74c3c">三级消费者</span>
+    <span style="background:rgba(155,89,182,0.2);color:#bb8fce">分解者</span>
+  </div>
+  <div class="level-btns" id="filterBtns">
+    <button data-lv="-1" class="on">全部</button>
+    <button data-lv="0" style="color:#2ecc71">生产者</button>
+    <button data-lv="1" style="color:#5dade2">初级</button>
+    <button data-lv="2" style="color:#f1c40f">次级</button>
+    <button data-lv="3" style="color:#e74c3c">三级</button>
+  </div>
+  <div class="info-box" id="infoBox">
+    <div class="sname" style="color:#888">悬停或点击物种</div>
+    <div class="sdesc">查看它在食物网中的位置</div>
+  </div>
+  <div class="footer-link"><a href="../资料/生物.html">← 返回生物</a></div>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+let W, H;
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const TROPHY = [
+  { label: '生产者', color: '#2ecc71', bg: 'rgba(46,204,113,0.12)', border: 'rgba(46,204,113,0.4)' },
+  { label: '初级消费者', color: '#5dade2', bg: 'rgba(93,173,226,0.12)', border: 'rgba(93,173,226,0.4)' },
+  { label: '次级消费者', color: '#f1c40f', bg: 'rgba(241,196,15,0.12)', border: 'rgba(241,196,15,0.4)' },
+  { label: '三级消费者', color: '#e74c3c', bg: 'rgba(231,76,60,0.12)', border: 'rgba(231,76,60,0.4)' },
+  { label: '分解者', color: '#bb8fce', bg: 'rgba(155,89,182,0.12)', border: 'rgba(155,89,182,0.4)' },
+];
+
+const species = [
+  // ── 生产者 (level 0) ──
+  { id: 'grass', name:'草', emoji:'🌿', en:'Grass', level:0, trophic:0,
+    desc:'最常见的绿色植物之一，通过光合作用将太阳能转化为化学能，是陆地生态系统中最基础的生产者。', x:.08, y:.82 },
+  { id: 'tree', name:'树', emoji:'🌳', en:'Tree', level:0, trophic:0,
+    desc:'木本植物，提供果实、花蜜和栖息地。叶片通过光合作用生产有机物，是森林生态系统的基石。', x:.18, y:.82 },
+  { id: 'algae', name:'藻类', emoji:'🟢', en:'Algae', level:0, trophic:0,
+    desc:'水中进行光合作用的低等植物，是水生生态系统的主要生产者，为水域食物网提供能量基础。', x:.30, y:.82 },
+  { id: 'phytoplankton', name:'浮游植物', emoji:'🌊', en:'Phytoplankton', level:0, trophic:0,
+    desc:'悬浮在水体中的微小植物，包括硅藻、绿藻等。进行光合作用，是海洋食物网的起点。', x:.42, y:.82 },
+  { id: 'rice', name:'水稻', emoji:'🌾', en:'Rice', level:0, trophic:0,
+    desc:'人工栽培的重要粮食作物。在农田生态系统中作为生产者，支撑着以农田为基础的食物网。', x:.54, y:.82 },
+  { id: 'corn', name:'玉米', emoji:'🌽', en:'Corn', level:0, trophic:0,
+    desc:'高产粮食作物，为植食动物和人类提供能量来源。叶片和种子被多种昆虫和鸟类取食。', x:.66, y:.82 },
+  { id: 'waterweed', name:'水草', emoji:'🌱', en:'Waterweed', level:0, trophic:0,
+    desc:'水生的绿色植物，为水生植食动物提供食物，同时释放氧气，维持水域生态系统的物质循环。', x:.78, y:.82 },
+
+  // ── 初级消费者 (level 1) ──
+  { id: 'grasshopper', name:'蝗虫', emoji:'🦗', en:'Grasshopper', level:1, trophic:1,
+    desc:'植食性昆虫，以禾本科植物（草、水稻、玉米）的叶片为食。是次级消费者的重要食物来源。', x:.04, y:.63 },
+  { id: 'rabbit', name:'兔', emoji:'🐰', en:'Rabbit', level:1, trophic:1,
+    desc:'草食性哺乳动物，喜食青草和嫩叶。繁殖力强，是草原生态系统中重要的初级消费者。', x:.14, y:.63 },
+  { id: 'mouse', name:'鼠', emoji:'🐭', en:'Mouse', level:1, trophic:1,
+    desc:'杂食性啮齿动物，以植物种子、果实和昆虫为食。适应力极强，是众多肉食动物的捕食对象。', x:.25, y:.63 },
+  { id: 'bee', name:'蜜蜂', emoji:'🐝', en:'Bee', level:1, trophic:1,
+    desc:'以花蜜和花粉为食的昆虫，在采蜜过程中为植物传粉。是生态系统中关键的传粉媒介。', x:.36, y:.63 },
+  { id: 'snail', name:'蜗牛', emoji:'🐌', en:'Snail', level:1, trophic:1,
+    desc:'软体动物，以植物叶片、藻类和腐烂有机物为食。行动缓慢，是许多鸟兽和昆虫的捕食对象。', x:.47, y:.63 },
+  { id: 'deer', name:'鹿', emoji:'🦌', en:'Deer', level:1, trophic:1,
+    desc:'大型草食性哺乳动物，以草、树叶和树皮为食。在森林生态系统中是重要的初级消费者。', x:.60, y:.63 },
+  { id: 'caterpillar', name:'毛虫', emoji:'🐛', en:'Caterpillar', level:1, trophic:1,
+    desc:'蝴蝶或蛾的幼虫，以植物叶片为食。虽然个体小但数量庞大，是鸟类重要的食物资源。', x:.71, y:.63 },
+  { id: 'zooplankton', name:'浮游动物', emoji:'🦐', en:'Zooplankton', level:1, trophic:1,
+    desc:'在水中浮游生活的小型动物，以浮游植物和有机碎屑为食。是水生食物网的关键一环。', x:.83, y:.63 },
+
+  // ── 次级消费者 (level 2) ──
+  { id: 'frog', name:'青蛙', emoji:'🐸', en:'Frog', level:2, trophic:2,
+    desc:'两栖动物，捕食蝗虫、蜗牛等小型无脊椎动物。是湿地和农田生态系统中重要的次级消费者。', x:.06, y:.42 },
+  { id: 'spider', name:'蜘蛛', emoji:'🕷️', en:'Spider', level:2, trophic:2,
+    desc:'肉食性节肢动物，结网捕食飞行昆虫或地面捕猎。是控制植食性昆虫数量的重要天敌。', x:.18, y:.42 },
+  { id: 'sparrow', name:'麻雀', emoji:'🐦', en:'Sparrow', level:2, trophic:2,
+    desc:'杂食性鸟类，既吃植物种子也捕食昆虫。在农田生态系统中既取食谷物也捕食害虫。', x:.30, y:.42 },
+  { id: 'hedgehog', name:'刺猬', emoji:'🦔', en:'Hedgehog', level:2, trophic:2,
+    desc:'夜行性哺乳动物，以昆虫、蜗牛、鼠类等为食。是控制有害动物数量的重要天敌。', x:.42, y:.42 },
+  { id: 'dragonfly', name:'蜻蜓', emoji:'🔷', en:'Dragonfly', level:2, trophic:2,
+    desc:'肉食性昆虫，成虫在空中捕食蚊虫、蜜蜂等飞行昆虫。幼虫（水虿）在水中捕食浮游动物。', x:.54, y:.42 },
+  { id: 'insect_bird', name:'食虫鸟', emoji:'🐧', en:'Insectivorous Bird', level:2, trophic:2,
+    desc:'以昆虫为主食的鸟类，如鹡鸰、柳莺等。捕食蝗虫、毛虫等植食性昆虫，控制害虫数量。', x:.66, y:.42 },
+  { id: 'small_fish', name:'小型鱼类', emoji:'🐟', en:'Small Fish', level:2, trophic:2,
+    desc:'水生次级消费者，以浮游动物、水生昆虫为食。是水域食物网中连接浮游动物和顶级掠食者的桥梁。', x:.78, y:.42 },
+
+  // ── 三级消费者 (level 3) ──
+  { id: 'snake', name:'蛇', emoji:'🐍', en:'Snake', level:3, trophic:3,
+    desc:'肉食性爬行动物，捕食青蛙、鼠类、鸟类等。在生态系统中扮演中级至顶级掠食者的角色。', x:.10, y:.20 },
+  { id: 'fox', name:'狐狸', emoji:'🦊', en:'Fox', level:3, trophic:3,
+    desc:'中小型肉食性哺乳动物，捕食兔、鼠、鸟等。适应力强，在多种生境中均可成为顶级掠食者。', x:.30, y:.20 },
+  { id: 'eagle', name:'鹰', emoji:'🦅', en:'Eagle', level:3, trophic:3,
+    desc:'大型猛禽，处于食物链顶端。捕食蛇、兔、鼠、鸟类等。对维持生态系统平衡具有重要作用。', x:.55, y:.20 },
+  { id: 'large_fish', name:'大型鱼类', emoji:'🐋', en:'Large Fish', level:3, trophic:3,
+    desc:'水生态系统的顶级掠食者，以小型鱼类和大型浮游动物为食。处于水生食物链的顶端。', x:.75, y:.20 },
+
+  // ── 分解者 (level 4, side) ──
+  { id: 'fungi', name:'真菌', emoji:'🍄', en:'Fungi', level:4, trophic:4,
+    desc:'分解者，将动植物遗体中的有机物分解为无机物，释放到土壤中供植物再利用。', x:.92, y:.38 },
+  { id: 'bacteria', name:'细菌', emoji:'🦠', en:'Bacteria', level:4, trophic:4,
+    desc:'微生物分解者，分解有机残体，将有机物转化为无机盐。是物质循环中不可或缺的一环。', x:.92, y:.52 },
+  { id: 'earthworm', name:'蚯蚓', emoji:'🪱', en:'Earthworm', level:4, trophic:4,
+    desc:'土壤动物，以枯枝落叶和有机物为食。疏松土壤，促进有机物分解和养分循环。', x:.92, y:.66 },
+];
+
+// Define food relationships (predator → prey)
+const relations = [
+  // → 草
+  ['grasshopper','grass'], ['rabbit','grass'], ['mouse','grass'], ['snail','grass'], ['deer','grass'],
+  // → 树
+  ['deer','tree'], ['caterpillar','tree'], ['bee','tree'],
+  // → 藻类
+  ['snail','algae'], ['zooplankton','algae'],
+  // → 浮游植物
+  ['zooplankton','phytoplankton'],
+  // → 水稻
+  ['grasshopper','rice'], ['mouse','rice'], ['sparrow','rice'],
+  // → 玉米
+  ['grasshopper','corn'], ['mouse','corn'], ['caterpillar','corn'], ['sparrow','corn'],
+  // → 水草
+  ['snail','waterweed'],
+
+  // → 蝗虫
+  ['frog','grasshopper'], ['spider','grasshopper'], ['sparrow','grasshopper'], ['hedgehog','grasshopper'], ['insect_bird','grasshopper'],
+  // → 兔
+  ['fox','rabbit'], ['eagle','rabbit'],
+  // → 鼠
+  ['snake','mouse'], ['fox','mouse'], ['eagle','mouse'], ['hedgehog','mouse'],
+  // → 蜜蜂
+  ['spider','bee'], ['frog','bee'], ['sparrow','bee'], ['dragonfly','bee'],
+  // → 蜗牛
+  ['frog','snail'], ['hedgehog','snail'], ['snake','snail'],
+  // → 鹿
+  ['fox','deer'], ['eagle','deer'],
+  // → 毛虫
+  ['spider','caterpillar'], ['sparrow','caterpillar'], ['insect_bird','caterpillar'], ['dragonfly','caterpillar'],
+  // → 浮游动物
+  ['dragonfly','zooplankton'], ['small_fish','zooplankton'],
+
+  // → 青蛙
+  ['snake','frog'],
+  // → 蜘蛛
+  ['insect_bird','spider'], ['snake','spider'],
+  // → 麻雀
+  ['snake','sparrow'], ['eagle','sparrow'], ['fox','sparrow'],
+  // → 刺猬
+  ['snake','hedgehog'], ['fox','hedgehog'],
+  // → 蜻蜓
+  ['frog','dragonfly'], ['spider','dragonfly'], ['insect_bird','dragonfly'],
+  // → 食虫鸟
+  ['snake','insect_bird'], ['eagle','insect_bird'], ['fox','insect_bird'],
+  // → 小型鱼类
+  ['large_fish','small_fish'],
+
+  // → 蛇
+  ['eagle','snake'],
+  // → 狐狸
+  ['eagle','fox'],
+];
+
+const DECOMPOSERS = ['fungi','bacteria','earthworm'];
+// Decomposer connections: all non-decomposers → decomposers
+const decompLinks = species.filter(s=>s.level<4).map(s=>[s.id,'fungi']);
+decompLinks.push(...species.filter(s=>s.level<4&&s.level>0).map(s=>[s.id,'bacteria']));
+decompLinks.push(...species.filter(s=>s.level<4&&s.level<=1).map(s=>[s.id,'earthworm']));
+
+const allEdges = [...relations, ...decompLinks];
+
+// Build adjacency
+const adj = {};
+species.forEach(s => adj[s.id] = []);
+allEdges.forEach(([pred,prey]) => {
+  if (!adj[pred]) adj[pred] = [];
+  adj[pred].push(prey);
+});
+
+const rev = {};
+species.forEach(s => rev[s.id] = []);
+allEdges.forEach(([pred,prey]) => {
+  if (!rev[prey]) rev[prey] = [];
+  rev[prey].push(pred);
+});
+
+// Map id to species
+const smap = {};
+species.forEach(s => smap[s.id] = s);
+
+// ──── State ────
+let hovered = null;
+let selected = null;
+let filter = -1; // -1 = all
+let particles = [];
+let animTime = 0;
+
+function generateParticles() {
+  particles = [];
+  allEdges.forEach(([pred,prey], ei) => {
+    for (let i=0;i<2;i++) {
+      particles.push({
+        edge: ei, t: Math.random(),
+        speed: 0.003 + Math.random() * 0.004,
+        size: 1.5 + Math.random() * 1.5,
+        alpha: 0.3 + Math.random() * 0.4,
+      });
+    }
+  });
+}
+generateParticles();
+
+// ──── Layout calculation ────
+function getPos(s, padX=0.12, padY=0.07) {
+  const x = padX + s.x * (1 - 2*padX);
+  const y = padY + (1-s.y) * (1 - 2*padY);
+  return [x * W, y * H];
+}
+
+const NODE_W = 80;
+const NODE_H = 36;
+
+function createPath(x1,y1,x2,y2, isDecomp=false) {
+  const dx=x2-x1, dy=y2-y1;
+  const len = Math.sqrt(dx*dx+dy*dy);
+  const mx = (x1+x2)/2, my = (y1+y2)/2;
+  const offset = Math.min(len*0.15, 30);
+  const perpX = -dy/len*offset, perpY = dx/len*offset;
+  return { x1,y1, x2,y2, cx:mx+perpX, cy:my+perpY, len };
+}
+
+// ──── Drawing ────
+function drawArrowhead(x,y, angle, color, size=8) {
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(angle);
+  ctx.beginPath();
+  ctx.moveTo(size,0);
+  ctx.lineTo(-size*0.4,-size*0.5);
+  ctx.lineTo(-size*0.4,size*0.5);
+  ctx.closePath();
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.restore();
+}
+
+function drawCurvedArrow(p, color, alpha=0.5, highlight=false) {
+  ctx.save();
+  ctx.globalAlpha = highlight ? 0.9 : alpha;
+  ctx.strokeStyle = color;
+  ctx.lineWidth = highlight ? 2.5 : 1.2;
+  ctx.setLineDash([]);
+  ctx.beginPath();
+  ctx.moveTo(p.x1, p.y1);
+  ctx.quadraticCurveTo(p.cx, p.cy, p.x2, p.y2);
+  ctx.stroke();
+
+  // Arrowhead at endpoint
+  const t = 0.95;
+  const x = (1-t)*(1-t)*p.x1 + 2*(1-t)*t*p.cx + t*t*p.x2;
+  const y = (1-t)*(1-t)*p.y1 + 2*(1-t)*t*p.cy + t*t*p.y2;
+  const dt = 0.02;
+  const xt = (1-(t+dt))*(1-(t+dt))*p.x1 + 2*(1-(t+dt))*(t+dt)*p.cx + (t+dt)*(t+dt)*p.x2;
+  const yt = (1-(t+dt))*(1-(t+dt))*p.y1 + 2*(1-(t+dt))*(t+dt)*p.cy + (t+dt)*(t+dt)*p.y2;
+  const angle = Math.atan2(yt-y, xt-x);
+  const arrowSize = highlight ? 10 : 7;
+  drawArrowhead(x, y, angle, highlight ? color : color, arrowSize);
+  ctx.restore();
+}
+
+function drawNode(s, highlight=false, dim=false) {
+  const [x,y] = getPos(s);
+  const trophy = TROPHY[s.trophic] || TROPHY[0];
+  const r = 8;
+
+  ctx.save();
+  ctx.globalAlpha = dim ? 0.2 : 1;
+
+  // Background glow for hovered
+  if (highlight) {
+    const grad = ctx.createRadialGradient(x,y,0,x,y,50);
+    grad.addColorStop(0, trophy.color.replace(')',',0.15)').replace('rgb','rgba'));
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(x,y,50,0,Math.PI*2);
+    ctx.fill();
+  }
+
+  // Node bg
+  ctx.fillStyle = highlight ? (s.trophic===4?'rgba(155,89,182,0.25)':'rgba(255,255,255,0.12)') : trophy.bg;
+  ctx.strokeStyle = trophy.border;
+  ctx.lineWidth = highlight ? 2.5 : 1.2;
+  ctx.beginPath();
+  ctx.roundRect(x-NODE_W/2, y-NODE_H/2, NODE_W, NODE_H, r);
+  ctx.fill();
+  ctx.stroke();
+
+  // Emoji
+  ctx.font = '18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(s.emoji, x-NODE_W/2+16, y-1);
+
+  // Name
+  ctx.font = 'bold 12px "Microsoft YaHei",sans-serif';
+  ctx.fillStyle = highlight ? '#fff' : trophy.color;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(s.name, x-NODE_W/2+32, y-1);
+
+  ctx.restore();
+}
+
+function drawDecompLabel() {
+  const [x,y] = getPos(smap['fungi']);
+  ctx.save();
+  ctx.globalAlpha = 0.5;
+  ctx.font = '11px "Microsoft YaHei",sans-serif';
+  ctx.fillStyle = '#bb8fce';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  ctx.fillText('← 分解有机物 ←', x-50, y+NODE_H);
+  ctx.restore();
+}
+
+// ──── Particles ────
+function drawParticles(time) {
+  particles.forEach(p => {
+    const [pred,prey] = allEdges[p.edge];
+    const sp = smap[pred], sq = smap[prey];
+    if (!sp || !sq) return;
+    if (filter >= 0 && sp.level !== filter && sq.level !== filter) return;
+
+    const [x1,y1] = getPos(sp);
+    const [x2,y2] = getPos(sq);
+    const isDec = DECOMPOSERS.includes(prey);
+    const path = createPath(x1,y1,x2,y2, isDec);
+
+    const t = p.t;
+    const px = (1-t)*(1-t)*path.x1 + 2*(1-t)*t*path.cx + t*t*path.x2;
+    const py = (1-t)*(1-t)*path.y1 + 2*(1-t)*t*path.cy + t*t*path.y2;
+
+    const trophy = TROPHY[sp.trophic] || TROPHY[0];
+    ctx.save();
+    ctx.globalAlpha = p.alpha * 0.6;
+    ctx.fillStyle = trophy.color;
+    ctx.beginPath();
+    ctx.arc(px, py, p.size, 0, Math.PI*2);
+    ctx.fill();
+    ctx.restore();
+  });
+}
+
+function updateParticles() {
+  particles.forEach(p => {
+    p.t += p.speed;
+    if (p.t > 1) p.t = 0;
+  });
+}
+
+// ──── Hit detection ────
+function hitTest(mx,my) {
+  for (let i=species.length-1; i>=0; i--) {
+    const s = species[i];
+    if (filter>=0 && s.level!==filter) continue;
+    const [x,y] = getPos(s);
+    if (Math.abs(mx-x) < NODE_W/2+5 && Math.abs(my-y) < NODE_H/2+5) return s;
+  }
+  return null;
+}
+
+// ──── Render ────
+function render() {
+  ctx.clearRect(0,0,W,H);
+
+  // Draw edges
+  const dimHover = hovered && !selected;
+
+  allEdges.forEach(([pred,prey], ei) => {
+    const sp = smap[pred], sq = smap[prey];
+    if (!sp || !sq) return;
+
+    // Filter
+    if (filter>=0 && sp.level!==filter && sq.level!==filter) return;
+
+    const isDec = DECOMPOSERS.includes(prey);
+    const [x1,y1] = getPos(sp);
+    const [x2,y2] = getPos(sq);
+    const p = createPath(x1,y1,x2,y2, isDec);
+
+    const baseColor = TROPHY[sp.trophic].color;
+
+    let hl = false, dim = false;
+    if (hovered) {
+      if (adj[hovered.id]?.includes(sq.id) && sp.id===hovered.id) hl = true;
+      else if (rev[hovered.id]?.includes(sp.id) && sq.id===hovered.id) hl = true;
+      else dim = true;
+    }
+    if (selected) {
+      if (adj[selected.id]?.includes(sq.id) && sp.id===selected.id) hl = true;
+      else if (rev[selected.id]?.includes(sp.id) && sq.id===selected.id) hl = true;
+      else dim = true;
+    }
+
+    if (!hovered && !selected) {
+      drawCurvedArrow(p, baseColor, 0.25, false);
+    } else {
+      drawCurvedArrow(p, baseColor, dim?0.06:0.5, hl);
+    }
+  });
+
+  // Decomposer label
+  drawDecompLabel();
+
+  // Particles
+  drawParticles(animTime);
+
+  // Draw nodes
+  species.forEach(s => {
+    if (filter>=0 && s.level!==filter) return;
+    let highlight = false, dim = false;
+    if (hovered) {
+      highlight = s.id===hovered.id || adj[hovered.id]?.includes(s.id) || rev[hovered.id]?.includes(s.id);
+      dim = !highlight;
+    }
+    if (selected) {
+      const isSel = s.id===selected.id;
+      const isPrey = adj[selected.id]?.includes(s.id);
+      const isPred = rev[selected.id]?.includes(s.id);
+      highlight = isSel || isPrey || isPred;
+      dim = !highlight;
+    }
+    drawNode(s, highlight, dim);
+  });
+}
+
+// ──── Info ────
+function showInfo(s) {
+  const trophy = TROPHY[s.trophic];
+  const prey = adj[s.id]?.map(id=>smap[id]).filter(Boolean) || [];
+  const pred = rev[s.id]?.map(id=>smap[id]).filter(Boolean) || [];
+  const box = document.getElementById('infoBox');
+  box.innerHTML = `
+    <div class="sname" style="color:${trophy.color}">${s.emoji} ${s.name} <span class="sen">${s.en}</span></div>
+    <div style="margin:4px 0">
+      <span style="display:inline-block;padding:1px 10px;border-radius:8px;font-size:10px;background:${trophy.bg};color:${trophy.color}">${trophy.label}</span>
+    </div>
+    <div class="sdesc">${s.desc}</div>
+    ${prey.length ? `<div class="seats">捕食：${prey.map(p=>`<span style="background:${TROPHY[p.trophic].bg};color:${TROPHY[p.trophic].color}">${p.emoji} ${p.name}</span>`).join('')}</div>` : ''}
+    ${pred.length ? `<div class="seats">天敌：${pred.map(p=>`<span style="background:${TROPHY[p.trophic].bg};color:${TROPHY[p.trophic].color}">${p.emoji} ${p.name}</span>`).join('')}</div>` : ''}
+  `;
+}
+
+// ──── Interaction ────
+canvas.addEventListener('mousemove', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const hit = hitTest(mx, my);
+  hovered = hit;
+  canvas.style.cursor = hit ? 'pointer' : 'default';
+});
+
+canvas.addEventListener('click', e => {
+  const rect = canvas.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  const hit = hitTest(mx, my);
+  if (hit) {
+    selected = hit;
+    showInfo(hit);
+  } else {
+    selected = null;
+    document.getElementById('infoBox').innerHTML =
+      `<div class="sname" style="color:#888">悬停或点击物种</div><div class="sdesc">查看它在食物网中的位置</div>`;
+  }
+});
+
+// Filter buttons
+document.querySelectorAll('#filterBtns button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#filterBtns button').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    filter = parseInt(btn.dataset.lv);
+    selected = null;
+    document.getElementById('infoBox').innerHTML =
+      `<div class="sname" style="color:#888">悬停或点击物种</div><div class="sdesc">查看它在食物网中的位置</div>`;
+  });
+});
+
+// ──── Animation loop ────
+function loop(time) {
+  animTime = time;
+  updateParticles();
+  render();
+  requestAnimationFrame(loop);
+}
+loop(0);
+</script>
+</body></html>

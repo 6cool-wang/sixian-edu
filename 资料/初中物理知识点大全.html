@@ -39,6 +39,13 @@ table tr:nth-child(even){background:#faf4f4}
 .back-to-top{position:fixed;bottom:30px;right:30px;width:44px;height:44px;border-radius:50%;background:var(--back-to-top-bg,#5688CC);color:#fff;border:none;font-size:20px;cursor:pointer;opacity:0;visibility:hidden;transition:all .3s;box-shadow:0 2px 12px rgba(0,0,0,.15);z-index:999;display:flex;align-items:center;justify-content:center}
 .back-to-top.show{opacity:1;visibility:visible}
 .back-to-top:hover{opacity:.85;transform:translateY(-2px)}
+.topic-link-block{margin:30px 0;padding:24px;background:#fdf4f4;border-radius:14px;border:1px solid #f0d0d0}
+.topic-link-block h3{margin:0 0 6px;font-size:17px;color:#c0392b}
+.topic-link-block p{margin:0 0 12px;font-size:13px;color:#888;line-height:1.6;text-indent:0}
+.topic-link-block a{color:#c0392b;text-decoration:none;font-weight:600}
+.topic-link-block a:hover{text-decoration:underline}
+.topic-link-block .tg{display:flex;flex-wrap:wrap;gap:6px}
+.topic-link-block .tg span{font-size:12px;padding:4px 12px;background:#fdf4f4;border:1px solid #f0d0d0;border-radius:8px;color:#c0392b}
 </style>
 <script src="../js/theme.js"></script>
 </head>
@@ -48,6 +55,14 @@ table tr:nth-child(even){background:#faf4f4}
 
 <h1>初中物理知识点大全<small>人教版 · 八年级至九年级 · 中考总复习</small></h1>
 <p class="sub">系统梳理全部核心考点 · 公式定理 · 典型例题 · 易错提醒</p>
+
+<div class="topic-link-block">
+  <h3>📖 专题精讲</h3>
+  <p>本学科15大专题精讲，点击进入完整内容 → <a href="物理.html">初中物理专题精讲</a></p>
+  <div class="tg">
+    <span>机械运动</span><span>质量密度</span><span>力与受力分析</span><span>压强</span><span>浮力</span><span>简单机械</span><span>功与功率</span><span>欧姆定律</span><span>电功率</span><span>家庭电路</span><span>磁现象</span><span>物态变化</span><span>内能比热容</span><span>光的反射</span><span>光的折射</span>
+  </div>
+</div>
 
 <!-- ════════════════════════════════════════════════════════════ -->
 <h2>一、机械运动</h2>
@@ -658,6 +673,7 @@ table tr:nth-child(even){background:#faf4f4}
   <div class="label">【易错 12】串并联电路识别</div>
   <p>电流路径法：从电源正极出发沿电流方向画路径，只有一条→串联，有分支→并联。拆除法：拆除一个用电器，其他不工作→串联，其他照常→并联。</p>
 </div>
+
 
 <div class="footer">
   <p>— 思贤学习站 · 物理学科 · 祝中考顺利 —</p>
