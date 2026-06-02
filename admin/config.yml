@@ -1,0 +1,51 @@
+backend:
+  name: github
+  branch: master
+  repo: sixian-edu/sixian-edu
+  auth_type: pkce
+  app_id: Ov23liDoCAm6hYZNxKYH
+
+media_folder: "images/uploads"
+public_folder: "/images/uploads"
+
+editor:
+  preview: false
+
+locale: "zh_Hans"
+display_url: https://sixian-edu.github.io/sixian-edu/
+logo: https://sixian-edu.github.io/sixian-edu/images/logo.png
+
+collections:
+  - name: "ziliao"
+    label: "📚 资料库"
+    files:
+      - name: "shuxue"
+        label: "数学专题"
+        file: "资料/数学.html"
+        fields:
+          - { label: "页面标题", name: "title", widget: "hidden" }
+          - { label: "页面内容", name: "body", widget: "text" }
+
+      - name: "wuli"
+        label: "物理专题"
+        file: "资料/物理.html"
+        fields:
+          - { label: "页面标题", name: "title", widget: "hidden" }
+          - { label: "页面内容", name: "body", widget: "text" }
+
+      - name: "huaxue"
+        label: "化学专题"
+        file: "资料/化学.html"
+        fields:
+          - { label: "页面标题", name: "title", widget: "hidden" }
+          - { label: "页面内容", name: "body", widget: "text" }
+
+  - name: "update"
+    label: "📋 更新日志"
+    files:
+      - name: "changelog"
+        label: "更新日志"
+        file: "更新日志.html"
+        fields:
+          - { label: "页面标题", name: "title", widget: "hidden" }
+          - { label: "页面内容", name: "body", widget: "text" }
