@@ -13,6 +13,7 @@ editor:
 
 locale: "zh_Hans"
 display_url: https://sixian-edu.github.io/sixian-edu/
+# config rev 2
 
 collections:
   - name: "ziliao"
