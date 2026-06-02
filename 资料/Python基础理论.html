@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Python 基础理论 · 大学专区 · 思贤学习站</title><link rel="icon" href="../images/logo.png">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f7fa;color:#2d3436;line-height:1.8}
+.head{max-width:960px;margin:0 auto;padding:18px 20px 0}
+.head a{color:#888;font-size:13px;text-decoration:none}
+.head a:hover{color:#7A88C0}
+.head h1{font-size:26px;color:#1a1a2e;margin:6px 0 2px}
+.head .sub{font-size:13px;color:#999;margin-bottom:8px}
+.head .sub span{color:#7A88C0;font-weight:600}
+.container{max-width:960px;margin:0 auto;padding:12px 20px 40px}
+
+/* Banner */
+.uni-banner{background:linear-gradient(135deg,#8899CC,#7A88C0);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.uni-banner h2{font-size:18px;margin-bottom:4px}
+.uni-banner p{font-size:13px;opacity:.85}
+.uni-banner .tag{display:inline-block;background:rgba(255,255,255,0.2);padding:2px 12px;border-radius:10px;font-size:11px;margin-top:6px}
+
+/* TOC */
+.toc{background:#fff;border-radius:14px;padding:20px 24px;margin-bottom:20px;box-shadow:0 2px 12px rgba(0,0,0,0.05)}
+.toc h2{font-size:16px;color:#1a1a2e;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #7A88C0}
+.toc ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:4px 20px}
+.toc ul li{font-size:13px}
+.toc ul li a{color:#7A88C0;text-decoration:none}
+.toc ul li a:hover{text-decoration:underline}
+.toc ul li .num{color:#999;margin-right:4px}
+
+/* Section */
+.section{background:#fff;border-radius:14px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.05);overflow:hidden}
+.section h2{font-size:17px;font-weight:700;padding:14px 24px;margin:0;display:flex;align-items:center;gap:10px;border-bottom:1px solid #eee}
+.section h2 .s-num{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;color:#fff;font-size:14px;flex-shrink:0}
+
+.kp-box{padding:14px 24px 8px}
+.kp-box .kp-title{font-size:14px;font-weight:600;color:#7A88C0;margin-bottom:6px}
+.kp-box ul{padding-left:20px;margin-bottom:8px}
+.kp-box ul li{font-size:13px;color:#555;margin-bottom:4px}
+.kp-box p{font-size:13px;color:#555;margin-bottom:6px}
+
+/* Example with toggle */
+.example{padding:8px 24px 14px;border-top:1px dashed #eee}
+.example .ex-title{font-size:13px;font-weight:600;color:#2d3436;margin-bottom:4px}
+.example .ex-title .ex-tag{display:inline-block;background:#7A88C0;color:#fff;font-size:10px;padding:1px 8px;border-radius:4px;margin-right:6px;vertical-align:middle}
+.example .ex-text{font-size:13px;color:#555;margin-bottom:6px;line-height:1.7}
+.sol-toggle{display:inline-block;font-size:12px;color:#7A88C0;cursor:pointer;padding:3px 10px;border:1px solid #7A88C0;border-radius:6px;transition:all .2s;margin:4px 0}
+.sol-toggle:hover{background:#7A88C0;color:#fff}
+.sol-content{display:none;margin-top:6px;padding:10px 14px;background:#f8f9fc;border-left:3px solid #7A88C0;border-radius:4px;font-size:13px;color:#555;line-height:1.7}
+.sol-content pre{background:#1e1e2e;color:#cdd6f4;border-radius:8px;padding:10px 14px;font-size:12px;line-height:1.5;overflow-x:auto;font-family:"Cascadia Code","Fira Code","Consolas",monospace;margin-top:6px}
+.sol-content .key{color:#c0392b;font-weight:600}
+
+/* Note box */
+.note-box{background:#fef9e7;border-left:3px solid #f39c12;padding:10px 16px;margin:8px 24px 14px;border-radius:4px;font-size:13px;color:#856404}
+.note-box strong{color:#e67e22}
+
+/* HW */
+.hw{padding:14px 24px;border-top:1px dashed #eee}
+.hw h3{font-size:14px;font-weight:600;color:#1a1a2e;margin-bottom:8px}
+.hw .hw-item{font-size:13px;color:#555;margin-bottom:6px;padding-left:18px;position:relative}
+.hw .hw-item::before{content:'';position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:#7A88C0}
+
+/* Back to top */
+.back-to-top{position:fixed;bottom:30px;right:30px;width:44px;height:44px;border-radius:50%;background:#7A88C0;color:#fff;border:none;font-size:20px;cursor:pointer;opacity:0;visibility:hidden;transition:all .3s;box-shadow:0 2px 12px rgba(0,0,0,.15);z-index:999}
+.back-to-top.show{opacity:1;visibility:visible}
+.back-to-top:hover{opacity:.85;transform:translateY(-2px)}
+
+@media(max-width:768px){
+  .toc ul{grid-template-columns:1fr}
+  .head h1{font-size:22px}
+  .kp-box{padding:12px 16px 6px}
+  .section h2{padding:12px 16px;font-size:15px}
+  .example{padding:6px 16px 12px}
+  .hw{padding:12px 16px}
+}
+</style>
+<script src="../js/theme.js"></script>
+</head>
+<body>
+
+<div class="head">
+<a href="../学习专区.html">&larr; 返回学习专区</a>
+<h1>Python 基础理论</h1>
+<p class="sub">Python 程序设计·核心理论知识·概念梳理·典型例题 共 <span>12</span> 章</p>
+</div>
+
+<div class="container">
+
+<!-- ════ 横幅 ════ -->
+<div class="uni-banner">
+<h2>🎓 大学专区 · Python 基础理论</h2>
+<p>本页梳理 Python 程序设计的核心理论知识，每个章节包含知识点归纳、典型例题（含解析）和练习题。配合《Python 程序大全》使用效果更佳。</p>
+<span class="tag">📖 共 12 章 · 理论 + 例题 + 练习</span>
+</div>
+
+<!-- ════ 目录 ════ -->
+<div class="toc">
+<h2>📑 目录</h2>
+<ul>
+<li><span class="num">01</span><a href="#s1">Python 语言概述</a></li>
+<li><span class="num">02</span><a href="#s2">基本语法与命名规范</a></li>
+<li><span class="num">03</span><a href="#s3">数据类型与变量</a></li>
+<li><span class="num">04</span><a href="#s4">运算符与表达式</a></li>
+<li><span class="num">05</span><a href="#s5">字符串操作</a></li>
+<li><span class="num">06</span><a href="#s6">流程控制</a></li>
+<li><span class="num">07</span><a href="#s7">列表、元组、字典、集合</a></li>
+<li><span class="num">08</span><a href="#s8">函数与作用域</a></li>
+<li><span class="num">09</span><a href="#s9">面向对象编程</a></li>
+<li><span class="num">10</span><a href="#s10">模块与包</a></li>
+<li><span class="num">11</span><a href="#s11">文件操作与异常处理</a></li>
+<li><span class="num">12</span><a href="#s12">综合练习</a></li>
+</ul>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 01 Python 语言概述 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s1">
+<h2><span class="s-num" style="background:#8899CC">01</span> Python 语言概述</h2>
+
+<div class="kp-box">
+<p><strong>Python</strong> 是一种<strong>解释型、面向对象、高级编程语言</strong>，由 Guido van Rossum 于 1991 年首次发布。其设计哲学强调代码可读性和简洁性，被称为"可执行的伪代码"。</p>
+<ul>
+<li><strong>解释型：</strong>无需编译，逐行解释执行</li>
+<li><strong>动态类型：</strong>变量类型在运行时确定，无需显式声明</li>
+<li><strong>垃圾回收：</strong>自动管理内存，无需手动释放</li>
+<li><strong>胶水语言：</strong>可轻松调用 C/C++ 等语言编写的库</li>
+<li><strong>跨平台：</strong>Windows / macOS / Linux 均可运行</li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例1</span>请简述 Python 的优缺点</div>
+<div class="ex-text">
+<strong>优点：</strong>语法简洁、开发效率高、生态丰富（PyPI 超过 20 万包）、跨平台、社区活跃。<br>
+<strong>缺点：</strong>运行速度较慢（解释型+GIL 限制多线程）、移动端支持弱、底层控制能力弱。
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">Python 的优势在于快速开发和数据处理/ML 领域，但在高性能计算、系统编程等场景需要结合 C/C++ 扩展。</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 02 基本语法与命名规范 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s2">
+<h2><span class="s-num" style="background:#7A88C0">02</span> 基本语法与命名规范</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>缩进：</strong>Python 使用缩进（通常 4 空格）表示代码块，不用 {} 或 begin/end</li>
+<li><strong>注释：</strong><code>#</code> 单行注释，<code>'''</code> 或 <code>"""</code> 多行注释/文档字符串</li>
+<li><strong>标识符：</strong>由字母、数字、下划线组成，不能以数字开头，区分大小写</li>
+<li><strong>关键字：</strong><code>if</code>、<code>for</code>、<code>while</code>、<code>def</code>、<code>class</code>、<code>import</code> 等 35 个</li>
+<li><strong>命名规范：</strong>变量/函数用 <code>snake_case</code>，类用 <code>CamelCase</code>，常量用 <code>UPPER_CASE</code></li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例2</span>判断以下变量名是否合法</div>
+<div class="ex-text">
+<code>_name</code>、<code>2total</code>、<code>my-var</code>、<code>class</code>、<code>total_sum</code>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+合法：<code>_name</code>（下划线开头可以）、<code>total_sum</code>（标准 snake_case）<br>
+不合法：<code>2total</code>（数字开头）、<code>my-var</code>（含连字符）、<code>class</code>（关键字）
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 03 数据类型与变量 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s3">
+<h2><span class="s-num" style="background:#B89AD4">03</span> 数据类型与变量</h2>
+
+<div class="kp-box">
+<p>Python 内置核心类型：</p>
+<ul>
+<li><strong>不可变类型：</strong>int、float、bool、str、tuple、frozenset</li>
+<li><strong>可变类型：</strong>list、dict、set、bytearray</li>
+<li><strong>NoneType：</strong><code>None</code> 表示空值</li>
+<li><strong>类型转换：</strong><code>int()</code>、<code>float()</code>、<code>str()</code>、<code>list()</code>、<code>bool()</code> 等</li>
+<li><strong>动态绑定：</strong>变量是对象的引用，赋值即绑定</li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例3</span>写出以下代码输出</div>
+<div class="ex-text">
+<pre>a = [1, 2, 3]
+b = a
+b.append(4)
+print(a)
+print(b)</pre>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+输出 <code>[1, 2, 3, 4]</code> 两次。<br>
+<code>b = a</code> 是引用赋值，<code>b</code> 和 <code>a</code> 指向同一个列表对象。修改可变对象会反映在所有引用上。若只想复制值，应使用 <code>b = a[:]</code> 或 <code>b = a.copy()</code>。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例4</span>布尔类型的坑</div>
+<div class="ex-text">以下哪些值在 <code>if x:</code> 判断中为 <code>False</code>？<br>
+<code>0</code>、<code>""</code>、<code>[]</code>、<code>None</code>、<code>"False"</code>、<code>0.0</code>、<code>()</code>、<code>{}</code></div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+除 <code>"False"</code> 外全部为 False。<br>
+Python 中以下值被视为 <strong>falsy</strong>：<code>False</code>、<code>None</code>、数值 0、空序列（<code>""</code>、<code>[]</code>、<code>()</code>、<code>{}</code>、<code>set()</code>、<code>range(0)</code>）。<br>
+注意 <code>"False"</code> 是非空字符串，为 truthy。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 04 运算符与表达式 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s4">
+<h2><span class="s-num" style="background:#C8AAE0">04</span> 运算符与表达式</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>算术：</strong><code>+</code> <code>-</code> <code>*</code> <code>/</code>（浮点除）<code>//</code>（整除）<code>%</code>（取余）<code>**</code>（幂）</li>
+<li><strong>比较：</strong><code>==</code> <code>!=</code> <code>></code> <code><</code> <code>>=</code> <code><=</code>，可链式比较如 <code>a < b <= c</code></li>
+<li><strong>逻辑：</strong><code>and</code> <code>or</code> <code>not</code>（短路求值）</li>
+<li><strong>位运算：</strong><code>&</code> <code>|</code> <code>^</code> <code>~</code> <code><<</code> <code>>></code></li>
+<li><strong>成员/身份：</strong><code>in</code> <code>not in</code> <code>is</code> <code>is not</code></li>
+<li><strong>海象运算符 (3.8+)：</strong><code>if (n := len(x)) > 5: ...</code></li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例5</span>表达式求值</div>
+<div class="ex-text">
+计算：<code>17 // 3</code>、<code>17 % 3</code>、<code>17 / 3</code>、<code>2 ** 3 ** 2</code>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<code>17 // 3 = 5</code>（整除，向下取整）<br>
+<code>17 % 3 = 2</code>（余数）<br>
+<code>17 / 3 = 5.666...</code>（浮点除法）<br>
+<code>2 ** 3 ** 2 = 2 ** 9 = 512</code>（幂运算右结合，等价于 <code>2 ** (3 ** 2)</code>）
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例6</span>短路求值</div>
+<div class="ex-text">
+<pre>def f():
+    print("f called")
+    return True
+def g():
+    print("g called")
+    return False
+result = g() and f()
+print(result)</pre>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+输出：<br>
+<pre class="output">g called
+False</pre>
+<code>and</code> 是短路运算符：<code>g()</code> 返回 <code>False</code> 后直接短路，<code>f()</code> 不会被调用。类似地，<code>or</code> 在第一个参数为 True 时短路。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 05 字符串操作 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s5">
+<h2><span class="s-num" style="background:#D4A5A5">05</span> 字符串操作</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>定义方式：</strong>单引号 <code>'...'</code>、双引号 <code>"..."</code>、三引号 <code>'''...'''</code> / <code>"""..."""</code></li>
+<li><strong>转义字符：</strong><code>\n</code>（换行）、<code>\t</code>（制表）、<code>\\</code>（反斜杠）</li>
+<li><strong>原始字符串：</strong><code>r"raw\nstring"</code> 不转义</li>
+<li><strong>f-string (3.6+)：</strong><code>f"value is {x}"</code>，支持表达式 <code>f"{a + b:.2f}"</code></li>
+<li><strong>常用方法：</strong><code>.upper()</code>、<code>.lower()</code>、<code>.strip()</code>、<code>.split()</code>、<code>.join()</code>、<code>.replace()</code>、<code>.find()</code>、<code>.startswith()</code></li>
+<li><strong>切片：</strong><code>s[start:stop:step]</code></li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例7</span>字符串反转</div>
+<div class="ex-text">
+<code>s = "Python"</code>，写表达式反转得到 <code>"nohtyP"</code>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>s[::-1]  # 'nohtyP'</pre>
+<code>step = -1</code> 表示从右向左取全部字符。这是 Python 中反转序列最简洁的方式。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例8</span>f-string 格式化</div>
+<div class="ex-text">
+<pre>name = "Alice"
+score = 87.5
+print(f"{name:10s} 得分 {score:.1f}")</pre>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+输出：<code>Alice      得分 87.5</code><br>
+<code>:10s</code> 表示字符串占 10 个字符宽度（左对齐），<code>:.1f</code> 表示保留 1 位小数。f-string 从 Python 3.6 起是推荐的格式化方式，比 <code>%</code> 和 <code>.format()</code> 更直观高效。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 06 流程控制 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s6">
+<h2><span class="s-num" style="background:#A5B8D4">06</span> 流程控制</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong><code>if-elif-else</code>：</strong>条件分支，注意 <code>elif</code> 不是 <code>else if</code></li>
+<li><strong><code>for</code> 循环：</strong>遍历可迭代对象，配合 <code>range()</code> 用于次数循环</li>
+<li><strong><code>while</code> 循环：</strong>条件满足时持续执行</li>
+<li><strong>循环控制：</strong><code>break</code>（跳出当前层）、<code>continue</code>（进入下一次迭代）</li>
+<li><strong><code>else</code> 子句：</strong>循环未被 break 中断时执行</li>
+<li><strong><code>pass</code>：</strong>空操作占位符</li>
+<li><strong><code>match-case</code> (3.10+)：</strong>模式匹配，类似 switch</li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例9</span>for-else 用法</div>
+<div class="ex-text">
+查找列表 <code>[3, 7, 12, 5]</code> 中是否有能被 3 整除的数，并打印结果。
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>nums = [3, 7, 12, 5]
+for n in nums:
+    if n % 3 == 0:
+        print(f"找到: {n}")
+        break
+else:
+    print("没有能被3整除的数")</pre>
+<code>for-else</code> 的 <code>else</code> 分支仅在循环 <strong>未被 break</strong> 时执行。上面代码会输出 <code>找到: 3</code>。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例10</span>列出 <code>range(10)</code> 中所有奇数</div>
+<div class="ex-text">要求：用 for 循环 + if 实现，单行写法也可。</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre># 传统写法
+for i in range(10):
+    if i % 2 == 1:
+        print(i)
+
+# 列表推导式（Pythonic）
+odds = [i for i in range(10) if i % 2 == 1]</pre>
+列表推导式更简洁高效，是 Python 处理过滤转换操作的首选方式。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 07 列表、元组、字典、集合 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s7">
+<h2><span class="s-num" style="background:#A5D4B5">07</span> 列表、元组、字典、集合</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>列表 [ ]：</strong>可变、有序、可重复。常用 <code>.append()</code>、<code>.extend()</code>、<code>.insert()</code>、<code>.pop()</code>、<code>.remove()</code>、<code>.sort()</code></li>
+<li><strong>元组 ( )：</strong>不可变、有序、可哈希（可作为字典键）。拆包 <code>a, b = (1, 2)</code></li>
+<li><strong>字典 {k:v}：</strong>键值对、可变、键唯一且可哈希。3.7+ 保持插入顺序。.<code>get()</code>、<code>.keys()</code>、<code>.values()</code>、<code>.items()</code></li>
+<li><strong>集合 { }：</strong>无序、不重复。交集 <code>&</code>、并集 <code>|</code>、差集 <code>-</code>、对称差 <code>^</code></li>
+<li><strong>推导式：</strong><code>[x*2 for x in range(10)]</code>、<code>{k:v for k,v in zip(keys,vals)}</code></li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例11</span><code>a = [1, 2, 3]; b = a[:]</code> — <code>b</code> 和 <code>a</code> 是同一个对象吗？</div>
+<div class="ex-text">
+再问：修改 <code>b[0] = 99</code> 后 <code>a[0]</code> 是多少？
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<code>a[:]</code> 是<strong>浅拷贝</strong>，<code>b</code> 是新的列表对象。修改 <code>b[0]</code> 不影响 <code>a</code>，<code>a[0]</code> 仍是 <code>1</code>。<br>
+但对于嵌套列表（如 <code>[[1,2], [3,4]]</code>），浅拷贝只拷贝外层，内层仍共享引用，此时需用 <code>copy.deepcopy()</code>。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例12</span>统计字符串中每个字符出现次数</div>
+<div class="ex-text">
+<code>s = "hello world"</code>，输出为字典形式。
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>s = "hello world"
+# 方法1：for 循环
+count = {}
+for ch in s:
+    count[ch] = count.get(ch, 0) + 1
+
+# 方法2：collections.Counter
+from collections import Counter
+count = Counter(s)</pre>
+<code>dict.get(key, default)</code> 是安全的取值方式，键不存在时返回默认值。生产环境推荐 <code>Counter</code>，它专门做计数。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 08 函数与作用域 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s8">
+<h2><span class="s-num" style="background:#D4C5A5">08</span> 函数与作用域</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>定义：</strong><code>def 函数名(参数):</code></li>
+<li><strong>参数类型：</strong>位置参数、默认参数、关键字参数、可变参数 <code>*args</code>、关键字可变参数 <code>**kwargs</code></li>
+<li><strong>返回值：</strong>函数可返回多个值（实际是元组）</li>
+<li><strong>作用域规则 LEGB：</strong>Local → Enclosing → Global → Built-in</li>
+<li><strong><code>global</code> / <code>nonlocal</code>：</strong>声明非局部变量</li>
+<li><strong>lambda：</strong><code>lambda x: x * 2</code> 匿名函数</li>
+<li><strong>装饰器：</strong>使用 <code>@decorator</code> 语法增强函数功能</li>
+<li><strong>生成器：</strong>使用 <code>yield</code> 的惰性求值函数</li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例13</span>以下代码输出什么</div>
+<div class="ex-text">
+<pre>x = 10
+def f():
+    x = 20
+    def g():
+        nonlocal x
+        x = 30
+    g()
+    print(x)
+f()
+print(x)</pre>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+输出 <code>30</code> 和 <code>10</code>。<br>
+<code>nonlocal x</code> 引用的是外层函数 <code>f</code> 的局部变量 <code>x</code>，将 <code>f</code> 作用域内的 <code>x</code> 改为 30。全局变量 <code>x = 10</code> 不受影响。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例14</span>可变默认参数的陷阱</div>
+<div class="ex-text">
+<pre>def f(x=[]):
+    x.append(1)
+    return x
+print(f())
+print(f())
+print(f())</pre>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+输出：
+<pre class="output">[1]
+[1, 1]
+[1, 1, 1]</pre>
+<strong>默认参数在函数定义时求值一次</strong>，而不是每次调用时新建。可变默认参数会被多次调用累积修改。<br>
+<span class="key">最佳实践：</span><code>def f(x=None): if x is None: x = []</code>
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例15</span>编写一个装饰器，打印函数执行时间</div>
+<div class="ex-text">用 <code>time</code> 模块实现。</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>import time
+def timer(func):
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        print(f"{func.__name__} 耗时 {time.time()-start:.4f}s")
+        return result
+    return wrapper
+
+@timer
+def slow_func():
+    time.sleep(0.5)
+
+slow_func()  # 输出: slow_func 耗时 0.5002s</pre>
+<code>*args</code> 接收位置参数，<code>**kwargs</code> 接收关键字参数，使得装饰器可以适配任意签名的函数。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 09 面向对象编程 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s9">
+<h2><span class="s-num" style="background:#C5A5D4">09</span> 面向对象编程</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>类定义：</strong><code>class ClassName:</code>，<code>__init__</code> 构造方法</li>
+<li><strong><code>self</code>：</strong>实例方法的第一个参数，指向实例本身</li>
+<li><strong>继承：</strong><code>class A(B):</code>，支持多继承，<code>super()</code> 调用父类</li>
+<li><strong>封装：</strong>单下划线 <code>_x</code> 表示保护，双下划线 <code>__x</code> 触发名称修饰</li>
+<li><strong>特殊方法：</strong><code>__str__</code>、<code>__repr__</code>、<code>__len__</code>、<code>__getitem__</code>、<code>__call__</code> 等</li>
+<li><strong>类方法/静态方法：</strong><code>@classmethod</code> 操作类，<code>@staticmethod</code> 独立函数</li>
+<li><strong>属性装饰器：</strong><code>@property</code> 将方法变成属性访问</li>
+<li><strong>鸭子类型：</strong>"如果它走路像鸭子、叫声像鸭子，那它就是鸭子"——关注行为而非类型</li>
+</ul>
+</div>
+
+<div class="note-box">
+<strong>MRO（Method Resolution Order）：</strong>多继承时，Python 使用 C3 线性化算法确定方法搜索顺序，可通过 <code>ClassName.__mro__</code> 查看。
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例16</span>实现一个 <code>BankAccount</code> 类</div>
+<div class="ex-text">
+要求有 <code>owner</code>、<code>balance</code> 属性，<code>deposit(amount)</code>、<code>withdraw(amount)</code> 方法，且余额不能为负。
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>class BankAccount:
+    def __init__(self, owner, balance=0):
+        self.owner = owner
+        self.__balance = balance
+
+    def deposit(self, amount):
+        if amount <= 0:
+            raise ValueError("存款金额必须为正")
+        self.__balance += amount
+
+    def withdraw(self, amount):
+        if amount > self.__balance:
+            raise ValueError("余额不足")
+        self.__balance -= amount
+
+    @property
+    def balance(self):
+        return self.__balance
+
+    def __str__(self):
+        return f"{self.owner} 账户余额: {self.__balance:.2f}元"
+
+acct = BankAccount("张三", 1000)
+acct.deposit(500)
+acct.withdraw(200)
+print(acct)  # 张三 账户余额: 1300.00元</pre>
+使用 <code>__balance</code> 将余额私有化，通过 <code>@property</code> 提供只读访问，确保数据封装。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例17</span>MRO 与 super() 调用顺序</div>
+<div class="ex-text">
+<pre>class A:
+    def f(self): print("A")
+class B(A):
+    def f(self): print("B"); super().f()
+class C(A):
+    def f(self): print("C"); super().f()
+class D(B, C):
+    def f(self): print("D"); super().f()
+D().f()</pre>
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+输出顺序：<code>D</code> → <code>B</code> → <code>C</code> → <code>A</code><br>
+<code>D.__mro__</code> 为 <code>(D, B, C, A, object)</code>。<br>
+Python 的 <code>super()</code> 按 MRO 顺序调用下一个类，而非简单地调用父类。这是 C3 线性化的结果，保证了所有父类仅被调用一次。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 10 模块与包 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s10">
+<h2><span class="s-num" style="background:#A5C5D4">10</span> 模块与包</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>模块：</strong>一个 <code>.py</code> 文件即一个模块，<code>import 模块名</code> 导入</li>
+<li><strong>包：</strong>包含 <code>__init__.py</code> 的目录，<code>from 包 import 模块</code></li>
+<li><strong>导入方式：</strong><code>import ...</code>、<code>from ... import ...</code>、<code>import ... as 别名</code></li>
+<li><strong><code>if __name__ == '__main__'</code>：</strong>判断是否作为主程序运行</li>
+<li><strong>标准库概览：</strong>os、sys、math、random、datetime、json、re、collections、itertools、functools</li>
+<li><strong><code>sys.path</code>：</strong>Python 搜索模块的路径列表</li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例18</span>为什么要有 <code>if __name__ == '__main__'</code></div>
+<div class="ex-text">解释其作用和使用场景。</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+当模块被直接运行时，<code>__name__</code> 为 <code>'__main__'</code>；被 import 时，<code>__name__</code> 为模块名。<br>
+这个判断确保测试代码只在直接运行时执行，被导入时不会意外执行。每个 Python 文件都应把可执行代码放在此判断内，将函数/类定义放在外层。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例19</span>使用 <code>random</code> 模块实现洗牌和抽样</div>
+<div class="ex-text">从 <code>[1..100]</code> 中随机抽取 5 个不重复的数。</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>import random
+# 不重复抽样
+sample = random.sample(range(1, 101), 5)
+
+# 洗牌
+cards = list(range(1, 53))
+random.shuffle(cards)
+
+# 随机整数
+dice = random.randint(1, 6)</pre>
+<code>random.sample</code> 不重复抽取，<code>random.shuffle</code> 原地打乱，<code>random.randint</code> 生成 [a, b] 闭区间随机整数。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 11 文件操作与异常处理 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s11">
+<h2><span class="s-num" style="background:#D4A5C5">11</span> 文件操作与异常处理</h2>
+
+<div class="kp-box">
+<ul>
+<li><strong>文件打开：</strong><code>open(filename, mode)</code>，mode: <code>r</code> 读、<code>w</code> 写、<code>a</code> 追加、<code>b</code> 二进制、<code>+</code> 读写</li>
+<li><strong>上下文管理器：</strong><code>with open(...) as f:</code> 自动关闭文件</li>
+<li><strong>读取：</strong><code>.read()</code>、<code>.readline()</code>、<code>.readlines()</code>；直接遍历文件对象</li>
+<li><strong>写入：</strong><code>.write()</code>、<code>.writelines()</code></li>
+<li><strong>异常处理：</strong><code>try-except-else-finally</code></li>
+<li><strong>常见异常：</strong><code>ValueError</code>、<code>TypeError</code>、<code>IndexError</code>、<code>KeyError</code>、<code>FileNotFoundError</code>、<code>AttributeError</code></li>
+<li><strong>自定义异常：</strong>继承 <code>Exception</code> 类</li>
+<li><strong><code>raise</code>：</strong>主动触发异常</li>
+</ul>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例20</span>安全的文件读取</div>
+<div class="ex-text">
+读取 <code>data.txt</code> 中的全部内容，处理文件不存在的异常。
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>try:
+    with open('data.txt', 'r', encoding='utf-8') as f:
+        content = f.read()
+        print(content)
+except FileNotFoundError:
+    print("文件不存在")
+except PermissionError:
+    print("无权限读取")
+else:
+    print("文件读取成功")
+finally:
+    print("操作结束")</pre>
+<code>with</code> 语句确保文件正确关闭（即使发生异常）。<code>encoding='utf-8'</code> 避免中文乱码。<code>else</code> 分支在没有异常时执行，<code>finally</code> 始终执行。
+</div>
+</div>
+
+<div class="example">
+<div class="ex-title"><span class="ex-tag">例21</span>自定义异常：余额不足</div>
+<div class="ex-text">
+定义一个 <code>InsufficientBalanceError</code> 并抛出的场景。
+</div>
+<span class="sol-toggle" onclick="toggleSol(this)">▶ 查看解析</span>
+<div class="sol-content">
+<pre>class InsufficientBalanceError(Exception):
+    def __init__(self, balance, amount):
+        self.balance = balance
+        self.amount = amount
+        super().__init__(f"余额不足: 当前 {balance}元, 需要 {amount}元")
+
+def withdraw(balance, amount):
+    if amount > balance:
+        raise InsufficientBalanceError(balance, amount)
+    return balance - amount
+
+try:
+    withdraw(100, 200)
+except InsufficientBalanceError as e:
+    print(e)</pre>
+自定义异常继承 <code>Exception</code>，构造函数中传入关键数据便于上层捕获时排查。
+</div>
+</div>
+</div>
+
+<!-- ════════════════════════════════════════════ -->
+<!-- 12 综合练习 -->
+<!-- ════════════════════════════════════════════ -->
+<div class="section" id="s12">
+<h2><span class="s-num" style="background:#D4A5A5">12</span> 综合练习</h2>
+
+<div class="hw">
+<h3>📝 理论题</h3>
+<div class="hw-item">Python 中可变对象和不可变对象的区别是什么？各举 3 个例子。</div>
+<div class="hw-item">解释 <code>is</code> 和 <code>==</code> 的区别，什么情况下两者结果不同？</div>
+<div class="hw-item">闭包是什么？用 Python 写一个闭包的例子。</div>
+<div class="hw-item">什么是装饰器？<code>@wraps</code> 的作用是什么？</div>
+<div class="hw-item">解释 GIL（全局解释器锁）对多线程程序的影响。</div>
+<div class="hw-item">Python 中深拷贝和浅拷贝的区别？如何实现深拷贝？</div>
+<div class="hw-item">生成器和迭代器的关系是什么？<code>yield</code> 关键字的作用？</div>
+<div class="hw-item"><code>__new__</code> 和 <code>__init__</code> 的区别是什么？</div>
+</div>
+
+<div class="hw">
+<h3>📝 编程题</h3>
+<div class="hw-item">实现一个 <code>Fibonacci</code> 类，支持迭代器协议（<code>__iter__</code> + <code>__next__</code>），生成前 n 个斐波那契数。</div>
+<div class="hw-item">编写一个上下文管理器（用 <code>__enter__</code> + <code>__exit__</code>），自动计时代码块执行时间。</div>
+<div class="hw-item">实现 <code>flatten(lst)</code> 函数，将任意嵌套的列表展平为一位列表（如 <code>[1,[2,[3,4]],5]</code> → <code>[1,2,3,4,5]</code>）。</div>
+<div class="hw-item">使用 <code>functools.lru_cache</code> 优化递归斐波那契数列，对比优化前后的性能差异。</div>
+</div>
+
+<div class="hw">
+<h3>📝 代码阅读题</h3>
+<div class="hw-item">
+<pre>def func(a, b=[]):
+    b.append(a)
+    return b
+print(func(1))
+print(func(2, []))
+print(func(3))</pre>
+给出输出结果并解释原因。
+</div>
+<div class="hw-item">
+<pre>class A:
+    x = 1
+    def __init__(self):
+        self.x = 2
+a = A()
+print(A.x, a.x)
+A.x = 3
+print(A.x, a.x)</pre>
+给出输出结果并解释。
+</div>
+</div>
+</div>
+
+</div><!-- /container -->
+
+<button class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+window.addEventListener('scroll',function(){document.querySelector('.back-to-top').classList.toggle('show',window.scrollY>300)});
+
+function toggleSol(el){
+  var content = el.nextElementSibling;
+  if(!content || !content.classList.contains('sol-content')) return;
+  if(content.style.display === 'block'){
+    content.style.display = 'none';
+    el.textContent = '▶ 查看解析';
+  } else {
+    content.style.display = 'block';
+    el.textContent = '▼ 收起解析';
+  }
+}
+</script>
+
+</body>
+</html>
