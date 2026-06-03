@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>六级词汇闯关</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0b0b18;--card:#16162e;--card2:#1a1a3e;--accent:#e94560;--gold:#f0c040;--silver:#c0c0c0;--bronze:#cd7f32;--green:#4ecca3;--text:#eee;--sub:#777;--glow:#e94560;--radius:14px}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden}
+#app{width:100%;max-width:420px;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,#0b0b18 0%,#16162e 100%)}
+
+/* ── 背景装饰 ── */
+.bg-deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-deco .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.12}
+.bg-deco .orb:nth-child(1){width:300px;height:300px;background:var(--accent);top:-120px;right:-100px}
+.bg-deco .orb:nth-child(2){width:250px;height:250px;background:var(--green);bottom:-80px;left:-80px}
+.bg-deco .orb:nth-child(3){width:200px;height:200px;background:var(--gold);top:40%;left:30%}
+
+/* ── 顶部栏 ── */
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 6px;z-index:10;position:relative}
+.rank-badge{display:flex;align-items:center;gap:8px}
+.rank-badge .icon{font-size:24px}
+.rank-badge .name{font-size:16px;font-weight:700}
+.rank-badge .lvl{font-size:10px;color:var(--sub);margin-top:-2px}
+.stage-info{text-align:right;font-size:12px;color:var(--sub);line-height:1.3}
+.stage-info .num{font-size:20px;font-weight:800;color:var(--text)}
+
+/* ── HP ── */
+.hp-row{display:flex;justify-content:space-between;align-items:center;padding:4px 18px 8px;z-index:10}
+.hp-bar{display:flex;gap:3px}
+.hp-bar .heart{font-size:18px;transition:all .3s}
+.hp-bar .heart.lost{opacity:.15;transform:scale(.7)}
+.combo-display{font-size:14px;font-weight:800;color:var(--gold);opacity:0;transition:all .2s;min-width:60px;text-align:right}
+.combo-display.active{opacity:1}
+
+/* ── 计时条 ── */
+.timer-wrap{padding:0 18px 6px;z-index:10}
+.timer-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.timer-bar .fill{height:100%;border-radius:2px;transition:width .1s linear;background:var(--green)}
+.timer-bar .fill.warning{background:#f0c040}
+.timer-bar .fill.danger{background:var(--accent)}
+
+/* ── 进度条 ── */
+.progress-wrap{padding:0 18px 8px;z-index:10}
+.progress-bar{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--green),#2dd4bf);border-radius:3px;transition:width .35s ease;width:0%}
+.progress-row{display:flex;justify-content:space-between;font-size:10px;color:var(--sub);margin-top:3px}
+
+/* ── 游戏区 ── */
+.game-area{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 16px 16px;z-index:10}
+
+/* ── 卡片 ── */
+.card{background:var(--card);border-radius:var(--radius);padding:24px 20px;border:1px solid rgba(255,255,255,.06);box-shadow:0 8px 32px rgba(0,0,0,.4);animation:fadeUp .35s ease;position:relative;overflow:hidden}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{translate:0}20%{translate:-7px}40%{translate:7px}60%{translate:-5px}80%{translate:5px}}
+@keyframes comboPop{0%{transform:scale(.3);opacity:0}50%{transform:scale(1.3)}100%{transform:scale(1);opacity:1}}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+
+.word-display{text-align:center;margin-bottom:18px}
+.word-display .word{font-size:34px;font-weight:800;letter-spacing:.5px}
+.word-display .phonetic{font-size:13px;color:var(--sub);margin-top:2px;font-style:italic}
+
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.choice-btn{background:var(--card2);border:1.5px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 8px;font-size:14px;color:var(--text);cursor:pointer;transition:all .15s;text-align:center;line-height:1.3;position:relative}
+.choice-btn:active{transform:scale(.96)}
+.choice-btn .tag{font-size:10px;color:var(--sub);display:block;margin-bottom:2px}
+.choice-btn.correct{background:rgba(78,204,163,.15);border-color:var(--green);animation:fadeUp .25s}
+.choice-btn.wrong{background:rgba(233,69,96,.15);border-color:var(--accent);animation:shake .35s}
+.choice-btn.disabled{pointer-events:none;opacity:.6}
+.choice-btn.correct::after,.choice-btn.wrong::after{content:'';position:absolute;inset:0;border-radius:10px;animation:ripple .5s ease-out}
+@keyframes ripple{0%{box-shadow:0 0 0 0 rgba(78,204,163,.4)}100%{box-shadow:0 0 0 12px rgba(78,204,163,0)}}
+.choice-btn.wrong::after{animation-name:rippleRed}@keyframes rippleRed{0%{box-shadow:0 0 0 0 rgba(233,69,96,.4)}100%{box-shadow:0 0 0 12px rgba(233,69,96,0)}}
+
+/* ── 浮动加分 ── */
+.float-score{position:absolute;font-size:22px;font-weight:900;pointer-events:none;z-index:50;animation:floatUp .8s ease-out forwards}
+.float-score.bonus{color:var(--gold)}
+
+/* ── 粒子 ── */
+.particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+.particle{position:absolute;width:6px;height:6px;border-radius:50%;animation:particleFly .6s ease-out forwards}
+@keyframes particleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+
+/* ── 结果页 ── */
+.result-screen{text-align:center}
+.result-screen .big-icon{font-size:56px;margin-bottom:8px}
+.result-screen .title{font-size:22px;font-weight:800;margin-bottom:2px}
+.result-screen .sub{color:var(--sub);font-size:13px;margin-bottom:16px}
+.result-screen .score{font-size:44px;font-weight:800;color:var(--gold)}
+.result-screen .score-label{font-size:12px;color:var(--sub);margin-bottom:14px}
+.stat-row{display:flex;justify-content:center;gap:20px;margin-bottom:16px}
+.stat-item{text-align:center}
+.stat-item .val{font-size:20px;font-weight:700}
+.stat-item .lbl{font-size:10px;color:var(--sub)}
+
+/* ── 段位展示 ── */
+.rank-display{text-align:center;padding:6px 0}
+.rank-display .emoji{font-size:40px}
+.rank-display .rname{font-size:18px;font-weight:800;margin:2px 0}
+.rank-display .rsub{font-size:11px;color:var(--sub)}
+
+/* ── 按钮 ── */
+.btn{display:block;width:100%;padding:13px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#ff6b6b);color:#fff}
+.btn-success{background:linear-gradient(135deg,var(--green),#2dd4bf);color:#111}
+.btn-outline{background:transparent;border:2px solid rgba(255,255,255,.12);color:var(--text)}
+.btn-gold{background:linear-gradient(135deg,#f0c040,#f59e0b);color:#111}
+.btn-group{display:flex;gap:8px;margin-top:10px}
+.btn-group .btn{flex:1}
+
+/* ── 首页 ── */
+.home-screen{text-align:center;padding:30px 18px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.home-screen h1{font-size:30px;font-weight:900;margin-bottom:2px;background:linear-gradient(135deg,#f0c040,#e94560);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-screen .subtitle{color:var(--sub);font-size:13px;margin-bottom:18px}
+
+/* ── 塔楼可视化 ── */
+.tower{display:flex;flex-direction:column-reverse;align-items:center;gap:4px;margin:0 auto 20px;padding:12px 0}
+.tower .floor{width:calc(100% - var(--i,0)*12px);max-width:280px;height:28px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;opacity:.4;transition:all .3s;border:1px solid rgba(255,255,255,.06)}
+.tower .floor.reached{opacity:1;border-color:rgba(255,255,255,.15);box-shadow:0 0 12px rgba(78,204,163,.15)}
+.tower .floor.current{opacity:1;transform:scale(1.05);border-color:var(--gold);box-shadow:0 0 16px rgba(240,192,64,.2);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 12px rgba(240,192,64,.15)}50%{box-shadow:0 0 24px rgba(240,192,64,.35)}}
+.tower .floor .name{font-size:11px}
+.tower .floor .check{font-size:12px;margin-right:4px}
+
+.floor-colors{display:flex;flex-direction:column;align-items:center;gap:4px;margin:0 auto 20px}
+.floor-colors .f{width:200px;height:30px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;opacity:.35;transition:all .4s}
+.floor-colors .f.reached{opacity:1;box-shadow:0 0 20px rgba(255,255,255,.1)}
+.floor-colors .f.current{opacity:1;transform:scale(1.06);animation:pulse 1.5s ease-in-out infinite;box-shadow:0 0 30px rgba(255,255,255,.2)}
+
+.features{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;text-align:left}
+.features .feat{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);background:rgba(255,255,255,.03);padding:8px 12px;border-radius:8px}
+
+/* ── 降段 ── */
+.demotion-overlay{text-align:center}.demotion-overlay .big{font-size:44px;margin-bottom:6px}
+
+/* ── 宝箱 ── */
+.chest-screen{text-align:center}
+.chest-screen .chest-icon{font-size:56px;margin-bottom:6px;cursor:pointer;transition:transform .2s}
+.chest-screen .chest-icon:active{transform:scale(.9)}
+.chest-screen .chest-icon.opened{animation:chestOpen .5s ease}
+@keyframes chestOpen{0%{transform:scale(1) rotate(0)}30%{transform:scale(1.2) rotate(-5deg)}60%{transform:scale(1.3) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+.chest-screen .reward{font-size:28px;font-weight:800;color:var(--gold);margin:8px 0}
+.chest-screen .reward-sub{font-size:13px;color:var(--sub);margin-bottom:12px}
+
+/* ── 封顶 ── */
+.max-rank{text-align:center;padding:30px 18px}
+.max-rank .big{font-size:64px;margin-bottom:8px}
+.max-rank h2{font-size:26px;font-weight:900;background:linear-gradient(135deg,#f0c040,#e94560);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.max-rank p{color:var(--sub);font-size:13px;margin-bottom:16px}
+
+.hidden{display:none !important}
+
+/* ── 模式选择 ── */
+.mode-select{display:flex;gap:10px;margin-bottom:14px}
+.mode-btn{flex:1;padding:16px 10px;border:none;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;transition:all .15s;text-align:center;line-height:1.3}
+.mode-btn:active{transform:scale(.96)}
+.mode-btn.ladder{background:linear-gradient(135deg,#4ecca3,#1a8a6a);color:#fff}
+.mode-btn.battle{background:linear-gradient(135deg,#e94560,#ff6b6b);color:#fff}
+.mode-btn .micon{font-size:28px;display:block;margin-bottom:2px}
+.mode-btn .mdesc{font-size:10px;font-weight:400;opacity:.75;margin-top:2px}
+/* ── 战斗HUD ── */
+.battle-hud{display:flex;flex-direction:column;gap:4px;padding:10px 14px;background:rgba(0,0,0,.25);border-radius:10px;border:1px solid rgba(255,255,255,.06);margin-bottom:12px}
+.battle-hud .m-row{display:flex;align-items:center;gap:10px;position:relative}
+.battle-hud .m-icon{font-size:30px;min-width:40px;text-align:center;animation:monsterIdle 1.5s ease-in-out infinite}
+.battle-hud .m-icon.hit{animation:monsterHit .4s ease}
+.battle-hud .m-icon.atk{animation:monsterAtk .35s ease}
+.battle-hud .m-info{flex:1;min-width:0}
+.battle-hud .m-name{font-size:13px;font-weight:700;margin-bottom:1px}
+.battle-hud .m-hp{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden}
+.battle-hud .m-hp .fill{height:100%;border-radius:4px;transition:width .4s ease;background:linear-gradient(90deg,var(--accent),#ff6b6b)}
+.battle-hud .m-hp .fill.warning{background:linear-gradient(90deg,#f0c040,#f59e0b)}
+.battle-hud .m-hp .fill.safe{background:linear-gradient(90deg,var(--green),#2dd4bf)}
+.battle-hud .m-hp-text{font-size:10px;color:var(--sub);margin-top:1px;display:flex;justify-content:space-between}
+.battle-hud .p-row{display:flex;align-items:center;gap:6px;font-size:13px;margin-top:4px}
+.battle-hud .p-row .label{color:var(--sub);font-size:11px}
+.battle-hud .p-row .hp-hearts{display:flex;gap:2px}
+.battle-hud .p-row .hp-hearts .h{font-size:14px;transition:all .3s}
+.battle-hud .p-row .hp-hearts .h.lost{opacity:.15;transform:scale(.7)}
+.battle-hud .stat-line{display:flex;gap:12px;font-size:11px;color:var(--sub);margin-top:3px}
+
+/* ── 战斗道具栏 ── */
+.battle-items{display:flex;gap:6px;justify-content:center;padding:8px 0 2px;flex-wrap:wrap}
+.battle-items .bi-btn{background:var(--card2);border:1.5px solid rgba(255,255,255,.08);border-radius:8px;padding:5px 10px;font-size:12px;cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:4px;font-weight:700;color:var(--text)}
+.battle-items .bi-btn:active{transform:scale(.92)}
+.battle-items .bi-btn .cnt{color:var(--gold);font-size:10px;min-width:14px;text-align:center}
+.battle-items .bi-btn.used{opacity:.3;pointer-events:none}
+
+@media(max-width:420px){#app{max-width:100%}.word-display .word{font-size:28px}.choices{gap:6px}.choice-btn{padding:10px 6px;font-size:13px}.card{padding:18px 14px}}
+/* ── 商店 ── */
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 0}
+.shop-item{background:var(--card2);border:1.5px solid rgba(255,255,255,.07);border-radius:10px;padding:12px 6px;text-align:center;transition:all .15s;position:relative;cursor:pointer}
+.shop-item:active{transform:scale(.96)}
+.shop-item .sicon{font-size:26px}
+.shop-item .sname{font-size:12px;font-weight:700;margin:2px 0}
+.shop-item .sdesc{font-size:10px;color:var(--sub);margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.shop-item .sprice{font-size:12px;font-weight:700;color:var(--gold)}
+.shop-item.owned{opacity:.6;border-color:var(--green)}
+.shop-item.owned .sprice{color:var(--green)}
+.shop-item.owned::after{content:'\2713';position:absolute;top:-4px;right:-4px;background:var(--green);color:#111;width:18px;height:18px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.shop-item.locked{opacity:.35;pointer-events:none}
+.shop-tabs{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.shop-tabs button{flex:1;min-width:60px;padding:6px 4px;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:transparent;color:var(--sub);font-size:11px;cursor:pointer;transition:all .15s}
+.shop-tabs button.active{background:var(--card2);border-color:var(--accent);color:var(--text);font-weight:700}
+.points-display{display:flex;align-items:center;gap:4px;font-size:13px;font-weight:700;color:var(--gold)}
+.points-display .picon{font-size:16px}
+/* ── 守护灵 ── */
+.pet-area{position:absolute;bottom:-6px;right:0;font-size:28px;pointer-events:none;z-index:3;animation:petFloat 2s ease-in-out infinite;opacity:.8}
+@keyframes petFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.pet-area.dragon{font-size:36px}
+/* ── 词库 ── */
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;max-height:40vh;overflow-y:auto;padding:4px}
+.vocab-grid .ve{padding:8px 8px;background:var(--card2);border-radius:6px;font-size:11px;text-align:left}
+.vocab-grid .ve .vw{font-weight:700;font-size:12px}
+.vocab-grid .ve .vd{color:var(--sub);font-size:10px;margin-top:1px}
+.star-sparkle{position:absolute;inset:0;pointer-events:none;font-size:20px;text-align:center;padding-top:10px;animation:petFloat 2s ease-in-out infinite}
+/* ── 战斗 ── */
+.battle-area{display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:rgba(0,0,0,.25);border-radius:10px;border:1px solid rgba(255,255,255,.06);position:relative}
+.battle-area .monster{font-size:32px;min-width:44px;text-align:center;animation:monsterIdle 1.5s ease-in-out infinite}
+@keyframes monsterIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.battle-area .monster.atk{animation:monsterAtk .35s ease}
+@keyframes monsterAtk{0%{transform:translateX(0)}30%{transform:translateX(15px) scale(1.1)}60%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+.battle-area .monster.hit{animation:monsterHit .4s ease}
+@keyframes monsterHit{0%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+.battle-info{flex:1;min-width:0}
+.battle-info .mname{font-size:13px;font-weight:700;margin-bottom:2px}
+.battle-hp{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;position:relative}
+.battle-hp .fill{height:100%;border-radius:4px;transition:width .4s ease;background:linear-gradient(90deg,var(--accent),#ff6b6b)}
+.battle-hp .fill.warning{background:linear-gradient(90deg,#f0c040,#f59e0b)}
+.battle-hp .fill.safe{background:linear-gradient(90deg,var(--green),#2dd4bf)}
+.battle-hp-text{font-size:10px;color:var(--sub);margin-top:1px;display:flex;justify-content:space-between}
+.dmg-num{position:absolute;font-size:24px;font-weight:900;color:var(--green);z-index:5;pointer-events:none;animation:dmgFloat .6s ease-out forwards}
+.dmg-num.taken{color:var(--accent)}
+@keyframes dmgFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-30px) scale(1.3)}}
+/* ── 气泡 ── */
+</style>
+</head>
+<body>
+
+<div class="bg-deco"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<div id="app">
+
+  <!-- 顶部栏 -->
+  <header id="gameHeader" class="hidden">
+    <div class="rank-badge">
+      <span class="icon" id="rankIcon">🟤</span>
+      <div>
+        <div class="name" id="rankName">青铜</div>
+        <div class="lvl" id="rankLvl">Lv.1</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="points-display">
+        <span class="picon">⭐</span>
+        <span id="pointsDisplay">0</span>
+      </div>
+      <div class="stage-info">
+      <span class="num" id="stageNum">第 1 关</span>
+      <span id="stageSep">/ <span id="totalStages">18</span></span>
+    </div>
+    </div>
+  </header>
+
+  <!-- HP + Combo -->
+  <div id="hpRow" class="hp-row hidden">
+    <div class="hp-bar" id="hpContainer"></div>
+    <div class="combo-display" id="comboDisplay">🔥 <span id="comboCount">2</span>x</div>
+  </div>
+
+  <!-- 计时条 -->
+  <div id="timerWrap" class="timer-wrap hidden">
+    <div class="timer-bar"><div class="fill" id="timerFill"></div></div>
+  </div>
+
+  <!-- 进度 -->
+  <div id="progressWrap" class="progress-wrap hidden">
+    <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+    <div class="progress-row">
+      <span id="progressLabel">第 1 / 5 题</span>
+      <span id="progressCorrect">✅ 0</span>
+    </div>
+  </div>
+
+  <!-- 游戏主区域 -->
+  <div class="game-area" id="gameArea">
+
+    <!-- 首页 -->
+    <div id="homeScreen">
+      <div style="text-align:center;padding:30px 18px">
+        <h1 style="font-size:30px;font-weight:900;margin-bottom:2px;background:linear-gradient(135deg,#f0c040,#e94560);-webkit-background-clip:text;-webkit-text-fill-color:transparent">六级词汇闯关</h1>
+        <div style="color:var(--sub);font-size:13px;margin-bottom:12px">天梯冲段 · 打怪特训</div>
+
+        <div class="mode-select">
+          <button class="mode-btn ladder" id="ladderBtn">
+            <span class="micon">🏰</span>天梯模式
+            <span class="mdesc">爬塔冲段·稳扎稳打</span>
+          </button>
+          <button class="mode-btn battle" id="battleBtn">
+            <span class="micon">⚔️</span>打怪模式
+            <span class="mdesc">连续战斗·挑战极限</span>
+          </button>
+        </div>
+
+        <!-- 塔楼 -->
+        <div class="floor-colors" id="towerDisplay"></div>
+
+        <div class="features">
+          <div class="feat"><span>⏱️</span>每题 10 秒倒计时，紧迫答题</div>
+          <div class="feat"><span>🔥</span>连续答对触发 Combo 加分</div>
+          <div class="feat"><span>🎁</span>每段通关开启奖励宝箱</div>
+          <div class="feat"><span>💾</span>自动存档，随时再战</div>
+        </div>
+        <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-bottom:10px">
+          <div class="points-display"><span class="picon">⭐</span><span id="homePoints">0</span></div>
+          <div style="font-size:11px;color:var(--sub)">积分</div>
+        </div>
+        <div class="btn-group" style="margin-top:8px">
+          <button class="btn btn-outline" id="shopBtn" style="font-size:12px;padding:10px">🏪 商店</button>
+          <button class="btn btn-outline" id="vocabBtn" style="font-size:12px;padding:10px">📖 图鉴</button>
+        </div>
+        <button class="btn btn-outline" id="resetBtn" style="margin-top:8px;font-size:12px">重置进度</button>
+      </div>
+    </div>
+
+    <!-- 答题 -->
+    <div id="quizScreen" class="hidden">
+      <div id="battleHud" class="battle-hud hidden">
+        <div class="m-row">
+          <div class="m-icon" id="battleMonsterIcon">🟢</div>
+          <div class="m-info">
+            <div class="m-name" id="battleMonsterName">史莱姆</div>
+            <div class="m-hp"><div class="fill safe" id="battleMonsterFill" style="width:100%"></div></div>
+            <div class="m-hp-text"><span id="battleMonsterHp">5/5</span><span id="battleWave">第 1 波</span></div>
+          </div>
+        </div>
+        <div class="p-row">
+          <span class="label">生命</span>
+          <span class="hp-hearts" id="battlePlayerHearts"></span>
+        </div>
+        <div class="stat-line">
+          <span id="battleStats">✅ 0  ❌ 0</span>
+          <span id="battleCombo" style="color:var(--gold);font-weight:700;display:none"></span>
+        </div>
+      </div>
+      <div id="ladderTower" class="hidden" style="padding:0 4px 6px;z-index:10">
+        <div class="lt-row" id="ltRow" style="display:flex;gap:3px;height:18px"></div>
+        <div class="lt-label" id="ltLabel" style="font-size:10px;color:var(--sub);text-align:center;margin-top:2px"></div>
+      </div>
+      <div class="card" id="questionCard">
+        <div class="battle-area" id="battleArea">
+          <div class="monster" id="monsterIcon">🟢</div>
+          <div class="battle-info">
+            <div class="mname" id="monsterName">史莱姆</div>
+            <div class="battle-hp"><div class="fill" id="monsterHpFill" style="width:100%"></div></div>
+            <div class="battle-hp-text"><span id="monsterHpLabel">6/6</span><span>❤️×<span id="battleLives">3</span></span></div>
+          </div>
+        </div>
+        <div class="word-display">
+          <div class="word" id="currentWord">abandon</div>
+          <div class="phonetic" id="currentPhonetic">/əˈbændən/</div>
+        </div>
+        <div class="choices" id="choicesContainer"></div>
+        <div class="battle-items hidden" id="battleItems"></div>
+        <div class="particles" id="particles"></div>
+        <div class="pet-area hidden" id="petArea">🐣</div>
+      </div>
+    </div>
+
+    <!-- 过关结果 -->
+    <div id="resultScreen" class="hidden result-screen">
+      <div class="card">
+        <div class="big-icon" id="resultIcon">🎯</div>
+        <div class="title" id="resultTitle">过关！</div>
+        <div class="sub" id="resultSub">进入下一关</div>
+        <div class="score" id="resultScore">0</div>
+        <div class="score-label">总正确数</div>
+        <div class="stat-row">
+          <div class="stat-item"><div class="val" id="statCorrect">0</div><div class="lbl">本关正确</div></div>
+          <div class="stat-item"><div class="val" id="statWrong">0</div><div class="lbl">本关错误</div></div>
+          <div class="stat-item"><div class="val" id="statStreak">0</div><div class="lbl">最大连击</div></div>
+        </div>
+        <button class="btn btn-success" id="nextBtn">继续</button>
+        <button class="btn btn-outline" id="resultHomeBtn" style="margin-top:6px;font-size:12px">回到首页</button>
+      </div>
+    </div>
+
+    <!-- 宝箱 -->
+    <div id="chestScreen" class="hidden chest-screen">
+      <div class="card">
+        <div style="font-size:13px;color:var(--sub);margin-bottom:6px" id="chestTitle">段位通关奖励</div>
+        <div class="chest-icon" id="chestIcon">🎁</div>
+        <div class="reward" id="chestReward">+0</div>
+        <div class="reward-sub" id="chestSub">额外奖励分</div>
+        <button class="btn btn-gold" id="chestBtn">领取</button>
+      </div>
+    </div>
+
+    <!-- 降段 -->
+    <div id="demotionScreen" class="hidden demotion-overlay">
+      <div class="card" style="border-color:rgba(233,69,96,.25)">
+        <div class="big">💔</div>
+        <div style="font-size:20px;font-weight:800;margin-bottom:2px">命用完了！</div>
+        <div style="font-size:13px;color:var(--sub);margin-bottom:10px" id="demotionText">降段到 青铜</div>
+        <div class="rank-display">
+          <div class="emoji" id="demotionIcon">🟤</div>
+          <div class="rname" id="demotionName">青铜</div>
+        </div>
+        <div style="margin-top:14px">
+          <button class="btn btn-primary" id="demotionBtn">重新挑战</button>
+          <button class="btn btn-outline" id="demotionHomeBtn" style="margin-top:6px">返回首页</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 封顶 -->
+    <div id="maxRankScreen" class="hidden max-rank">
+      <div class="big">👑</div>
+      <h2>恭喜登顶！</h2>
+      <p>六级词汇全部掌握</p>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:44px">👑</div>
+        <div style="font-size:22px;font-weight:800;color:var(--gold)">王者</div>
+        <div class="stat-row" style="margin-top:10px">
+          <div class="stat-item"><div class="val" id="maxCorrect">0</div><div class="lbl">总正确</div></div>
+          <div class="stat-item"><div class="val" id="maxWrong">0</div><div class="lbl">总错误</div></div>
+          <div class="stat-item"><div class="val" id="maxStreak">0</div><div class="lbl">最大连击</div></div>
+        </div>
+      </div>
+      <button class="btn btn-gold" id="maxReplayBtn">重新挑战</button>
+      <button class="btn btn-outline" id="maxHomeBtn" style="margin-top:6px">返回首页</button>
+    </div>
+
+    <!-- 商店 -->
+    <div id="shopScreen" class="hidden" style="padding:16px;flex:1;display:flex;flex-direction:column">
+      <div class="card" style="flex:1;display:flex;flex-direction:column;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="font-size:18px;font-weight:800">🏪 积分商店</div>
+          <div class="points-display"><span class="picon">⭐</span><span id="shopPoints">0</span></div>
+        </div>
+        <div class="shop-tabs" id="shopTabs"></div>
+        <div style="flex:1;overflow-y:auto"><div class="shop-grid" id="shopGrid"></div></div>
+        <button class="btn btn-outline" id="shopBackBtn" style="margin-top:8px;font-size:12px">返回</button>
+      </div>
+    </div>
+
+    <!-- 词库 -->
+    <div id="vocabScreen" class="hidden" style="padding:16px;flex:1;display:flex;flex-direction:column">
+      <div class="card" style="flex:1;display:flex;flex-direction:column;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-size:18px;font-weight:800">📖 词库图鉴</div>
+          <span style="font-size:12px;color:var(--sub)" id="vocabCount">0 词</span>
+        </div>
+        <div class="vocab-grid" id="vocabGrid"></div>
+        <button class="btn btn-outline" id="vocabBackBtn" style="margin-top:8px;font-size:12px">返回</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════
+//  词汇数据
+// ═══════════════════════════════
+const VOCAB = {
+  bronze: [
+    {w:'abandon',p:'/əˈbændən/',d:'放弃'},
+    {w:'absorb',p:'/əbˈzɔːrb/',d:'吸收'},
+    {w:'abstract',p:'/ˈæbstrækt/',d:'抽象的'},
+    {w:'abundant',p:'/əˈbʌndənt/',d:'丰富的'},
+    {w:'accelerate',p:'/əkˈseləreɪt/',d:'加速'},
+    {w:'accommodate',p:'/əˈkɑːmədeɪt/',d:'容纳'},
+    {w:'accumulate',p:'/əˈkjuːmjəleɪt/',d:'积累'},
+    {w:'accurate',p:'/ˈækjərət/',d:'准确的'},
+    {w:'accuse',p:'/əˈkjuːz/',d:'指控'},
+    {w:'acknowledge',p:'/əkˈnɑːlɪdʒ/',d:'承认'},
+    {w:'acquire',p:'/əˈkwaɪər/',d:'获得'},
+    {w:'adapt',p:'/əˈdæpt/',d:'适应'},
+    {w:'adequate',p:'/ˈædɪkwət/',d:'充足的'},
+    {w:'adjust',p:'/əˈdʒʌst/',d:'调整'},
+    {w:'ambitious',p:'/æmˈbɪʃəs/',d:'有雄心的'},
+    {w:'annual',p:'/ˈænjuəl/',d:'每年的'},
+    {w:'anticipate',p:'/ænˈtɪsɪpeɪt/',d:'预期'},
+    {w:'apparent',p:'/əˈpærənt/',d:'明显的'},
+    {w:'appeal',p:'/əˈpiːl/',d:'吸引/呼吁'},
+    {w:'appreciate',p:'/əˈpriːʃieɪt/',d:'欣赏/感激'},
+    {w:'approach',p:'/əˈproʊtʃ/',d:'接近/方法'},
+    {w:'appropriate',p:'/əˈproʊpriət/',d:'适当的'},
+    {w:'assess',p:'/əˈses/',d:'评估'},
+    {w:'assign',p:'/əˈsaɪn/',d:'分配'},
+    {w:'assume',p:'/əˈsuːm/',d:'假设'},
+    {w:'available',p:'/əˈveɪləbl/',d:'可用的'},
+    {w:'barrier',p:'/ˈbæriər/',d:'障碍'},
+    {w:'benefit',p:'/ˈbenɪfɪt/',d:'利益'},
+    {w:'campaign',p:'/kæmˈpeɪn/',d:'运动/活动'},
+    {w:'capable',p:'/ˈkeɪpəbl/',d:'有能力的'},
+  ,
+    {"w":"adopt","p":"/əˈdɑːpt/","d":"采纳/收养"},
+    {"w":"affect","p":"/əˈfekt/","d":"影响/感动"},
+    {"w":"afford","p":"/əˈfɔːrd/","d":"负担得起"},
+    {"w":"agency","p":"/ˈeɪdʒənsi/","d":"代理机构"},
+    {"w":"agenda","p":"/əˈdʒendə/","d":"议事日程"},
+    {"w":"allocate","p":"/ˈæləkeɪt/","d":"分配/拨出"},
+    {"w":"alter","p":"/ˈɔːltər/","d":"改变/修改"},
+    {"w":"alternative","p":"/ɔːlˈtɜːrnətɪv/","d":"替代的"},
+    {"w":"amaze","p":"/əˈmeɪz/","d":"使惊奇"},
+    {"w":"apart","p":"/əˈpɑːrt/","d":"分离地"},
+    {"w":"applause","p":"/əˈplɔːz/","d":"掌声"},
+    {"w":"applicable","p":"/ˈæplɪkəbl/","d":"适用的"},
+    {"w":"approve","p":"/əˈpruːv/","d":"批准/赞同"},
+    {"w":"arise","p":"/əˈraɪz/","d":"出现/产生"},
+    {"w":"arrange","p":"/əˈreɪndʒ/","d":"安排/排列"},
+    {"w":"aspect","p":"/ˈæspekt/","d":"方面/面貌"},
+    {"w":"associate","p":"/əˈsoʊʃieɪt/","d":"联系/关联"},
+    {"w":"atmosphere","p":"/ˈætməsfɪr/","d":"气氛/大气层"},
+    {"w":"attach","p":"/əˈtætʃ/","d":"附上/连接"},
+    {"w":"attend","p":"/əˈtend/","d":"参加/照料"},
+    {"w":"aware","p":"/əˈweər/","d":"意识到的"},
+    {"w":"balance","p":"/ˈbæləns/","d":"平衡/余额"},
+    {"w":"behave","p":"/bɪˈheɪv/","d":"举止/表现"},
+    {"w":"belief","p":"/bɪˈliːf/","d":"信念/相信"},
+    {"w":"bother","p":"/ˈbɑːðər/","d":"打扰/烦恼"},
+    {"w":"bound","p":"/baʊnd/","d":"必定/界限"},
+    {"w":"brief","p":"/briːf/","d":"简短的/摘要"},
+    {"w":"calculate","p":"/ˈkælkjuleɪt/","d":"计算/推算"},
+    {"w":"celebrate","p":"/ˈselɪbreɪt/","d":"庆祝/歌颂"},
+    {"w":"channel","p":"/ˈtʃænl/","d":"渠道/频道"},
+    {"w":"character","p":"/ˈkærəktər/","d":"性格/角色"},
+    {"w":"claim","p":"/kleɪm/","d":"声称/索赔"},
+    {"w":"clarify","p":"/ˈklærəfaɪ/","d":"澄清/阐明"},
+    {"w":"combat","p":"/ˈkɑːmbæt/","d":"战斗/抗击"},
+    {"w":"comfort","p":"/ˈkʌmfərt/","d":"安慰/舒适"},
+    {"w":"comment","p":"/ˈkɑːment/","d":"评论/意见"},
+    {"w":"commit","p":"/kəˈmɪt/","d":"犯(罪)/承诺"},
+    {"w":"communicate","p":"/kəˈmjuːnɪkeɪt/","d":"交流/传达"},
+    {"w":"companion","p":"/kəmˈpænjən/","d":"同伴/伙伴"},
+    {"w":"compare","p":"/kəmˈper/","d":"比较/对比"},
+    {"w":"compete","p":"/kəmˈpiːt/","d":"竞争/比赛"},
+    {"w":"complain","p":"/kəmˈpleɪn/","d":"抱怨/投诉"},
+    {"w":"complex","p":"/kəmˈpleks/","d":"复杂的"},
+    {"w":"conclude","p":"/kənˈkluːd/","d":"总结/得出结论"},
+    {"w":"confident","p":"/ˈkɑːnfɪdənt/","d":"自信的"},
+    {"w":"confirm","p":"/kənˈfɜːrm/","d":"确认/证实"},
+    {"w":"confuse","p":"/kənˈfjuːz/","d":"使困惑"},
+    {"w":"connect","p":"/kəˈnekt/","d":"连接/联系"},
+    {"w":"conservation","p":"/ˌkɑːnsərˈveɪʃn/","d":"保护/保存"},
+    {"w":"consider","p":"/kənˈsɪdər/","d":"考虑/认为"},
+    {"w":"construct","p":"/kənˈstrʌkt/","d":"建造/构筑"},
+    {"w":"contain","p":"/kənˈteɪn/","d":"包含/容纳"},
+    {"w":"convey","p":"/kənˈveɪ/","d":"传达/运输"}],
+  silver: [
+    {w:'abolish',p:'/əˈbɑːlɪʃ/',d:'废除'},
+    {w:'absurd',p:'/əbˈsɜːrd/',d:'荒谬的'},
+    {w:'abuse',p:'/əˈbjuːs/',d:'滥用'},
+    {w:'accompany',p:'/əˈkʌmpəni/',d:'陪伴'},
+    {w:'accomplish',p:'/əˈkɑːmplɪʃ/',d:'完成'},
+    {w:'adolescent',p:'/ˌædəˈlesnt/',d:'青少年'},
+    {w:'adverse',p:'/ədˈvɜːrs/',d:'不利的'},
+    {w:'advocate',p:'/ˈædvəkeɪt/',d:'提倡'},
+    {w:'aggressive',p:'/əˈɡresɪv/',d:'有侵略性的'},
+    {w:'allege',p:'/əˈledʒ/',d:'声称'},
+    {w:'alleviate',p:'/əˈliːvieɪt/',d:'减轻'},
+    {w:'ambiguous',p:'/æmˈbɪɡjuəs/',d:'模棱两可的'},
+    {w:'amuse',p:'/əˈmjuːz/',d:'逗乐'},
+    {w:'analyze',p:'/ˈænəlaɪz/',d:'分析'},
+    {w:'ancestor',p:'/ˈænsestər/',d:'祖先'},
+    {w:'anxiety',p:'/æŋˈzaɪəti/',d:'焦虑'},
+    {w:'appetite',p:'/ˈæpɪtaɪt/',d:'食欲/欲望'},
+    {w:'applaud',p:'/əˈplɔːd/',d:'鼓掌'},
+    {w:'appliance',p:'/əˈplaɪəns/',d:'器具'},
+    {w:'aristocrat',p:'/əˈrɪstəkræt/',d:'贵族'},
+    {w:'artificial',p:'/ˌɑːrtɪˈfɪʃl/',d:'人造的'},
+    {w:'assemble',p:'/əˈsembl/',d:'集合/组装'},
+    {w:'assert',p:'/əˈsɜːrt/',d:'断言'},
+    {w:'asset',p:'/ˈæset/',d:'资产'},
+    {w:'attain',p:'/əˈteɪn/',d:'达到'},
+    {w:'attempt',p:'/əˈtempt/',d:'尝试'},
+    {w:'attitude',p:'/ˈætɪtuːd/',d:'态度'},
+    {w:'attract',p:'/əˈtrækt/',d:'吸引'},
+    {w:'authority',p:'/əˈθɔːrəti/',d:'权威/当局'},
+    {w:'available',p:'/əˈveɪləbl/',d:'可用的'},
+  ,
+    {"w":"damp","p":"/dæmp/","d":"潮湿的/使潮湿"},
+    {"w":"debate","p":"/dɪˈbeɪt/","d":"辩论/争论"},
+    {"w":"debt","p":"/det/","d":"债务/欠款"},
+    {"w":"decorate","p":"/ˈdekəreɪt/","d":"装饰/装潢"},
+    {"w":"delay","p":"/dɪˈleɪ/","d":"延迟/耽搁"},
+    {"w":"delight","p":"/dɪˈlaɪt/","d":"高兴/愉快"},
+    {"w":"deliver","p":"/dɪˈlɪvər/","d":"递送/发表"},
+    {"w":"demand","p":"/dɪˈmænd/","d":"需求/要求"},
+    {"w":"deny","p":"/dɪˈnaɪ/","d":"否认/拒绝"},
+    {"w":"depart","p":"/dɪˈpɑːrt/","d":"离开/出发"},
+    {"w":"deposit","p":"/dɪˈpɑːzɪt/","d":"存放/押金"},
+    {"w":"describe","p":"/dɪˈskraɪb/","d":"描述/形容"},
+    {"w":"desire","p":"/dɪˈzaɪər/","d":"渴望/欲望"},
+    {"w":"destroy","p":"/dɪˈstrɔɪ/","d":"破坏/毁灭"},
+    {"w":"detect","p":"/dɪˈtekt/","d":"察觉/检测"},
+    {"w":"develop","p":"/dɪˈveləp/","d":"发展/开发"},
+    {"w":"differ","p":"/ˈdɪfər/","d":"不同/相异"},
+    {"w":"difficulty","p":"/ˈdɪfɪkəlti/","d":"困难/艰难"},
+    {"w":"digest","p":"/daɪˈdʒest/","d":"消化/摘要"},
+    {"w":"dignity","p":"/ˈdɪɡnəti/","d":"尊严/高贵"},
+    {"w":"dilemma","p":"/dɪˈlemə/","d":"困境/两难"},
+    {"w":"dip","p":"/dɪp/","d":"蘸/浸/下降"},
+    {"w":"direct","p":"/dəˈrekt/","d":"直接的/指导"},
+    {"w":"disable","p":"/dɪsˈeɪbl/","d":"使无能/使残疾"},
+    {"w":"disappear","p":"/ˌdɪsəˈpɪr/","d":"消失/不见"},
+    {"w":"disaster","p":"/dɪˈzæstər/","d":"灾难/灾害"},
+    {"w":"discount","p":"/ˈdɪskaʊnt/","d":"折扣/打折"},
+    {"w":"discover","p":"/dɪˈskʌvər/","d":"发现/发觉"},
+    {"w":"dismiss","p":"/dɪsˈmɪs/","d":"解散/解雇"},
+    {"w":"display","p":"/dɪˈspleɪ/","d":"展示/显示"},
+    {"w":"dissolve","p":"/dɪˈzɑːlv/","d":"溶解/解散"},
+    {"w":"distance","p":"/ˈdɪstəns/","d":"距离/远方"},
+    {"w":"distress","p":"/dɪˈstres/","d":"痛苦/困境"},
+    {"w":"district","p":"/ˈdɪstrɪkt/","d":"地区/区域"},
+    {"w":"disturb","p":"/dɪˈstɜːrb/","d":"打扰/妨碍"},
+    {"w":"dive","p":"/daɪv/","d":"潜水/跳水"},
+    {"w":"diverse","p":"/daɪˈvɜːrs/","d":"多样的"},
+    {"w":"document","p":"/ˈdɑːkjumənt/","d":"文件/文档"},
+    {"w":"doubt","p":"/daʊt/","d":"怀疑/疑惑"},
+    {"w":"draft","p":"/dræft/","d":"草稿/起草"},
+    {"w":"drag","p":"/dræɡ/","d":"拖拽/拉扯"},
+    {"w":"drain","p":"/dreɪn/","d":"排水/耗尽"},
+    {"w":"drift","p":"/drɪft/","d":"漂流/偏移"},
+    {"w":"due","p":"/duː/","d":"到期的/由于"},
+    {"w":"dump","p":"/dʌmp/","d":"倾倒/抛弃"},
+    {"w":"eager","p":"/ˈiːɡər/","d":"渴望的/热切的"},
+    {"w":"earn","p":"/ɜːrn/","d":"赚取/获得"},
+    {"w":"ease","p":"/iːz/","d":"轻松/缓解"},
+    {"w":"echo","p":"/ˈekoʊ/","d":"回声/回响"},
+    {"w":"economy","p":"/ɪˈkɑːnəmi/","d":"经济/节约"},
+    {"w":"edition","p":"/ɪˈdɪʃn/","d":"版本/版次"},
+    {"w":"educate","p":"/ˈedʒukeɪt/","d":"教育/培养"},
+    {"w":"efficient","p":"/ɪˈfɪʃnt/","d":"高效的/有效率的"},
+    {"w":"elderly","p":"/ˈeldərli/","d":"年长的/老年的"}],
+  gold: [
+    {w:'authentic',p:'/ɔːˈθentɪk/',d:'真实的'},
+    {w:'autonomy',p:'/ɔːˈtɑːnəmi/',d:'自治'},
+    {w:'bankruptcy',p:'/ˈbæŋkrʌptsi/',d:'破产'},
+    {w:'bizarre',p:'/bɪˈzɑːr/',d:'奇异的'},
+    {w:'boom',p:'/buːm/',d:'繁荣'},
+    {w:'boundary',p:'/ˈbaʊndri/',d:'边界'},
+    {w:'breakthrough',p:'/ˈbreɪkθruː/',d:'突破'},
+    {w:'brilliant',p:'/ˈbrɪliənt/',d:'辉煌的'},
+    {w:'budget',p:'/ˈbʌdʒɪt/',d:'预算'},
+    {w:'bulletin',p:'/ˈbʊlətɪn/',d:'公告'},
+    {w:'burden',p:'/ˈbɜːrdn/',d:'负担'},
+    {w:'capture',p:'/ˈkæptʃər/',d:'捕获'},
+    {w:'catastrophe',p:'/kəˈtæstrəfi/',d:'灾难'},
+    {w:'caution',p:'/ˈkɔːʃn/',d:'谨慎'},
+    {w:'cease',p:'/siːs/',d:'停止'},
+    {w:'challenge',p:'/ˈtʃælɪndʒ/',d:'挑战'},
+    {w:'chaos',p:'/ˈkeɪɑːs/',d:'混乱'},
+    {w:'characteristic',p:'/ˌkærəktəˈrɪstɪk/',d:'特征'},
+    {w:'chronic',p:'/ˈkrɑːnɪk/',d:'慢性的'},
+    {w:'circumstance',p:'/ˈsɜːrkəmstæns/',d:'环境/情况'},
+    {w:'civilization',p:'/ˌsɪvələˈzeɪʃn/',d:'文明'},
+    {w:'collapse',p:'/kəˈlæps/',d:'倒塌/崩溃'},
+    {w:'command',p:'/kəˈmænd/',d:'命令/掌握'},
+    {w:'commercial',p:'/kəˈmɜːrʃl/',d:'商业的'},
+    {w:'commitment',p:'/kəˈmɪtmənt/',d:'承诺/投入'},
+    {w:'compel',p:'/kəmˈpel/',d:'强迫'},
+    {w:'compensate',p:'/ˈkɑːmpenseɪt/',d:'补偿'},
+    {w:'competent',p:'/ˈkɑːmpɪtənt/',d:'胜任的'},
+    {w:'component',p:'/kəmˈpoʊnənt/',d:'组成部分'},
+    {w:'comprehend',p:'/ˌkɑːmprɪˈhend/',d:'理解'},
+  ,
+    {"w":"elect","p":"/ɪˈlekt/","d":"选举/选择"},
+    {"w":"element","p":"/ˈelɪmənt/","d":"元素/要素"},
+    {"w":"elevate","p":"/ˈelɪveɪt/","d":"提升/举起"},
+    {"w":"eligible","p":"/ˈelɪdʒəbl/","d":"合格的/符合条件的"},
+    {"w":"embarrass","p":"/ɪmˈbærəs/","d":"使尴尬/使难堪"},
+    {"w":"emerge","p":"/ɪˈmɜːrdʒ/","d":"出现/浮现"},
+    {"w":"emotion","p":"/ɪˈmoʊʃn/","d":"情感/情绪"},
+    {"w":"emphasize","p":"/ˈemfəsaɪz/","d":"强调/着重"},
+    {"w":"employee","p":"/ɪmˈplɔɪiː/","d":"雇员/员工"},
+    {"w":"enable","p":"/ɪˈneɪbl/","d":"使能够/启用"},
+    {"w":"enclose","p":"/ɪnˈkloʊz/","d":"围住/附上"},
+    {"w":"encourage","p":"/ɪnˈkɜːrɪdʒ/","d":"鼓励/激励"},
+    {"w":"endure","p":"/ɪnˈdʊr/","d":"忍受/持久"},
+    {"w":"engage","p":"/ɪnˈɡeɪdʒ/","d":"从事/吸引"},
+    {"w":"enhance","p":"/ɪnˈhæns/","d":"增强/提高"},
+    {"w":"enjoy","p":"/ɪnˈdʒɔɪ/","d":"享受/欣赏"},
+    {"w":"enlarge","p":"/ɪnˈlɑːrdʒ/","d":"扩大/放大"},
+    {"w":"ensure","p":"/ɪnˈʃʊr/","d":"确保/保证"},
+    {"w":"enterprise","p":"/ˈentərpraɪz/","d":"企业/事业"},
+    {"w":"entertain","p":"/ˌentərˈteɪn/","d":"娱乐/招待"},
+    {"w":"enthusiasm","p":"/ɪnˈθuːziæzəm/","d":"热情/热忱"},
+    {"w":"entire","p":"/ɪnˈtaɪər/","d":"整个的/完全的"},
+    {"w":"entitle","p":"/ɪnˈtaɪtl/","d":"使有资格/命名为"},
+    {"w":"entry","p":"/ˈentri/","d":"进入/条目"},
+    {"w":"environment","p":"/ɪnˈvaɪrənmənt/","d":"环境/周围"},
+    {"w":"episode","p":"/ˈepɪsoʊd/","d":"片段/一集"},
+    {"w":"equal","p":"/ˈiːkwəl/","d":"相等的/平等的"},
+    {"w":"equip","p":"/ɪˈkwɪp/","d":"装备/配备"},
+    {"w":"equivalent","p":"/ɪˈkwɪvələnt/","d":"等价的/同等物"},
+    {"w":"era","p":"/ˈɪrə/","d":"时代/纪元"},
+    {"w":"erect","p":"/ɪˈrekt/","d":"建造/竖立"},
+    {"w":"error","p":"/ˈerər/","d":"错误/差错"},
+    {"w":"essential","p":"/ɪˈsenʃl/","d":"必要的/本质的"},
+    {"w":"estate","p":"/ɪˈsteɪt/","d":"房地产/财产"},
+    {"w":"estimate","p":"/ˈestɪmeɪt/","d":"估计/估价"},
+    {"w":"evaluate","p":"/ɪˈvæljueɪt/","d":"评估/评价"},
+    {"w":"evening","p":"/ˈiːvnɪŋ/","d":"晚上/傍晚"},
+    {"w":"event","p":"/ɪˈvent/","d":"事件/活动"},
+    {"w":"eventually","p":"/ɪˈventʃuəli/","d":"最终/终于"},
+    {"w":"evident","p":"/ˈevɪdənt/","d":"明显的/明白的"},
+    {"w":"evil","p":"/ˈiːvl/","d":"邪恶的/罪恶的"},
+    {"w":"exact","p":"/ɪɡˈzækt/","d":"精确的/确切的"},
+    {"w":"examine","p":"/ɪɡˈzæmɪn/","d":"检查/考试"},
+    {"w":"example","p":"/ɪɡˈzæmpl/","d":"例子/榜样"},
+    {"w":"exceed","p":"/ɪkˈsiːd/","d":"超过/超越"},
+    {"w":"excellent","p":"/ˈeksələnt/","d":"优秀的/杰出的"},
+    {"w":"except","p":"/ɪkˈsept/","d":"除了/除外"},
+    {"w":"excess","p":"/ɪkˈses/","d":"过量/过剩"},
+    {"w":"excite","p":"/ɪkˈsaɪt/","d":"使兴奋/激动"},
+    {"w":"exclude","p":"/ɪkˈskluːd/","d":"排除/排斥"},
+    {"w":"excuse","p":"/ɪkˈskjuːs/","d":"原谅/借口"},
+    {"w":"exhibit","p":"/ɪɡˈzɪbɪt/","d":"展览/展示"},
+    {"w":"exist","p":"/ɪɡˈzɪst/","d":"存在/生存"},
+    {"w":"exit","p":"/ˈeksɪt/","d":"出口/退出"}],
+  platinum: [
+    {w:'compulsory',p:'/kəmˈpʌlsəri/',d:'强制性的'},
+    {w:'conceal',p:'/kənˈsiːl/',d:'隐藏'},
+    {w:'concentrate',p:'/ˈkɑːnsntreɪt/',d:'集中'},
+    {w:'concrete',p:'/ˈkɑːnkriːt/',d:'具体的'},
+    {w:'confess',p:'/kənˈfes/',d:'承认/忏悔'},
+    {w:'confine',p:'/kənˈfaɪn/',d:'限制'},
+    {w:'conflict',p:'/ˈkɑːnflɪkt/',d:'冲突'},
+    {w:'conquer',p:'/ˈkɑːŋkər/',d:'征服'},
+    {w:'conscious',p:'/ˈkɑːnʃəs/',d:'有意识的'},
+    {w:'consent',p:'/kənˈsent/',d:'同意'},
+    {w:'consequence',p:'/ˈkɑːnsɪkwens/',d:'结果'},
+    {w:'conservative',p:'/kənˈsɜːrvətɪv/',d:'保守的'},
+    {w:'considerable',p:'/kənˈsɪdərəbl/',d:'相当大的'},
+    {w:'consistent',p:'/kənˈsɪstənt/',d:'一致的'},
+    {w:'constant',p:'/ˈkɑːnstənt/',d:'不断的/恒定的'},
+    {w:'constitute',p:'/ˈkɑːnstɪtuːt/',d:'构成'},
+    {w:'consult',p:'/kənˈsʌlt/',d:'咨询'},
+    {w:'consume',p:'/kənˈsuːm/',d:'消费/消耗'},
+    {w:'contemporary',p:'/kənˈtempəreri/',d:'当代的'},
+    {w:'contradict',p:'/ˌkɑːntrəˈdɪkt/',d:'矛盾/反驳'},
+    {w:'contribute',p:'/kənˈtrɪbjuːt/',d:'贡献'},
+    {w:'controversy',p:'/ˈkɑːntrəvɜːrsi/',d:'争议'},
+    {w:'convenient',p:'/kənˈviːniənt/',d:'方便的'},
+    {w:'convention',p:'/kənˈvenʃn/',d:'惯例/大会'},
+    {w:'convince',p:'/kənˈvɪns/',d:'说服'},
+    {w:'cooperate',p:'/koʊˈɑːpəreɪt/',d:'合作'},
+    {w:'correspond',p:'/ˌkɔːrəˈspɑːnd/',d:'对应/通信'},
+    {w:'counsel',p:'/ˈkaʊnsl/',d:'建议/法律顾问'},
+    {w:'crucial',p:'/ˈkruːʃl/',d:'关键的'},
+    {w:'cultivate',p:'/ˈkʌltɪveɪt/',d:'培养/耕种'},
+  ,
+    {"w":"expand","p":"/ɪkˈspænd/","d":"扩展/膨胀"},
+    {"w":"expect","p":"/ɪkˈspekt/","d":"期望/预期"},
+    {"w":"expense","p":"/ɪkˈspens/","d":"费用/花费"},
+    {"w":"experiment","p":"/ɪkˈsperɪmənt/","d":"实验/试验"},
+    {"w":"expert","p":"/ˈekspɜːrt/","d":"专家/内行"},
+    {"w":"explain","p":"/ɪkˈspleɪn/","d":"解释/说明"},
+    {"w":"explode","p":"/ɪkˈsploʊd/","d":"爆炸/爆发"},
+    {"w":"exploit","p":"/ɪkˈsplɔɪt/","d":"利用/剥削"},
+    {"w":"explore","p":"/ɪkˈsplɔːr/","d":"探索/探险"},
+    {"w":"export","p":"/ɪkˈspɔːrt/","d":"出口/输出"},
+    {"w":"expose","p":"/ɪkˈspoʊz/","d":"暴露/揭发"},
+    {"w":"extend","p":"/ɪkˈstend/","d":"延伸/扩展"},
+    {"w":"extensive","p":"/ɪkˈstensɪv/","d":"广泛的"},
+    {"w":"extent","p":"/ɪkˈstent/","d":"程度/范围"},
+    {"w":"external","p":"/ɪkˈstɜːrnl/","d":"外部的"},
+    {"w":"extra","p":"/ˈekstrə/","d":"额外的/附加"},
+    {"w":"extract","p":"/ɪkˈstrækt/","d":"提取/摘录"},
+    {"w":"extraordinary","p":"/ɪkˈstrɔːrdəneri/","d":"非凡的"},
+    {"w":"extreme","p":"/ɪkˈstriːm/","d":"极端的"},
+    {"w":"fabric","p":"/ˈfæbrɪk/","d":"织物/结构"},
+    {"w":"facility","p":"/fəˈsɪləti/","d":"设施/设备"},
+    {"w":"factor","p":"/ˈfæktər/","d":"因素/要素"},
+    {"w":"faculty","p":"/ˈfæklti/","d":"才能/全体教员"},
+    {"w":"fade","p":"/feɪd/","d":"褪色/消退"},
+    {"w":"failure","p":"/ˈfeɪljər/","d":"失败/故障"},
+    {"w":"fair","p":"/fer/","d":"公平的/晴朗的"},
+    {"w":"faith","p":"/feɪθ/","d":"信念/信任"},
+    {"w":"fame","p":"/feɪm/","d":"名声/声誉"},
+    {"w":"familiar","p":"/fəˈmɪliər/","d":"熟悉的/常见的"},
+    {"w":"famine","p":"/ˈfæmɪn/","d":"饥荒/匮乏"},
+    {"w":"fantastic","p":"/fænˈtæstɪk/","d":"极好的/奇幻的"},
+    {"w":"fashion","p":"/ˈfæʃn/","d":"时尚/方式"},
+    {"w":"fasten","p":"/ˈfæsn/","d":"系紧/固定"},
+    {"w":"fate","p":"/feɪt/","d":"命运/天命"},
+    {"w":"fatigue","p":"/fəˈtiːɡ/","d":"疲劳/疲倦"},
+    {"w":"fault","p":"/fɔːlt/","d":"过错/故障"},
+    {"w":"favor","p":"/ˈfeɪvər/","d":"偏爱/帮助"},
+    {"w":"feasible","p":"/ˈfiːzəbl/","d":"可行的"},
+    {"w":"feature","p":"/ˈfiːtʃər/","d":"特征/特色"},
+    {"w":"federal","p":"/ˈfedərəl/","d":"联邦的/中央的"},
+    {"w":"feedback","p":"/ˈfiːdbæk/","d":"反馈/回复"},
+    {"w":"female","p":"/ˈfiːmeɪl/","d":"女性的/雌性"},
+    {"w":"fence","p":"/fens/","d":"栅栏/篱笆"},
+    {"w":"fertile","p":"/ˈfɜːrtl/","d":"肥沃的/富饶的"},
+    {"w":"fiction","p":"/ˈfɪkʃn/","d":"小说/虚构"},
+    {"w":"fierce","p":"/fɪrs/","d":"凶猛的/激烈的"},
+    {"w":"figure","p":"/ˈfɪɡjər/","d":"数字/人物/图形"},
+    {"w":"finance","p":"/ˈfaɪnæns/","d":"财务/金融"},
+    {"w":"firm","p":"/fɜːrm/","d":"坚定的/公司"},
+    {"w":"fix","p":"/fɪks/","d":"固定/修理"},
+    {"w":"flame","p":"/fleɪm/","d":"火焰/燃烧"},
+    {"w":"flash","p":"/flæʃ/","d":"闪光/闪烁"},
+    {"w":"fleet","p":"/fliːt/","d":"舰队/车队"}],
+  diamond: [
+    {w:'decade',p:'/ˈdekeɪd/',d:'十年'},
+    {w:'decline',p:'/dɪˈklaɪn/',d:'下降/拒绝'},
+    {w:'decrease',p:'/dɪˈkriːs/',d:'减少'},
+    {w:'dedicate',p:'/ˈdedɪkeɪt/',d:'致力于'},
+    {w:'defeat',p:'/dɪˈfiːt/',d:'击败'},
+    {w:'defend',p:'/dɪˈfend/',d:'防御/辩护'},
+    {w:'deficiency',p:'/dɪˈfɪʃnsi/',d:'缺陷/不足'},
+    {w:'definite',p:'/ˈdefɪnət/',d:'明确的'},
+    {w:'deliberate',p:'/dɪˈlɪbərət/',d:'故意的/深思熟虑的'},
+    {w:'delicate',p:'/ˈdelɪkət/',d:'精致的/脆弱的'},
+    {w:'demonstrate',p:'/ˈdemənstreɪt/',d:'证明/展示'},
+    {w:'depress',p:'/dɪˈpres/',d:'使沮丧/压制'},
+    {w:'derive',p:'/dɪˈraɪv/',d:'源于/获得'},
+    {w:'deserve',p:'/dɪˈzɜːrv/',d:'值得'},
+    {w:'desperate',p:'/ˈdespərət/',d:'绝望的/不顾一切的'},
+    {w:'despite',p:'/dɪˈspaɪt/',d:'尽管'},
+    {w:'destruction',p:'/dɪˈstrʌkʃn/',d:'破坏'},
+    {w:'determine',p:'/dɪˈtɜːrmɪn/',d:'决定/确定'},
+    {w:'device',p:'/dɪˈvaɪs/',d:'设备/策略'},
+    {w:'devote',p:'/dɪˈvoʊt/',d:'奉献'},
+    {w:'dimension',p:'/daɪˈmenʃn/',d:'维度/方面'},
+    {w:'discipline',p:'/ˈdɪsəplɪn/',d:'纪律/学科'},
+    {w:'disclose',p:'/dɪsˈkloʊz/',d:'揭露'},
+    {w:'discourage',p:'/dɪsˈkɜːrɪdʒ/',d:'使气馁'},
+    {w:'dispute',p:'/dɪˈspjuːt/',d:'争论'},
+    {w:'distinct',p:'/dɪˈstɪŋkt/',d:'明显的/独特的'},
+    {w:'distinguish',p:'/dɪˈstɪŋɡwɪʃ/',d:'区分'},
+    {w:'distribute',p:'/dɪˈstrɪbjuːt/',d:'分配'},
+    {w:'diverse',p:'/daɪˈvɜːrs/',d:'多样的'},
+    {w:'domestic',p:'/dəˈmestɪk/',d:'国内的/家庭的'},
+  ,
+    {"w":"flexible","p":"/ˈfleksəbl/","d":"灵活的/柔韧的"},
+    {"w":"float","p":"/floʊt/","d":"漂浮/浮动"},
+    {"w":"flood","p":"/flʌd/","d":"洪水/淹没"},
+    {"w":"flourish","p":"/ˈflɜːrɪʃ/","d":"繁荣/茂盛"},
+    {"w":"flow","p":"/floʊ/","d":"流动/流量"},
+    {"w":"fluent","p":"/ˈfluːənt/","d":"流利的/流畅的"},
+    {"w":"focus","p":"/ˈfoʊkəs/","d":"焦点/集中"},
+    {"w":"fold","p":"/foʊld/","d":"折叠/合拢"},
+    {"w":"folk","p":"/foʊk/","d":"民间/人们"},
+    {"w":"forbid","p":"/fərˈbɪd/","d":"禁止/不许"},
+    {"w":"force","p":"/fɔːrs/","d":"力量/迫使"},
+    {"w":"forecast","p":"/ˈfɔːrkæst/","d":"预测/预报"},
+    {"w":"foreign","p":"/ˈfɔːrən/","d":"外国的/外来的"},
+    {"w":"forge","p":"/fɔːrdʒ/","d":"锻造/伪造"},
+    {"w":"formal","p":"/ˈfɔːrml/","d":"正式的/形式的"},
+    {"w":"former","p":"/ˈfɔːrmər/","d":"前者的/前任的"},
+    {"w":"formula","p":"/ˈfɔːrmjələ/","d":"公式/配方"},
+    {"w":"fortune","p":"/ˈfɔːrtʃən/","d":"财富/命运"},
+    {"w":"foundation","p":"/faʊnˈdeɪʃn/","d":"基础/基金会"},
+    {"w":"fraction","p":"/ˈfrækʃn/","d":"分数/部分"},
+    {"w":"frame","p":"/freɪm/","d":"框架/构造"},
+    {"w":"frequent","p":"/ˈfriːkwənt/","d":"频繁的/经常的"},
+    {"w":"friction","p":"/ˈfrɪkʃn/","d":"摩擦/冲突"},
+    {"w":"frighten","p":"/ˈfraɪtn/","d":"使害怕/惊吓"},
+    {"w":"frontier","p":"/frʌnˈtɪr/","d":"边境/前沿"},
+    {"w":"frost","p":"/frɔːst/","d":"霜冻/严寒"},
+    {"w":"frown","p":"/fraʊn/","d":"皱眉/不满"},
+    {"w":"frozen","p":"/ˈfroʊzn/","d":"冰冻的/冻结的"},
+    {"w":"fruitful","p":"/ˈfruːtfl/","d":"富有成效的"},
+    {"w":"frustrate","p":"/ˈfrʌstreɪt/","d":"使沮丧/阻挠"},
+    {"w":"fuel","p":"/ˈfjuːəl/","d":"燃料/加油"},
+    {"w":"fulfill","p":"/fʊlˈfɪl/","d":"实现/履行"},
+    {"w":"function","p":"/ˈfʌŋkʃn/","d":"功能/作用"},
+    {"w":"fund","p":"/fʌnd/","d":"资金/基金"},
+    {"w":"fundamental","p":"/ˌfʌndəˈmentl/","d":"基本的/根本的"},
+    {"w":"furious","p":"/ˈfjʊriəs/","d":"狂怒的/猛烈的"},
+    {"w":"furnish","p":"/ˈfɜːrnɪʃ/","d":"提供/装备"},
+    {"w":"furthermore","p":"/ˈfɜːrðərmɔːr/","d":"此外/而且"},
+    {"w":"gain","p":"/ɡeɪn/","d":"获得/增益"},
+    {"w":"gallery","p":"/ˈɡæləri/","d":"画廊/美术馆"},
+    {"w":"gap","p":"/ɡæp/","d":"间隙/差距"},
+    {"w":"garbage","p":"/ˈɡɑːrbɪdʒ/","d":"垃圾/废物"},
+    {"w":"gather","p":"/ˈɡæðər/","d":"聚集/收集"},
+    {"w":"gaze","p":"/ɡeɪz/","d":"凝视/注视"},
+    {"w":"gender","p":"/ˈdʒendər/","d":"性别"},
+    {"w":"gene","p":"/dʒiːn/","d":"基因"},
+    {"w":"generate","p":"/ˈdʒenəreɪt/","d":"产生/发电"},
+    {"w":"generous","p":"/ˈdʒenərəs/","d":"慷慨的/大方的"},
+    {"w":"genius","p":"/ˈdʒiːniəs/","d":"天才/天赋"},
+    {"w":"gesture","p":"/ˈdʒestʃər/","d":"手势/姿态"},
+    {"w":"giant","p":"/ˈdʒaɪənt/","d":"巨大的/巨人"},
+    {"w":"glance","p":"/ɡlæns/","d":"瞥一眼/扫视"},
+    {"w":"global","p":"/ˈɡloʊbl/","d":"全球的"}],
+  king: [
+    {w:'dominant',p:'/ˈdɑːmɪnənt/',d:'占主导地位的'},
+    {w:'dramatic',p:'/drəˈmætɪk/',d:'戏剧性的/巨大的'},
+    {w:'duration',p:'/duˈreɪʃn/',d:'持续时间'},
+    {w:'dynamic',p:'/daɪˈnæmɪk/',d:'动态的/有活力的'},
+    {w:'elaborate',p:'/ɪˈlæbərət/',d:'精心制作的/详尽的'},
+    {w:'eliminate',p:'/ɪˈlɪmɪneɪt/',d:'消除'},
+    {w:'embrace',p:'/ɪmˈbreɪs/',d:'拥抱/包含'},
+    {w:'emerge',p:'/ɪˈmɜːrdʒ/',d:'出现'},
+    {w:'emphasis',p:'/ˈempfəsɪs/',d:'强调/重点'},
+    {w:'encounter',p:'/ɪnˈkaʊntər/',d:'遭遇/偶遇'},
+    {w:'enormous',p:'/ɪˈnɔːrməs/',d:'巨大的'},
+    {w:'establish',p:'/ɪˈstæblɪʃ/',d:'建立'},
+    {w:'evaluate',p:'/ɪˈvæljueɪt/',d:'评估'},
+    {w:'evidence',p:'/ˈevɪdəns/',d:'证据'},
+    {w:'evolve',p:'/ɪˈvɑːlv/',d:'进化/演变'},
+    {w:'exaggerate',p:'/ɪɡˈzædʒəreɪt/',d:'夸张'},
+    {w:'examine',p:'/ɪɡˈzæmɪn/',d:'检查/考试'},
+    {w:'exceed',p:'/ɪkˈsiːd/',d:'超过'},
+    {w:'exception',p:'/ɪkˈsepʃn/',d:'例外'},
+    {w:'excessive',p:'/ɪkˈsesɪv/',d:'过度的'},
+    {w:'exchange',p:'/ɪksˈtʃeɪndʒ/',d:'交换'},
+    {w:'exclude',p:'/ɪkˈskluːd/',d:'排除'},
+    {w:'execute',p:'/ˈeksɪkjuːt/',d:'执行/处决'},
+    {w:'exhaust',p:'/ɪɡˈzɔːst/',d:'耗尽/使筋疲力尽'},
+    {w:'expand',p:'/ɪkˈspænd/',d:'扩展'},
+    {w:'expose',p:'/ɪkˈspoʊz/',d:'暴露/接触'},
+    {w:'extensive',p:'/ɪkˈstensɪv/',d:'广泛的'},
+    {w:'external',p:'/ɪkˈstɜːrnl/',d:'外部的'},
+    {w:'extraordinary',p:'/ɪkˈstrɔːrdəneri/',d:'非凡的'},
+    {w:'extreme',p:'/ɪkˈstriːm/',d:'极端的'},
+  ],
+    {"w":"glorious","p":"/ˈɡlɔːriəs/","d":"光荣的/辉煌的"},
+    {"w":"govern","p":"/ˈɡʌvərn/","d":"统治/管理"},
+    {"w":"grab","p":"/ɡræb/","d":"抓住/夺取"},
+    {"w":"grace","p":"/ɡreɪs/","d":"优雅/恩典"},
+    {"w":"gradual","p":"/ˈɡrædʒuəl/","d":"逐渐的/渐进的"},
+    {"w":"grant","p":"/ɡrænt/","d":"授予/同意"},
+    {"w":"grasp","p":"/ɡræsp/","d":"抓住/理解"},
+    {"w":"grateful","p":"/ˈɡreɪtfl/","d":"感激的/感谢的"},
+    {"w":"grave","p":"/ɡreɪv/","d":"严重的/坟墓"},
+    {"w":"greedy","p":"/ˈɡriːdi/","d":"贪婪的/贪心的"},
+    {"w":"grind","p":"/ɡraɪnd/","d":"磨碎/碾磨"},
+    {"w":"grip","p":"/ɡrɪp/","d":"紧握/控制"},
+    {"w":"gross","p":"/ɡroʊs/","d":"总的/毛的"},
+    {"w":"guarantee","p":"/ˌɡærənˈtiː/","d":"保证/担保"},
+    {"w":"guidance","p":"/ˈɡaɪdns/","d":"指导/引导"},
+    {"w":"guilty","p":"/ˈɡɪlti/","d":"有罪的/内疚的"},
+    {"w":"hamper","p":"/ˈhæmpər/","d":"妨碍/阻碍"},
+    {"w":"handle","p":"/ˈhændl/","d":"处理/操作"},
+    {"w":"happen","p":"/ˈhæpən/","d":"发生/碰巧"},
+    {"w":"harbor","p":"/ˈhɑːrbər/","d":"港口/庇护"},
+    {"w":"harden","p":"/ˈhɑːrdn/","d":"变硬/硬化"},
+    {"w":"hardship","p":"/ˈhɑːrdʃɪp/","d":"艰难/困苦"},
+    {"w":"hardware","p":"/ˈhɑːrdwer/","d":"硬件/五金"},
+    {"w":"harm","p":"/hɑːrm/","d":"伤害/损害"},
+    {"w":"harmony","p":"/ˈhɑːrməni/","d":"和谐/融洽"},
+    {"w":"harsh","p":"/hɑːrʃ/","d":"严酷的/刺耳的"},
+    {"w":"harvest","p":"/ˈhɑːrvɪst/","d":"收获/收割"},
+    {"w":"haste","p":"/heɪst/","d":"匆忙/急速"},
+    {"w":"hate","p":"/heɪt/","d":"憎恨/讨厌"},
+    {"w":"hazard","p":"/ˈhæzərd/","d":"危险/危害"},
+    {"w":"headline","p":"/ˈhedlaɪn/","d":"标题/头条"},
+    {"w":"heal","p":"/hiːl/","d":"治愈/愈合"},
+    {"w":"heap","p":"/hiːp/","d":"堆/堆积"},
+    {"w":"hedge","p":"/hedʒ/","d":"树篱/对冲"},
+    {"w":"hence","p":"/hens/","d":"因此/从此"},
+    {"w":"heritage","p":"/ˈherɪtɪdʒ/","d":"遗产/传统"},
+    {"w":"highlight","p":"/ˈhaɪlaɪt/","d":"强调/突出"},
+    {"w":"hike","p":"/haɪk/","d":"远足/徒步"},
+    {"w":"hinder","p":"/ˈhɪndər/","d":"阻碍/妨碍"},
+    {"w":"hint","p":"/hɪnt/","d":"暗示/提示"},
+    {"w":"honor","p":"/ˈɑːnər/","d":"荣誉/尊敬"},
+    {"w":"hook","p":"/hʊk/","d":"钩子/挂钩"},
+    {"w":"horizon","p":"/həˈraɪzn/","d":"地平线/眼界"},
+    {"w":"horrible","p":"/ˈhɔːrəbl/","d":"可怕的/极糟的"},
+    {"w":"hostile","p":"/ˈhɑːstl/","d":"敌对的/不友好的"},
+    {"w":"household","p":"/ˈhaʊshoʊld/","d":"家庭/家用的"},
+    {"w":"huge","p":"/hjuːdʒ/","d":"巨大的/庞大的"},
+    {"w":"humble","p":"/ˈhʌmbl/","d":"谦逊的/卑微的"},
+    {"w":"humor","p":"/ˈhjuːmər/","d":"幽默/诙谐"},
+    {"w":"hunt","p":"/hʌnt/","d":"打猎/搜索"},
+    {"w":"idea","p":"/aɪˈdiːə/","d":"想法/主意"},
+    {"w":"ideal","p":"/aɪˈdiːəl/","d":"理想的/完美的"},
+    {"w":"identical","p":"/aɪˈdentɪkl/","d":"相同的"}
+  ]
+};
+};
+
+// ═══════════════════════════════
+//  配置
+// ═══════════════════════════════
+const RANKS = [
+  { id:'bronze', name:'青铜', icon:'🟤', color:'#cd7f32', stages:3, passCount:3, lives:3 },
+  { id:'silver', name:'白银', icon:'⚪', color:'#c0c0c0', stages:3, passCount:3, lives:3 },
+  { id:'gold',   name:'黄金', icon:'🟡', color:'#f0c040', stages:3, passCount:4, lives:3 },
+  { id:'platinum', name:'铂金', icon:'🔵', color:'#5dade2', stages:3, passCount:4, lives:3 },
+  { id:'diamond', name:'钻石', icon:'💎', color:'#a569bd', stages:3, passCount:4, lives:3 },
+  { id:'king',   name:'王者', icon:'👑', color:'#f0c040', stages:0, passCount:0, lives:0 }
+];
+const MONSTERS = {
+  bronze:   [{n:'绿液怪',i:'🟢'},{n:'泥沼怪',i:'🟤'},{n:'毒雾怪',i:'🐍'}],
+  silver:   [{n:'哥布林斥候',i:'👺'},{n:'哥布林战士',i:'⚔️'},{n:'哥布林首领',i:'🗡️'}],
+  gold:     [{n:'石像鬼',i:'🗿'},{n:'钢像鬼',i:'🪨'},{n:'金像鬼',i:'🪩'}],
+  platinum: [{n:'小火魔',i:'🔥'},{n:'火焰魔',i:'👹'},{n:'地狱魔',i:'😈'}],
+  diamond:  [{n:'幼龙',i:'🐲'},{n:'暗影龙',i:'🐉'},{n:'远古龙',i:'🐉'}],
+  king:     [{n:'魔王侍从',i:'💀'},{n:'魔王将军',i:'☠️'},{n:'大魔王',i:'👾'}],
+};
+const QS = 5;
+const TIME_LIMIT = 10;
+const MAX_RANK = RANKS.length - 2;
+
+const SHOP = [
+  { cat:'塔楼装饰', items:[
+    { id:'flag',  name:'胜利旗帜', icon:'🚩', price:50,  desc:'每层塔楼插上飘扬旗帜' },
+    { id:'star',  name:'星光闪烁', icon:'✨', price:100, desc:'塔楼周围星光粒子环绕' },
+    { id:'neon',  name:'霓虹灯带', icon:'🌈', price:200, desc:'塔楼每层霓虹流光效果' },
+  ]},
+  { cat:'守护灵', items:[
+    { id:'pet1', name:'小灵雏', icon:'🐣', price:80,  desc:'答题陪伴的小精灵' },
+    { id:'pet2', name:'夜枭',   icon:'🦉', price:200, desc:'酷酷的夜枭守护灵', need:'pet1' },
+    { id:'pet3', name:'青龙',   icon:'🐉', price:500, desc:'终极守护灵·至尊形态', need:'pet2' },
+  ]},
+  { cat:'答题特效', items:[
+    { id:'goldfx',  name:'金色闪光', icon:'✨', price:150, desc:'答对时金色粒子爆发' },
+    { id:'firefx',  name:'连击火焰', icon:'🔥', price:250, desc:'连击时燃起火焰特效' },
+  ]},
+  { cat:'词库图鉴', items:[
+    { id:'vocab', name:'词库浏览', icon:'📖', price:120, desc:'解锁词库图鉴，回顾所有单词' },
+  ]},
+  { cat:'战斗道具', items:[
+    { id:'shield', name:'护盾', icon:'🛡️', price:80,  desc:'抵挡一次答错的伤害（自动触发）', cons:true },
+    { id:'heal',   name:'血瓶', icon:'🧪', price:100, desc:'战斗中恢复 1 点生命', cons:true },
+    { id:'dblatk', name:'双刃剑', icon:'⚔️', price:150, desc:'接下来 3 题伤害翻倍', cons:true },
+    { id:'fpass',  name:'免答卡', icon:'🎫', price:50,  desc:'跳过当前题目，不扣命不断连击', cons:true },
+  ]},
+];
+const ALL_ITEMS = SHOP.flatMap(g=>g.items);
+const ITEM_MAP = Object.fromEntries(ALL_ITEMS.map(i=>[i.id,i]));
+
+let S = loadState() || {
+  mode:'ladder', rankIdx:0, stage:0, lives:3, qi:0, correct:0, wrong:0,
+  totalCorrect:0, totalWrong:0, streak:0, maxStreak:0,
+  answered:false, gameOver:false, usedWords:{},
+  chests:0, points:0, inventory:[], battleKills:0, items:{}
+};
+let questions = [];
+let timer = null, timeLeft = TIME_LIMIT;
+let BT = null;
+let battleWords = [];
+let battleWordIdx = 0;
+
+function saveState(){
+  try{ localStorage.setItem('cet6_tower2', JSON.stringify(S)); }catch(e){}
+}
+function loadState(){
+  try{
+    const r=localStorage.getItem('cet6_tower2');
+    if(!r) return null;
+    const s=JSON.parse(r);
+    if(typeof s.usedWords==='undefined') s.usedWords={};
+    if(typeof s.chests==='undefined') s.chests=0;
+    if(typeof s.points==='undefined') s.points=0;
+    if(!Array.isArray(s.inventory)) s.inventory=[];
+    if(typeof s.battleKills==='undefined') s.battleKills=0;
+    if(typeof s.items==='undefined'||typeof s.items!=='object') s.items={};
+    s.mode='ladder';
+    return s;
+  }catch(e){return null}
+}
+function clearState(){ localStorage.removeItem('cet6_tower2'); }
+
+function pickQuestions(){
+  const rank=RANKS[S.rankIdx];
+  const pool=VOCAB[rank.id];
+  if(!pool) return [];
+  let avail=pool.filter((_,i)=>!S.usedWords[rank.id+'_'+i]);
+  if(avail.length<QS){
+    Object.keys(S.usedWords).forEach(k=>{if(k.startsWith(rank.id+'_')) delete S.usedWords[k]});
+    avail=pool;
+  }
+  const shuffled=[...avail].sort(()=>Math.random()-.5);
+  const selected=shuffled.slice(0,QS);
+  selected.forEach(item=>{
+    const idx=pool.indexOf(item);
+    if(idx>=0) S.usedWords[rank.id+'_'+idx]=true;
+  });
+  return selected.map(item=>{
+    const others=pool.filter(w=>w.w!==item.w);
+    const wrongs=[...others].sort(()=>Math.random()-.5).slice(0,3).map(w=>w.d);
+    const opts=[item.d,...wrongs].sort(()=>Math.random()-.5);
+    return { word:item.w, phonetic:item.p||'', options:opts, correctIdx:opts.indexOf(item.d) };
+  });
+}
+
+let ac=null;
+function tone(f,d,t='sine'){
+  try{
+    if(!ac) ac=new(window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=t; o.frequency.value=f; g.gain.value=0.1;
+    g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime+d);
+  }catch(e){}
+}
+function sfxOk(){tone(880,.12);setTimeout(()=>tone(1100,.15),80)}
+function sfxBad(){tone(300,.2,'sawtooth')}
+function sfxPass(){tone(660,.1);setTimeout(()=>tone(880,.1),100);setTimeout(()=>tone(1100,.2),200)}
+function sfxDrop(){tone(400,.15);setTimeout(()=>tone(300,.25),120)}
+function sfxChest(){tone(523,.1);setTimeout(()=>tone(659,.1),100);setTimeout(()=>tone(784,.15),200);setTimeout(()=>tone(1047,.25),300)}
+
+const $=id=>document.getElementById(id);
+
+function render(){
+  if(S.mode==='battle') return renderBattle();
+  S.answered=false;
+  if(S.gameOver||S.rankIdx>=RANKS.length-1) return showMax();
+  const rank=RANKS[S.rankIdx];
+  if(S.stage>=rank.stages){
+    S.rankIdx++; S.stage=0; S.lives=RANKS[S.rankIdx]?.lives||3;
+    S.qi=0; S.correct=0; S.wrong=0; S.answered=false; questions=[];
+    saveState();
+    if(S.rankIdx>=RANKS.length-1) return showMax();
+    return render();
+  }
+  if(S.lives<=0) return showDemo();
+  if(questions.length===0) questions=pickQuestions();
+  showGame();
+  renderLadderTower();
+  updateHUD();
+  renderQ();
+  startTimer();
+}
+
+function showGame(){
+  $('homeScreen').classList.add('hidden');
+  $('quizScreen').classList.remove('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.add('hidden');
+  $('demotionScreen').classList.add('hidden');
+  $('maxRankScreen').classList.add('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('battleArea').classList.add('hidden');
+  $('battleHud').classList.add('hidden');
+  $('battleItems').classList.add('hidden');
+  $('ladderTower').classList.add('hidden');
+  if(S.mode==='battle'){
+    $('hpRow').classList.add('hidden');
+    $('timerWrap').classList.remove('hidden');
+    $('progressWrap').classList.add('hidden');
+    $('battleHud').classList.remove('hidden');
+    $('battleItems').classList.remove('hidden');
+  }else{
+    $('hpRow').classList.remove('hidden');
+    $('timerWrap').classList.remove('hidden');
+    $('progressWrap').classList.remove('hidden');
+    $('ladderTower').classList.remove('hidden');
+  }
+}
+
+function renderLadderTower(){
+  const row=$('ltRow');
+  row.innerHTML='';
+  RANKS.forEach((r,i)=>{
+    const seg=document.createElement('div');
+    const op=i<S.rankIdx?.6:i===S.rankIdx?1:.12;
+    let extra=i===S.rankIdx?'transform:scale(1.05);box-shadow:0 0 8px rgba(255,255,255,.2);':'';
+    seg.style.cssText='flex:1;border-radius:3px;background:'+r.color+';opacity:'+op+';transition:all .3s;'+extra;
+    row.appendChild(seg);
+  });
+  const rank=RANKS[S.rankIdx];
+  const total=RANKS.slice(0,-1).reduce((a,b)=>a+b.stages,0);
+  const cur=RANKS.slice(0,S.rankIdx).reduce((a,b)=>a+b.stages,0)+S.stage+1;
+  $('ltLabel').textContent=rank.icon+' '+rank.name+' · 第 '+cur+'/'+total+' 关';
+}
+
+function updateHUD(){
+  const r=RANKS[S.rankIdx];
+  $('rankIcon').textContent=r.icon;
+  $('rankName').textContent=r.name;
+  $('rankLvl').textContent='Lv.'+(S.rankIdx+1);
+  $('pointsDisplay').textContent=S.points;
+  const total=RANKS.slice(0,-1).reduce((a,b)=>a+b.stages,0);
+  const cur=RANKS.slice(0,S.rankIdx).reduce((a,b)=>a+b.stages,0)+S.stage+1;
+  $('stageNum').textContent='第 '+cur+' 关';
+  $('stageSep').style.display='';
+  $('totalStages').textContent=total;
+  $('hpContainer').innerHTML='';
+  for(let i=0;i<r.lives;i++){
+    const e=document.createElement('span');
+    e.className='heart'+(i>=S.lives?' lost':'');
+    e.textContent='❤️';
+    $('hpContainer').appendChild(e);
+  }
+  const comboEl=$('comboDisplay');
+  if(S.streak>=2){
+    comboEl.classList.add('active');
+    const cfx=S.inventory.includes('firefx')?'🔥🔥 ':'🔥 ';
+    comboEl.innerHTML=cfx+S.streak+'x';
+  }else comboEl.classList.remove('active');
+  const pct=S.qi>0?(S.qi/QS)*100:0;
+  $('progressFill').style.width=Math.min(pct,100)+'%';
+  $('progressLabel').textContent='第 '+Math.min(S.qi+1,QS)+' / '+QS+' 题';
+  $('progressCorrect').textContent='✅ '+S.correct;
+}
+
+function getMonster(){
+  const rank=RANKS[S.rankIdx];
+  const pool=MONSTERS[rank.id];
+  if(!pool||pool.length===0) return {n:'???',i:'👾'};
+  return pool[S.stage%pool.length];
+}
+
+function renderQ(){
+  const q=questions[S.qi];
+  if(!q) return;
+  $('currentWord').textContent=q.word;
+  $('currentPhonetic').textContent=q.phonetic;
+  $('particles').innerHTML='';
+  $('battleArea').classList.remove('screen-shake');
+  $('monsterIcon').className='monster';
+  $('battleArea').querySelectorAll('.dmg-num').forEach(e=>e.remove());
+  const mon=getMonster();
+  $('monsterIcon').textContent=mon.i;
+  $('monsterName').textContent=mon.n;
+  updateMonsterHP();
+  speakWord($('currentWord').textContent);
+  $('questionCard').style.animation='none';
+  void $('questionCard').offsetHeight;
+  $('questionCard').style.animation='fadeUp .35s ease';
+  const c=$('choicesContainer');
+  c.innerHTML='';
+  const lbs=['A','B','C','D'];
+  q.options.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='choice-btn';
+    b.innerHTML='<span class="tag">'+lbs[i]+'</span>'+opt;
+    b.dataset.idx=i;
+    b.addEventListener('click',()=>handleChoice(i));
+    c.appendChild(b);
+  });
+}
+
+function updateMonsterHP(){
+  const rank=RANKS[S.rankIdx];
+  const maxHp=rank.passCount;
+  const curHp=Math.max(0,maxHp-S.correct);
+  const pct=(curHp/maxHp)*100;
+  const fill=$('monsterHpFill');
+  fill.style.width=pct+'%';
+  fill.className='fill'+(pct>60?' safe':pct>30?' warning':'');
+  $('monsterHpLabel').textContent=curHp+'/'+maxHp;
+  $('battleLives').textContent=S.lives;
+}
+
+function speakWord(word){
+  try{
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(word);
+    u.lang='en-US'; u.rate=.85; u.pitch=1;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+function startTimer(){
+  stopTimer();
+  timeLeft=TIME_LIMIT;
+  updateTimerBar();
+  timer=setInterval(()=>{
+    timeLeft--;
+    updateTimerBar();
+    if(timeLeft<=0){
+      stopTimer();
+      if(!S.answered) handleChoice(-1);
+    }
+  },1000);
+}
+function stopTimer(){
+  if(timer){clearInterval(timer);timer=null;}
+}
+function updateTimerBar(){
+  const pct=(timeLeft/TIME_LIMIT)*100;
+  const fill=$('timerFill');
+  fill.style.width=pct+'%';
+  fill.className='fill';
+  if(timeLeft<=3) fill.classList.add('danger');
+  else if(timeLeft<=5) fill.classList.add('warning');
+}
+
+function spawnParticles(cx,cy,color){
+  const box=$('particles');
+  for(let i=0;i<12;i++){
+    const p=document.createElement('div');
+    p.className='particle';
+    const angle=Math.random()*360;
+    const dist=40+Math.random()*60;
+    p.style.cssText='--tx:'+Math.cos(angle)*dist+'px;--ty:'+Math.sin(angle)*dist+'px;background:'+color+';left:'+cx+'px;top:'+cy+'px';
+    box.appendChild(p);
+    setTimeout(()=>p.remove(),600);
+  }
+}
+
+function floatScore(x,y,text,bonus){
+  const el=document.createElement('div');
+  el.className='float-score'+(bonus?' bonus':'');
+  el.textContent=text;
+  el.style.cssText='left:'+x+'px;top:'+y+'px';
+  $('questionCard').appendChild(el);
+  setTimeout(()=>el.remove(),800);
+}
+
+function handleChoice(idx){
+  if(S.answered) return;
+  S.answered=true;
+  stopTimer();
+  const q=questions[S.qi];
+  const btns=$('choicesContainer').querySelectorAll('.choice-btn');
+  const isCorrect=idx>=0&&idx===q.correctIdx;
+  btns.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.correctIdx) b.classList.add('correct');
+    if(i===idx&&!isCorrect) b.classList.add('wrong');
+  });
+  if(isCorrect){
+    const speedBonus=Math.round((timeLeft/TIME_LIMIT)*50);
+    const comboBonus=Math.min(S.streak,10)*5;
+    const totalBonus=speedBonus+comboBonus;
+    S.points+=totalBonus;
+    S.correct++; S.totalCorrect++; S.streak++;
+    if(S.streak>S.maxStreak) S.maxStreak=S.streak;
+    sfxOk();
+    const mi=$('monsterIcon');
+    mi.className='monster hit';
+    const dmg=document.createElement('div');
+    dmg.className='dmg-num';
+    dmg.textContent='-2';
+    dmg.style.cssText='left:30px;top:10px';
+    $('battleArea').appendChild(dmg);
+    setTimeout(()=>dmg.remove(),600);
+    updateMonsterHP();
+    const card=$('questionCard').getBoundingClientRect();
+    const pColor=S.inventory.includes('goldfx')?'#ffd700':'#4ecca3';
+    spawnParticles(card.width/2,card.height/2,pColor);
+    floatScore(card.width/2-20,card.height/2-30,'+'+totalBonus,true);
+    if(S.streak>=2){
+      const fire=S.inventory.includes('firefx')?'🔥🔥 ':'🔥 ';
+      floatScore(card.width/2-30,card.height/2-60,fire+S.streak+'连击!',true);
+    }
+  }else{
+    S.wrong++; S.totalWrong++; S.lives--; S.streak=0;
+    sfxBad();
+    const mi=$('monsterIcon');
+    mi.className='monster atk';
+    const dmg=document.createElement('div');
+    dmg.className='dmg-num taken';
+    dmg.textContent='-❤️';
+    dmg.style.cssText='right:10px;top:10px';
+    $('battleArea').appendChild(dmg);
+    setTimeout(()=>dmg.remove(),600);
+    $('battleArea').classList.add('screen-shake');
+    updateMonsterHP();
+    if(idx<0){
+      btns.forEach(b=>b.classList.add('disabled'));
+    }
+  }
+  saveState();
+  updateHUD();
+  setTimeout(()=>{
+    S.qi++;
+    if(S.lives<=0){ questions=[]; render(); return; }
+    if(S.qi>=QS){
+      const rank=RANKS[S.rankIdx];
+      const passed=S.correct>=rank.passCount;
+      if(passed){ setTimeout(showPass,300); }
+      else {
+        S.qi=0; S.correct=0; S.wrong=0; S.answered=false; questions=[];
+        saveState(); render();
+      }
+      return;
+    }
+    S.answered=false;
+    saveState();
+    renderQ();
+    startTimer();
+    updateHUD();
+  },isCorrect?600:1000);
+}
+
+function showPass(){
+  sfxPass();
+  const rank=RANKS[S.rankIdx];
+  const isLast=S.stage+1>=rank.stages;
+  const nextIdx=S.rankIdx+1;
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.remove('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  if(isLast&&nextIdx<RANKS.length-1){
+    const nr=RANKS[nextIdx];
+    $('resultIcon').textContent='🎉';
+    $('resultTitle').textContent='晋升 '+nr.name+'！';
+    $('resultSub').textContent=rank.name+'通关，进入'+nr.name+'段位';
+  }else if(isLast&&nextIdx>=RANKS.length-1){
+    $('resultIcon').textContent='👑';
+    $('resultTitle').textContent='恭喜登顶！';
+    $('resultSub').textContent='即将解锁王者段位';
+  }else{
+    $('resultIcon').textContent='🎯';
+    $('resultTitle').textContent='过关！';
+    $('resultSub').textContent='进入下一关';
+  }
+  document.querySelector('.score-label').textContent='总正确数';
+  $('resultScore').textContent=S.totalCorrect;
+  $('statCorrect').textContent=S.correct;
+  $('statWrong').textContent=S.wrong;
+  $('statStreak').textContent=S.maxStreak;
+  $('nextBtn').onclick=()=>{
+    S.stage++; S.qi=0; S.correct=0; S.wrong=0; S.answered=false; questions=[];
+    S.lives=RANKS[S.rankIdx].lives;
+    if(isLast&&nextIdx<RANKS.length-1){
+      S.rankIdx=nextIdx;
+      showChest();
+      return;
+    }
+    if(isLast&&nextIdx>=RANKS.length-1){ S.gameOver=true; saveState(); render(); return; }
+    saveState(); render();
+  };
+  $('resultHomeBtn').onclick=goHome;
+}
+
+function showChest(){
+  sfxChest();
+  const bonus=20+S.rankIdx*10;
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.remove('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('chestTitle').textContent=RANKS[S.rankIdx].name+'段位通关奖励';
+  const icon=$('chestIcon');
+  icon.textContent='🎁';
+  icon.className='chest-icon';
+  $('chestReward').textContent='+'+bonus;
+  $('chestSub').textContent='⭐ 积分奖励已到账';
+  $('chestBtn').onclick=()=>{
+    icon.textContent='💎';
+    icon.classList.add('opened');
+    S.points+=bonus;
+    S.chests++;
+    saveState();
+    $('chestBtn').textContent='继续闯关';
+    $('chestReward').textContent='已领取！';
+    $('chestBtn').onclick=()=>{ render(); };
+  };
+}
+
+function showDemo(){
+  sfxDrop();
+  const prev=Math.max(0,S.rankIdx-1);
+  const pr=RANKS[prev];
+  showGame();
+  $('quizScreen').classList.add('hidden');
+  $('demotionScreen').classList.remove('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('demotionText').textContent=S.rankIdx>0?'降段到 '+pr.name:'重新挑战！';
+  $('demotionIcon').textContent=pr.icon;
+  $('demotionName').textContent=pr.name;
+  $('demotionBtn').onclick=()=>{
+    S.rankIdx=prev; S.stage=0; S.lives=RANKS[prev].lives;
+    S.qi=0; S.correct=0; S.wrong=0; S.answered=false; questions=[];
+    saveState(); render();
+  };
+  $('demotionHomeBtn').onclick=goHome;
+}
+
+function showMax(){
+  $('homeScreen').classList.add('hidden');
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.add('hidden');
+  $('demotionScreen').classList.add('hidden');
+  $('maxRankScreen').classList.remove('hidden');
+  $('gameHeader').classList.add('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('maxCorrect').textContent=S.totalCorrect;
+  $('maxWrong').textContent=S.totalWrong;
+  $('maxStreak').textContent=S.maxStreak;
+  $('maxReplayBtn').onclick=()=>{ resetGame(); render(); };
+  $('maxHomeBtn').onclick=goHome;
+}
+
+function goHome(){
+  S.mode='ladder'; S.answered=false; questions=[];
+  $('homeScreen').classList.remove('hidden');
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.add('hidden');
+  $('demotionScreen').classList.add('hidden');
+  $('maxRankScreen').classList.add('hidden');
+  $('shopScreen').classList.add('hidden');
+  $('vocabScreen').classList.add('hidden');
+  $('gameHeader').classList.add('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('homePoints').textContent=S.points;
+  renderTower();
+  saveState();
+}
+
+function resetGame(){
+  clearState();
+  S={mode:'ladder',rankIdx:0,stage:0,lives:RANKS[0].lives,qi:0,correct:0,wrong:0,totalCorrect:0,totalWrong:0,streak:0,maxStreak:0,answered:false,gameOver:false,usedWords:{},chests:0,points:0,inventory:[],battleKills:0,items:{}};
+  questions=[];
+}
+
+$('ladderBtn').addEventListener('click',()=>{
+  S.mode='ladder'; questions=[];
+  if(S.rankIdx>=RANKS.length-1&&!S.gameOver) resetGame();
+  S.lives=RANKS[S.rankIdx].lives;
+  render();
+});
+$('battleBtn').addEventListener('click',startBattle);
+$('resetBtn').addEventListener('click',()=>{
+  if(confirm('确定重置所有进度？')){ resetGame(); goHome(); renderTower(); }
+});
+$('shopBtn').addEventListener('click',()=>{ renderShop(); });
+$('shopBackBtn').addEventListener('click',goHome);
+$('vocabBtn').addEventListener('click',()=>{
+  if(!S.inventory.includes('vocab')) return alert('请先在商店购买「词库浏览」解锁图鉴！');
+  renderVocab();
+});
+$('vocabBackBtn').addEventListener('click',goHome);
+
+let _shopCat=0;
+function renderShop(){
+  goHome();
+  $('homeScreen').classList.add('hidden');
+  $('shopScreen').classList.remove('hidden');
+  $('shopPoints').textContent=S.points;
+  const tabs=$('shopTabs');
+  tabs.innerHTML='';
+  SHOP.forEach((g,i)=>{
+    const b=document.createElement('button');
+    b.textContent=g.cat;
+    b.className=i===_shopCat?'active':'';
+    b.onclick=()=>{ _shopCat=i; renderShop(); };
+    tabs.appendChild(b);
+  });
+  const grid=$('shopGrid');
+  grid.innerHTML='';
+  SHOP[_shopCat].items.forEach(item=>{
+    const owned=S.inventory.includes(item.id);
+    const locked=item.need&&!S.inventory.includes(item.need);
+    const div=document.createElement('div');
+    let priceHtml;
+    if(item.cons){
+      const cnt=S.items[item.id]||0;
+      priceHtml='<div class="sprice">'+(cnt?'×'+cnt:'无')+' · ⭐ '+item.price+'</div>';
+    }else{
+      priceHtml=owned?'<div class="sprice">已拥有</div>':'<div class="sprice">⭐ '+item.price+'</div>';
+    }
+    div.className='shop-item'+(owned?' owned':'')+(locked?' locked':'');
+    div.innerHTML='<div class="sicon">'+item.icon+'</div><div class="sname">'+item.name+'</div><div class="sdesc">'+item.desc+'</div>'+priceHtml;
+    if(!locked) div.onclick=()=>buyItem(item);
+    grid.appendChild(div);
+  });
+}
+
+function buyItem(item){
+  if(S.points<item.price) return alert('积分不足！还需要 '+(item.price-S.points)+' 积分');
+  if(item.cons){
+    S.points-=item.price;
+    if(!S.items[item.id]) S.items[item.id]=0;
+    S.items[item.id]++;
+  }else{
+    if(S.inventory.includes(item.id)) return;
+    S.points-=item.price;
+    S.inventory.push(item.id);
+  }
+  saveState();
+  renderShop();
+  $('shopPoints').textContent=S.points;
+  $('homePoints').textContent=S.points;
+  updateHUD();
+}
+
+function renderVocab(){
+  goHome();
+  $('homeScreen').classList.add('hidden');
+  $('vocabScreen').classList.remove('hidden');
+  const total=Object.values(VOCAB).flat().length;
+  const grid=$('vocabGrid');
+  grid.innerHTML='';
+  RANKS.slice(0,-1).forEach(rank=>{
+    const words=VOCAB[rank.id]||[];
+    const h=document.createElement('div');
+    h.style.cssText='grid-column:1/-1;font-size:13px;font-weight:700;padding:6px 4px 2px;color:'+rank.color;
+    h.textContent=rank.icon+' '+rank.name+' ('+words.length+'词)';
+    grid.appendChild(h);
+    words.forEach(w=>{
+      const e=document.createElement('div');
+      e.className='ve';
+      e.innerHTML='<div class="vw">'+w.w+'</div><div class="vd">'+w.p+'<br>'+w.d+'</div>';
+      grid.appendChild(e);
+    });
+  });
+  $('vocabCount').textContent=total+' 词';
+}
+
+function renderTower(){
+  const el=$('towerDisplay');
+  el.innerHTML='';
+  const towerRanks=[...RANKS].reverse();
+  towerRanks.forEach((r,i)=>{
+    const div=document.createElement('div');
+    div.className='f';
+    const globalIdx=RANKS.length-1-i;
+    if(globalIdx<S.rankIdx) div.classList.add('reached');
+    else if(globalIdx===S.rankIdx) div.classList.add('current');
+    if(globalIdx<S.rankIdx){
+      div.style.cursor='pointer';
+      div.title='点击重玩此段位';
+      div.onclick=()=>replayRank(globalIdx);
+    }
+    div.style.background=r.color;
+    div.style.width=(220-i*20)+'px';
+    let label=r.icon+' '+r.name;
+    if(globalIdx<S.rankIdx) label+=' ✅';
+    if(globalIdx<S.rankIdx&&S.inventory.includes('flag')) label='🚩 '+label;
+    div.textContent=label;
+    if(globalIdx<S.rankIdx&&S.inventory.includes('neon')){
+      div.style.boxShadow='0 0 16px '+r.color+',0 0 32px '+r.color;
+    }
+    el.appendChild(div);
+  });
+  const parent=el.parentElement;
+  parent.style.position='relative';
+  let starEl=parent.querySelector('.star-sparkle');
+  if(S.inventory.includes('star')){
+    if(!starEl){
+      starEl=document.createElement('div');
+      starEl.className='star-sparkle';
+      starEl.textContent='✨  ✨  ✨';
+      parent.appendChild(starEl);
+    }
+    starEl.style.display='block';
+  }else if(starEl) starEl.style.display='none';
+}
+
+function replayRank(idx){
+  const rank=RANKS[idx];
+  if(!confirm('重新挑战「'+rank.name+'」段位？\n（当前更高段位的进度将重置，积分和已购物品保留）')) return;
+  S.rankIdx=idx; S.stage=0; S.qi=0; S.correct=0; S.wrong=0;
+  S.streak=0; S.maxStreak=0; S.answered=false; S.gameOver=false; questions=[]; S.usedWords={};
+  S.lives=RANKS[idx].lives;
+  saveState();
+  S.lives=RANKS[S.rankIdx].lives;
+  render();
+}
+
+const _origRenderQ=renderQ;
+renderQ=function(){ _origRenderQ(); updatePet(); };
+
+function updatePet(){
+  const pet=$('petArea');
+  if(S.inventory.includes('pet3')){ pet.textContent='🐉'; pet.className='pet-area dragon'; }
+  else if(S.inventory.includes('pet2')){ pet.textContent='🦉'; pet.className='pet-area'; }
+  else if(S.inventory.includes('pet1')){ pet.textContent='🐣'; pet.className='pet-area'; }
+  else{ pet.className='pet-area hidden'; }
+}
+
+function startBattle(){
+  S.mode='battle'; S.answered=false;
+  saveState();
+  BT={wave:0,kills:0,playerHp:5,maxPlayerHp:5,streak:0,maxStreak:0,correct:0,wrong:0,dblStack:0};
+  battleWords=[]; battleWordIdx=0;
+  spawnMonster();
+  questions=[makeBattleQ()]; S.qi=0;
+  render();
+}
+
+function spawnMonster(){
+  const wave=BT.wave;
+  const ri=Math.min(Math.floor(wave/2),RANKS.length-2);
+  const pool=MONSTERS[RANKS[ri].id]||[{n:'???',i:'👾'}];
+  const m=pool[wave%pool.length];
+  const hp=3+wave;
+  BT.monsterName=m.n; BT.monsterIcon=m.i;
+  BT.monsterHp=hp; BT.maxMonsterHp=hp;
+}
+
+function makeBattleQ(){
+  if(!battleWords||battleWordIdx>=battleWords.length){
+    battleWords=Object.values(VOCAB).flat().sort(()=>Math.random()-.5);
+    battleWordIdx=0;
+  }
+  const item=battleWords[battleWordIdx++];
+  const all=Object.values(VOCAB).flat();
+  const wrongs=all.filter(w=>w.w!==item.w).sort(()=>Math.random()-.5).slice(0,3).map(w=>w.d);
+  const opts=[item.d,...wrongs].sort(()=>Math.random()-.5);
+  return {word:item.w,phonetic:item.p||'',options:opts,correctIdx:opts.indexOf(item.d)};
+}
+
+function renderBattle(){
+  showGame();
+  updateBattleHUD();
+  renderBattleQ();
+  renderBattleItems();
+  startTimer();
+}
+
+function updateBattleHUD(){
+  $('rankIcon').textContent='⚔️';
+  $('rankName').textContent='打怪';
+  $('rankLvl').textContent='波 '+(BT.wave+1);
+  $('pointsDisplay').textContent=S.points;
+  $('stageNum').textContent='击杀 '+BT.kills;
+  $('stageSep').style.display='none';
+  $('battleMonsterIcon').textContent=BT.monsterIcon;
+  $('battleMonsterName').textContent=BT.monsterName;
+  const pct=(BT.monsterHp/BT.maxMonsterHp)*100;
+  const bf=$('battleMonsterFill');
+  bf.style.width=pct+'%';
+  bf.className='fill'+(pct>60?' safe':pct>30?' warning':'');
+  $('battleMonsterHp').textContent=BT.monsterHp+'/'+BT.maxMonsterHp;
+  $('battleWave').textContent='第 '+(BT.wave+1)+' 波';
+  const ph=$('battlePlayerHearts'); ph.innerHTML='';
+  for(let i=0;i<BT.maxPlayerHp;i++){
+    const h=document.createElement('span'); h.className='h'+(i>=BT.playerHp?' lost':''); h.textContent='❤️'; ph.appendChild(h);
+  }
+  $('battleStats').textContent='✅ '+BT.correct+'  ❌ '+BT.wrong+(BT.dblStack>0?'  ⚔️×'+BT.dblStack:'');
+  const bc=$('battleCombo');
+  if(BT.streak>=2){ bc.style.display=''; bc.textContent='🔥🔥 '+BT.streak+'x'; }
+  else bc.style.display='none';
+  $('progressFill').style.width='0%';
+  $('progressLabel').textContent='';
+  $('progressCorrect').textContent='✅ '+BT.correct+' ❌ '+BT.wrong;
+}
+
+function renderBattleQ(){
+  const q=questions[S.qi];
+  if(!q){ questions=[makeBattleQ()]; S.qi=0; return renderBattleQ(); }
+  $('currentWord').textContent=q.word;
+  $('currentPhonetic').textContent=q.phonetic;
+  speakWord(q.word);
+  $('particles').innerHTML='';
+  $('battleMonsterIcon').className='m-icon';
+  $('battleHud').querySelectorAll('.dmg-num').forEach(e=>e.remove());
+  $('petArea').className='pet-area hidden';
+  const card=$('questionCard');
+  card.style.animation='none'; void card.offsetHeight; card.style.animation='fadeUp .35s ease';
+  const c=$('choicesContainer'); c.innerHTML='';
+  const lbs=['A','B','C','D'];
+  q.options.forEach((opt,i)=>{
+    const b=document.createElement('button');
+    b.className='choice-btn';
+    b.innerHTML='<span class="tag">'+lbs[i]+'</span>'+opt;
+    b.dataset.idx=i;
+    b.addEventListener('click',()=>handleBattleChoice(i));
+    c.appendChild(b);
+  });
+}
+
+function useItem(id){
+  if(S.answered||!S.items[id]) return;
+  if(id==='heal'&&BT.playerHp<BT.maxPlayerHp){
+    S.items[id]--; BT.playerHp++;
+    sfxChest(); updateBattleHUD(); renderBattleItems(); saveState();
+  }
+  if(id==='fpass'){
+    S.items[id]--; S.answered=true; stopTimer();
+    sfxChest();
+    setTimeout(()=>{
+      questions=[makeBattleQ()]; S.qi=0; S.answered=false;
+      renderBattle();
+    },200);
+    saveState();
+  }
+  if(id==='dblatk'){
+    S.items[id]--; BT.dblStack+=3;
+    sfxChest(); renderBattleItems(); saveState();
+  }
+}
+
+function renderBattleItems(){
+  const el=$('battleItems');
+  el.innerHTML='';
+  const items=[{id:'shield',i:'🛡️'},{id:'heal',i:'🧪'},{id:'dblatk',i:'⚔️'},{id:'fpass',i:'🎫'}];
+  items.forEach(it=>{
+    const cnt=S.items[it.id]||0;
+    if(!cnt) return;
+    const btn=document.createElement('div');
+    btn.className='bi-btn';
+    if(it.id==='dblatk'&&BT.dblStack>0) btn.classList.add('used');
+    if(it.id==='shield'){ btn.style.opacity='.6'; btn.style.cursor='default'; }
+    btn.innerHTML=it.i+'<span class="cnt">×'+cnt+'</span>';
+    if(it.id!=='shield'&&!(it.id==='dblatk'&&BT.dblStack>0)) btn.onclick=()=>useItem(it.id);
+    el.appendChild(btn);
+  });
+}
+
+function handleBattleChoice(idx){
+  if(S.answered) return;
+  S.answered=true; stopTimer();
+  const q=questions[S.qi];
+  const btns=$('choicesContainer').querySelectorAll('.choice-btn');
+  const isCorrect=idx>=0&&idx===q.correctIdx;
+  btns.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.correctIdx) b.classList.add('correct');
+    if(i===idx&&!isCorrect) b.classList.add('wrong');
+  });
+  if(isCorrect){
+    const speed=Math.round((timeLeft/TIME_LIMIT)*20);
+    const combo=Math.min(BT.streak,10)*5;
+    S.points+=speed+combo;
+    BT.correct++; BT.streak++;
+    if(BT.streak>BT.maxStreak) BT.maxStreak=BT.streak;
+    sfxOk();
+    let dmg=1+Math.floor(BT.streak/3);
+    if(BT.dblStack>0){ dmg*=2; BT.dblStack--; }
+    BT.monsterHp=Math.max(0,BT.monsterHp-dmg);
+    $('battleMonsterIcon').className='m-icon hit';
+    const de=document.createElement('div');
+    de.className='dmg-num'; de.textContent='-'+dmg;
+    de.style.cssText='left:30px;top:10px;position:absolute';
+    $('battleHud').appendChild(de);
+    setTimeout(()=>de.remove(),600);
+    const rect=$('questionCard').getBoundingClientRect();
+    spawnParticles(rect.width/2,rect.height/2,'#4ecca3');
+    floatScore(rect.width/2-20,rect.height/2-30,'+'+(speed+combo),true);
+    updateBattleHUD();
+    if(BT.monsterHp<=0){
+      BT.kills++; S.battleKills=(S.battleKills||0)+1;
+      BT.wave++; S.points+=10+BT.wave*2;
+      setTimeout(()=>{ spawnMonster(); questions=[makeBattleQ()]; S.qi=0; S.answered=false; saveState(); renderBattle(); },800);
+    }else{
+      setTimeout(()=>{ questions=[makeBattleQ()]; S.qi=0; S.answered=false; renderBattle(); },500);
+    }
+  }else{
+    BT.wrong++; BT.streak=0;
+    if((S.items.shield||0)>0){ S.items.shield--; sfxChest(); }
+    else BT.playerHp--;
+    sfxBad();
+    $('battleMonsterIcon').className='m-icon atk';
+    const de=document.createElement('div');
+    de.className='dmg-num taken'; de.textContent='-❤️';
+    de.style.cssText='right:10px;top:10px;position:absolute';
+    $('battleHud').appendChild(de);
+    setTimeout(()=>de.remove(),600);
+    if(idx<0) btns.forEach(b=>b.classList.add('disabled'));
+    updateBattleHUD();
+    if(BT.playerHp<=0) setTimeout(showBattleOver,1000);
+    else setTimeout(()=>{ questions=[makeBattleQ()]; S.qi=0; S.answered=false; renderBattle(); },1000);
+  }
+  saveState();
+}
+
+function showBattleOver(){
+  sfxDrop(); stopTimer();
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.remove('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('battleHud').classList.add('hidden');
+  $('resultIcon').textContent='💀';
+  $('resultTitle').textContent='战斗结束';
+  $('resultSub').textContent='击杀 '+BT.kills+' 只怪物';
+  $('resultScore').textContent=BT.kills;
+  document.querySelector('.score-label').textContent='击杀数';
+  $('statCorrect').textContent=BT.correct;
+  $('statWrong').textContent=BT.wrong;
+  $('statStreak').textContent=BT.maxStreak||0;
+  $('nextBtn').textContent='再来一局';
+  $('nextBtn').className='btn btn-primary';
+  $('nextBtn').onclick=()=>{ S.answered=false; startBattle(); };
+  $('resultHomeBtn').onclick=goHome;
+}
+
+function initHome(){
+  if(!loadState()) return;
+  $('homePoints').textContent=S.points;
+  if(S.rankIdx>0||S.totalCorrect>0){
+    const r=RANKS[S.rankIdx];
+    const featDiv=document.querySelector('.features');
+    if(featDiv&&!document.querySelector('.save-info')){
+      const info=document.createElement('div');
+      info.className='feat save-info';
+      info.style.cssText='border:1px solid rgba(255,255,255,.1);margin-top:4px';
+      info.innerHTML='<span>📊</span><span>'+r.icon+' '+r.name+' · 累计答对 '+S.totalCorrect+' 题</span>';
+      featDiv.appendChild(info);
+    }
+  }
+  if(S.battleKills>0){
+    const bInfo=document.createElement('div');
+    bInfo.className='feat battle-info';
+    bInfo.style.cssText='border:1px solid rgba(255,255,255,.1);margin-top:4px';
+    bInfo.innerHTML='<span>⚔️</span><span>打怪: 累计击杀 '+S.battleKills+' 只</span>';
+    document.querySelector('.features').appendChild(bInfo);
+  }
+  renderTower();
+}
+
+initHome();
+</script>
+</body>
+</html>
