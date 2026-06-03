@@ -63,6 +63,17 @@ body{background:#f5f6fa}
 .etip .ett{color:#f1c40f;font-weight:600;font-size:14px;margin-bottom:4px}
 /* practice list */
 .pq{margin:8px 0;padding:10px 14px;background:#fafbfc;border-radius:8px;border-left:3px solid #8e44ad;font-size:13px;color:#555}
+/* card grid for dense layout */
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+@media(max-width:800px){.row{grid-template-columns:1fr}}
+.card{background:#fff;border-radius:12px;padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.07);break-inside:avoid}
+.card h2{font-size:16px;color:#fff;background:#2c3e50;margin:-14px -16px 12px;padding:8px 16px;border-radius:12px 12px 0 0}
+.card h2.g{background:#27ae60}.card h2.o{background:#e67e22}.card h2.p{background:#8e44ad}
+.card h2.b{background:#2980b9}.card h2.r{background:#c0392b}.card h2.t{background:#16a085}
+.card h2.n{background:#7f8c8d}.card h2.pink{background:#c2185b}
+.card h3{font-size:14px;color:#2c3e50;margin:10px 0 4px;border-left:3px solid #2c3e50;padding-left:8px}
+.example{border:1px solid #c0392b;background:#fff5f5;border-radius:8px;padding:8px 10px;margin:6px 0;font-size:13px}
+.example .t{color:#c0392b;font-weight:600}
 @media(max-width:600px){
   .sec{padding:18px 14px}
   .sec h2{font-size:19px}
@@ -87,35 +98,527 @@ body{background:#f5f6fa}
 </div>
 
 <div class="hero">
-  <h1>计算智能 · 期末复习</h1>
-  <p>神经网络 · 进化计算 · 群体智能 · 模糊系统 · 混合系统<br>知识点精讲 + 例题解析 + 习题训练 + 考前速记</p>
+  <h1>计算智能 · 考前速通</h1>
+  <p>神经网络 进化计算 群体智能 模糊逻辑 SVM 深度学习<br>选择填空考点 + 计算题步骤模板 + 完整例题 · 期末急救版</p>
 </div>
 
-<div class="container">
+<div class="container" style="max-width:1100px">
 
-<!-- ===================== 课程总览 ===================== -->
-<div class="sec">
-  <h2>📋 课程总览</h2>
-  <p>计算智能（Computational Intelligence, CI）是人工智能的重要分支，借鉴生物智能系统的计算范式来解决复杂优化、学习与决策问题。主要包括四大核心领域：</p>
-  <table class="tab">
-    <tr><th>领域</th><th>生物原型</th><th>核心机制</th><th>典型算法</th></tr>
-    <tr><td><strong>神经网络</strong></td><td>人脑神经系统</td><td>分布式并行处理、学习与泛化</td><td>BP、Hopfield、SOM、RBF、CNN</td></tr>
-    <tr><td><strong>进化计算</strong></td><td>达尔文自然进化</td><td>选择-交叉-变异、适者生存</td><td>GA、ES、EP、GP、DE</td></tr>
-    <tr><td><strong>群体智能</strong></td><td>蚁群、鸟群等社会性生物</td><td>个体简单、群体涌现智能</td><td>PSO、ACO、ABC、鱼群算法</td></tr>
-    <tr><td><strong>模糊系统</strong></td><td>人类模糊推理能力</td><td>隶属度、模糊规则、近似推理</td><td>Mamdani、Sugeno、FCM</td></tr>
-  </table>
-  <p style="margin-top:10px;color:#888;font-size:13px">考试特点：概念辨析题（30%）+ 算法流程题（25%）+ 计算推导题（25%）+ 综合应用题（20%）。注重理解算法"为什么这样设计"而非死记硬背。</p>
+<div class="row">
+
+<!-- ===== 列1 ===== -->
+<div>
+
+<!-- 神经网络基础 -->
+<div class="card">
+<h2>一、人工神经网络基础</h2>
+
+<h3>M-P 模型 (1943)</h3>
+<div class="fbox">y = f(∑ w<sub>i</sub>x<sub>i</sub> − θ)</div>
+<ul>
+<li><b>x<sub>i</sub></b> — 输入信号 <span class="tg tg-blue">常考：多个输入一个输出</span></li>
+<li><b>w<sub>i</sub></b> — 连接权值（可正可负 = 兴奋/抑制）</li>
+<li><b>θ</b> — 阈值，可并入权重：x₀=−1, w₀=θ</li>
+<li><b>f</b> — 激活函数（阶跃/符号函数）</li>
+</ul>
+<div class="fbox">阶跃：y = 1 (∑wᵢxᵢ≥θ), 0 (其他)<br>符号：y = 1 (≥θ), −1 (其他)</div>
+<p><span class="tg tg-red">M-P 是硬限幅（阶跃），不能逼近任意函数</span></p>
+
+<h3>常见激活函数</h3>
+<table class="tab">
+<tr><th>名称</th><th>公式</th><th>导数范围</th><th>特点</th></tr>
+<tr><td>Sigmoid</td><td>f(x)=1/(1+e<sup>−x</sup>)</td><td>(0, 0.25]</td><td>输出 (0,1)，梯度饱和</td></tr>
+<tr><td>Tanh</td><td>f(x)=(eˣ−e⁻ˣ)/(eˣ+e⁻ˣ)</td><td>(0, 1]</td><td>输出 (−1,1)，零中心</td></tr>
+<tr><td>ReLU</td><td>f(x)=max(0,x)</td><td>{0,1}</td><td>缓解梯度消失</td></tr>
+</table>
+
+<h3>神经网络学习方式</h3>
+<ul>
+<li><b>有导师（监督）学习</b>：给定输入-输出对，误差驱动修正权值</li>
+<li><b>无导师（无监督）学习</b>：只给输入样本，自组织聚类（如 SOM）</li>
+<li><b>强化学习</b>：通过奖惩信号学习</li>
+</ul>
+
+<h3>Hebb 学习规则</h3>
+<div class="fbox">Δw<sub>ij</sub> = η · y<sub>i</sub> · y<sub>j</sub></div>
+<p>"细胞一起兴奋→连接加强" — 无导师。<span class="tg tg-orange">Delta 规则是有导师的：Δw = η(d−y)·x</span></p>
 </div>
 
-<!-- ===================== 一、神经网络 ===================== -->
-<div class="sec">
-  <h2>🧠 一、神经网络</h2>
-  <p>人工神经网络（Artificial Neural Network, ANN）由大量简单处理单元（神经元）相互连接构成，通过调整连接权重实现从数据中学习。</p>
+<!-- BP -->
+<div class="card">
+<h2 class="g">二、BP 神经网络 ★★★ 必考</h2>
 
-  <!-- 1.1 MP神经元 -->
-  <h3>1.1 MP神经元模型</h3>
-  <p>1943年 McCulloch &amp; Pitts 提出，是所有人造神经元的鼻祖。</p>
-  <div class="svg-chart">
+<h3>核心要点</h3>
+<ul>
+<li>多层前馈 + Sigmoid 激活</li>
+<li><span class="tg tg-red">误差反向传播 + 梯度下降法</span></li>
+<li>万能逼近定理：3层BP可逼近任意连续函数</li>
+</ul>
+
+<div class="fbox">
+<span class="flabel">正向传播</span>
+隐藏层 net<sub>j</sub> = ∑ v<sub>ij</sub>x<sub>i</sub> ,  z<sub>j</sub> = 1/(1+e<sup>−netⱼ</sup>)<br>
+输出层 net<sub>k</sub> = ∑ w<sub>jk</sub>z<sub>j</sub> ,  y<sub>k</sub> = 1/(1+e<sup>−netₖ</sup>)
+</div>
+<div class="fbox">
+<span class="flabel">反向传播</span>
+输出层 δ<sub>k</sub> = (d<sub>k</sub>−y<sub>k</sub>)·y<sub>k</sub>·(1−y<sub>k</sub>)<br>
+隐藏层 δ<sub>j</sub> = z<sub>j</sub>(1−z<sub>j</sub>)·∑δ<sub>k</sub>w<sub>jk</sub><br>
+Δw<sub>jk</sub> = η·δ<sub>k</sub>·z<sub>j</sub> &nbsp; Δv<sub>ij</sub> = η·δ<sub>j</sub>·x<sub>i</sub><br>
+修正：w←w+Δw
+</div>
+
+<h3>完整计算例题</h3>
+<div class="example">
+<div class="t">📌 题：1个输入x=[0.5], 1隐藏层1节点, 1输出, η=0.1<br>初始权值：v₁₁=0.3, θ₁=0.4, w₁₁=0.5, θ₂=0.6，期望输出 d=1<br>求一轮BP更新</div>
+<b>① 正向传播</b><br>
+net₁ = 0.5×0.3 − 0.4 = −0.25<br>
+z₁ = 1/(1+e<sup>0.25</sup>) = 1/1.284 = <b>0.4386</b><br>
+net₂ = 0.4386×0.5 − 0.6 = −0.3807<br>
+y₁ = 1/(1+e<sup>0.3807</sup>) = 1/1.463 = <b>0.4060</b><br><br>
+<b>② 计算误差</b><br>
+E = ½(1−0.406)² = ½×0.3529 = <b>0.1765</b><br><br>
+<b>③ 反向传播</b><br>
+δ₂ = (1−0.406)×0.406×(1−0.406) = 0.594×0.406×0.594 = <b>0.1433</b><br>
+δ₁ = 0.4386×(1−0.4386)×(0.1433×0.5) = 0.4386×0.5614×0.0717 = <b>0.01766</b><br><br>
+<b>④ 修正权值</b><br>
+Δw₁₁ = 0.1×0.1433×0.4386 = 0.00628 → w₁₁=<b>0.5063</b><br>
+Δv₁₁ = 0.1×0.01766×0.5 = 0.000883 → v₁₁=<b>0.3009</b><br>
+Δθ₂ = 0.1×0.1433×(−1) = −0.01433 → θ₂=<b>0.5857</b><br>
+Δθ₁ = 0.1×0.01766×(−1) = −0.001766 → θ₁=<b>0.3982</b>
+</div>
+
+<h3>重要概念</h3>
+<ul>
+<li><b>学习率 η</b>：太大震荡不收敛，太小收敛慢</li>
+<li><b>动量项</b>：Δw(t) = ηδz + αΔw(t−1)，加速+平滑</li>
+<li><b>过拟合</b>：训练误差小泛化差 → 早停 / L2正则化</li>
+<li><b>局部极小</b>：BP 易陷入 → 多初始点 / 动量/ GA+BP</li>
+</ul>
+</div>
+
+<!-- Hopfield + RBF -->
+<div class="card">
+<h2 class="o">三、Hopfield &amp; RBF 网络</h2>
+
+<h3>离散 Hopfield (DHNN)</h3>
+<ul>
+<li>单层全反馈，输出 ±1，异步更新</li>
+<li>联想记忆：存入平衡态 → 从部分恢复完整</li>
+<li>能量函数单调下降 → 收敛到吸引子</li>
+</ul>
+<div class="fbox">
+E = −½∑∑ w<sub>ij</sub>s<sub>i</sub>s<sub>j</sub> &nbsp; 且 ΔE ≤ 0<br>
+w<sub>ij</sub> = (1/N)∑ s<sub>i</sub><sup>(α)</sup> s<sub>j</sub><sup>(α)</sup> （Hebb 外积法）
+</div>
+
+<h3>RBF 径向基网络</h3>
+<ul>
+<li>3层：输入→隐藏层（径向基函数）→线性输出</li>
+<li>隐藏层激活：高斯函数 φ(r)=exp(−r²/2σ²)</li>
+<li><b>局部逼近</b> vs BP 全局逼近</li>
+</ul>
+<div class="fbox">y = ∑ w<sub>j</sub>·exp( −‖x−c<sub>j</sub>‖²/2σ² )</div>
+<ul>
+<li>c<sub>j</sub> 为中心点，σ 为宽度</li>
+<li>学习：K-means 聚类定中心 → 最小二乘求权值</li>
+</ul>
+</div>
+
+<!-- 模糊逻辑 + 模糊控制 -->
+<div class="card">
+<h2 class="p">四、模糊逻辑 &amp; 模糊控制 ★★</h2>
+
+<h3>模糊集合</h3>
+<ul>
+<li>隶属度 μ(x) ∈ [0,1]</li>
+<li>经典集合是特例（μ∈{0,1}）</li>
+</ul>
+
+<h3>常见隶属函数</h3>
+<table class="tab">
+<tr><th>类型</th><th>公式</th></tr>
+<tr><td>三角形</td><td>trimf(x;a,b,c)</td></tr>
+<tr><td>梯形</td><td>trapmf(x;a,b,c,d)</td></tr>
+<tr><td>高斯型</td><td>gaussmf(x;σ,c)=exp(−(x−c)²/2σ²)</td></tr>
+<tr><td>S 型</td><td>sigmf(x;a,c)=1/(1+e<sup>−a(x−c)</sup>)</td></tr>
+</table>
+
+<h3>模糊集合运算</h3>
+<div class="fbox">
+交：μ<sub>A∩B</sub>(x)=min(μ<sub>A</sub>,μ<sub>B</sub>) &nbsp; 并：μ<sub>A∪B</sub>(x)=max(μ<sub>A</sub>,μ<sub>B</sub>)<br>
+补：μ<sub>Ā</sub>(x)=1−μ<sub>A</sub>(x)
+</div>
+
+<h3>模糊关系合成 (CRI)</h3>
+<div class="fbox">μ<sub>R∘S</sub>(x,z) = max<sub>y</sub> min(μ<sub>R</sub>(x,y), μ<sub>S</sub>(y,z))</div>
+<div class="abox">
+<b>Mamdani 推理：</b><br>
+<b>①</b> R = A→B = A×B（μ<sub>R</sub>=min(μ<sub>A</sub>,μ<sub>B</sub>)）<br>
+<b>②</b> 给定 A' → B' = A' ∘ R<br>
+<b>③</b> 解模糊化
+</div>
+
+<h3>模糊推理例题</h3>
+<div class="example">
+<div class="t">📌 A={x₁/0.5, x₂/0.8}, B={y₁/0.3, y₂/0.6}<br>求 A'={x₁/0.6, x₂/0.7} 下的 B'</div>
+<b>① 构建 R</b>（Mamdani）<br>
+R(x₁,y₁)=min(0.5,0.3)=0.3 &nbsp; R(x₁,y₂)=min(0.5,0.6)=0.5<br>
+R(x₂,y₁)=min(0.8,0.3)=0.3 &nbsp; R(x₂,y₂)=min(0.8,0.6)=0.6<br>
+R = [[0.3, 0.5], [0.3, 0.6]]<br><br>
+<b>② B' = A' ∘ R</b><br>
+B'(y₁)=max(min(0.6,0.3), min(0.7,0.3))=max(0.3,0.3)=<b>0.3</b><br>
+B'(y₂)=max(min(0.6,0.5), min(0.7,0.6))=max(0.5,0.6)=<b>0.6</b><br>
+∴ B' = {y₁/0.3, y₂/0.6}
+</div>
+
+<h3>解模糊化</h3>
+<table class="tab">
+<tr><th>方法</th><th>公式</th><th>特点</th></tr>
+<tr><td>重心法</td><td>z₀=∫z·μ(z)dz/∫μ(z)dz</td><td>最常用，平滑</td></tr>
+<tr><td>最大隶属度法</td><td>选 μ(z) 最大的 z</td><td>简单但粗糙</td></tr>
+<tr><td>加权平均</td><td>z₀=∑z·μ(z)/∑μ(z)</td><td>离散简化</td></tr>
+</table>
+
+<h3>模糊控制系统</h3>
+<div class="abox">输入 → <b>模糊化</b> → 模糊推理（规则库）→ <b>解模糊化</b> → 输出</div>
+<ul>
+<li><b>Mamdani</b>：输出模糊集，需解模糊化</li>
+<li><b>Sugeno (TSK)</b>：输出函数 z = p·x + q·y + r</li>
+</ul>
+</div>
+
+<!-- GA -->
+<div class="card">
+<h2 class="b">五、遗传算法 ★★ 选择+计算</h2>
+
+<h3>核心概念</h3>
+<ul>
+<li><b>个体（染色体）</b>：解的编码表示</li>
+<li><b>种群</b>：多个个体组成</li>
+<li><b>适应度</b>：评价（越大越好）</li>
+<li>GA 核心：<b>选择+交叉+变异</b></li>
+</ul>
+
+<h3>GA 流程</h3>
+<div class="abox">
+① 编码 → ② 初始化种群 → ③ 计算适应度 →<br>
+④ 选择（轮盘赌）→ ⑤ 交叉（P<sub>c</sub>）→ ⑥ 变异（P<sub>m</sub>）→ ⑦ 终止
+</div>
+
+<h3>轮盘赌例题</h3>
+<div class="example">
+<div class="t">📌 种群4个体, 适应度 [5, 10, 15, 20], 求选择概率</div>
+总适应度 = 5+10+15+20 = <b>50</b><br>
+p₁=5/50=0.10 p₂=10/50=0.20 p₃=15/50=0.30 p₄=20/50=0.40<br>
+累积：0.10 → 0.30 → 0.60 → 1.00<br>
+若 r=0.45 → 选中个体③（在0.30~0.60区间）
+</div>
+
+<h3>编码方式</h3>
+<ul>
+<li><b>二进制</b>：简单但有汉明悬崖（0111→1000需改所有位）</li>
+<li><b>实数</b>：精度高，适合连续优化</li>
+<li><b>排列</b>：TSP 等组合优化</li>
+</ul>
+
+<h3>关键参数</h3>
+<table class="tab">
+<tr><th>参数</th><th>推荐值</th><th>影响</th></tr>
+<tr><td>种群大小 N</td><td>20~100</td><td>越大多样性好但慢</td></tr>
+<tr><td>交叉概率 P<sub>c</sub></td><td>0.6~0.9</td><td>大→探索强</td></tr>
+<tr><td>变异概率 P<sub>m</sub></td><td>0.001~0.1</td><td>大→防止早熟</td></tr>
+</table>
+<p><span class="tg tg-red">早熟收敛 = 种群多样性丧失 → 增大 P<sub>m</sub></span></p>
+</div>
+
+<!-- SVM -->
+<div class="card">
+<h2 class="t">六、SVM 支持向量机</h2>
+
+<h3>核心思想</h3>
+<ul>
+<li>找<b>最大间隔</b>超平面 w·x + b = 0</li>
+<li>支持向量 = 距分类面最近的样本点</li>
+<li>间隔 margin = 2/‖w‖</li>
+</ul>
+<div class="fbox">
+约束：y<sub>i</sub>(w·x<sub>i</sub>+b) ≥ 1 &nbsp; 优化：min ½‖w‖²
+</div>
+
+<h3>对偶与核技巧</h3>
+<div class="fbox">
+L = ½‖w‖² − ∑ α<sub>i</sub>[y<sub>i</sub>(w·x<sub>i</sub>+b)−1]<br>
+对偶式：max ∑α<sub>i</sub> − ½∑∑α<sub>i</sub>α<sub>j</sub>y<sub>i</sub>y<sub>j</sub>K(x<sub>i</sub>,x<sub>j</sub>)
+</div>
+<table class="tab">
+<tr><th>核函数</th><th>公式</th><th>适用</th></tr>
+<tr><td>线性核</td><td>K(x,z)=x·z</td><td>线性可分</td></tr>
+<tr><td>多项式核</td><td>K(x,z)=(x·z+1)<sup>d</sup></td><td>d 控制复杂度</td></tr>
+<tr><td>高斯核(RBF)</td><td>exp(−γ‖x−z‖²)</td><td>默认首选</td></tr>
+<tr><td>Sigmoid 核</td><td>tanh(a·x·z+b)</td><td>类神经网络</td></tr>
+</table>
+
+<h3>软间隔</h3>
+<ul>
+<li>min ½‖w‖² + C∑ξ<sub>i</sub>，允许部分样本分类错</li>
+<li><b>C 越大</b> → 惩罚越重 → 可能过拟合</li>
+</ul>
+<p><span class="tg tg-red">特点：凸优化（唯一全局最优）、小样本强泛化</span></p>
+</div>
+
+</div>
+
+<!-- ===== 列2 ===== -->
+<div>
+
+<!-- PSO + ACO -->
+<div class="card">
+<h2 class="r">七、群智能 ★★ PSO + ACO</h2>
+
+<h3>粒子群 (PSO)</h3>
+<ul>
+<li>粒子有位置 x 和速度 v</li>
+<li>跟踪个体最优 pBest 和全局最优 gBest</li>
+</ul>
+<div class="fbox">
+v<sub>i</sub>(t+1) = w·v<sub>i</sub>(t) + c<sub>1</sub>r<sub>1</sub>(pBest−x<sub>i</sub>) + c<sub>2</sub>r<sub>2</sub>(gBest−x<sub>i</sub>)<br>
+x<sub>i</sub>(t+1) = x<sub>i</sub>(t) + v<sub>i</sub>(t+1)
+</div>
+<table class="tab">
+<tr><th>参数</th><th>典型值</th><th>含义</th></tr>
+<tr><td>w</td><td>0.4~0.9</td><td>惯性（大=全局, 小=局部）</td></tr>
+<tr><td>c₁,c₂</td><td>通常=2</td><td>认知/社会系数</td></tr>
+<tr><td>r₁,r₂</td><td>[0,1]</td><td>随机性</td></tr>
+</table>
+
+<h3>PSO 计算例题</h3>
+<div class="example">
+<div class="t">📌 粒子 x=3, v=1, pBest=5, gBest=6<br>w=0.6, c₁=c₂=1.5, r₁=r₂=0.5, 求更新后位置</div>
+v(t+1)=0.6×1+1.5×0.5×(5−3)+1.5×0.5×(6−3)<br>
+= 0.6 + 1.5 + 2.25 = <b>4.35</b><br>
+x(t+1) = 3 + 4.35 = <b>7.35</b>
+</div>
+
+<h3>蚁群算法 (ACO)</h3>
+<ul>
+<li><b>信息素 τ</b>：路径累积，正反馈</li>
+<li><b>启发 η</b>：η<sub>ij</sub> = 1/d<sub>ij</sub>（距离倒数）</li>
+</ul>
+<div class="fbox">
+P<sub>ij</sub><sup>k</sup> = (τ<sub>ij</sub><sup>α</sup>·η<sub>ij</sub><sup>β</sup>) / ∑(τ<sub>il</sub><sup>α</sup>·η<sub>il</sub><sup>β</sup>)<br>
+τ<sub>ij</sub> = (1−ρ)·τ<sub>ij</sub> + ∑Δτ<sub>ij</sub><sup>k</sup>
+</div>
+<table class="tab">
+<tr><th>参数</th><th>含义</th></tr>
+<tr><td>α</td><td>信息素重要程度</td></tr>
+<tr><td>β</td><td>启发信息重要程度</td></tr>
+<tr><td>ρ</td><td>挥发系数 (0&lt;ρ&lt;1)，太大易局部</td></tr>
+</table>
+</div>
+
+<!-- 更多神经网络 -->
+<div class="card">
+<h2 class="n">八、更多神经网络（选择填空）</h2>
+
+<h3>SOM 自组织映射</h3>
+<ul>
+<li>Kohonen 网络，<b>无导师</b>竞争学习</li>
+<li>胜者神经元及其邻域更新权值</li>
+<li>保持输入拓扑结构 → 二维映射</li>
+</ul>
+<div class="fbox">w<sub>i</sub>(t+1) = w<sub>i</sub>(t) + η(t)·h<sub>ci</sub>(t)·(x−w<sub>i</sub>)</div>
+
+<h3>LVQ 学习向量量化</h3>
+<ul>
+<li><b>有导师</b>竞争学习</li>
+<li>正确→权值靠近；错误→权值远离</li>
+</ul>
+
+<h3>ART 自适应共振理论</h3>
+<ul>
+<li>解决"稳定性-可塑性"困境</li>
+<li>可增量学习不遗忘</li>
+<li>警戒参数 ρ：越大类别越细</li>
+</ul>
+
+<h3>CNN 卷积神经网络</h3>
+<table class="tab">
+<tr><th>层类型</th><th>作用</th></tr>
+<tr><td>卷积层</td><td>特征提取，卷积核滑动</td></tr>
+<tr><td>池化层</td><td>降采样：最大/平均池化</td></tr>
+<tr><td>全连接层</td><td>分类输出</td></tr>
+</table>
+<ul>
+<li><b>权值共享</b> + <b>局部连接</b></li>
+</ul>
+
+<h3>RNN 循环神经网络</h3>
+<ul>
+<li>反馈连接，处理序列数据</li>
+<li><b>LSTM</b>：输入门、遗忘门、输出门</li>
+<li>梯度消失/爆炸 → LSTM/GRU 缓解</li>
+</ul>
+</div>
+
+<!-- SA + TS -->
+<div class="card">
+<h2 class="o">九、模拟退火 &amp; 禁忌搜索</h2>
+
+<h3>模拟退火 (SA)</h3>
+<ul>
+<li>Metropolis 准则：</li>
+</ul>
+<div class="fbox">p = 1（新解更优）；p = exp(−ΔE/T)（新解更差）</div>
+<ul>
+<li>T 高→全局探索，T 低→局部求精</li>
+<li>降温 T=α·T（α 通常 0.85~0.98）</li>
+<li><span class="tg tg-green">理论上以概率 1 收敛到全局最优</span></li>
+</ul>
+<div class="abox">
+初始 T₀ → 产生新解 → 计算 ΔE →<br>
+ΔE≤0 接受；ΔE&gt;0 以 exp(−ΔE/T) 接受 → 降温 → 循环
+</div>
+
+<h3>禁忌搜索 (TS)</h3>
+<ul>
+<li><b>禁忌表</b>：记录最近解防循环</li>
+<li><b>禁忌长度</b>：步数</li>
+<li><b>藐视准则</b>：禁忌解优于当前最优则解禁</li>
+</ul>
+</div>
+
+<!-- 深度学习基础 -->
+<div class="card">
+<h2 class="pink">十、深度学习基础</h2>
+
+<h3>防过拟合技术</h3>
+<table class="tab">
+<tr><th>方法</th><th>说明</th></tr>
+<tr><td>L1/L2 正则化</td><td>损失加 λ∑|w| / λ∑w²</td></tr>
+<tr><td>Dropout</td><td>训练时随机丢弃神经元</td></tr>
+<tr><td>早停</td><td>验证集误差不降即停</td></tr>
+<tr><td>数据增强</td><td>旋转/裁剪增样本</td></tr>
+<tr><td>BatchNorm</td><td>每层输出归一化</td></tr>
+</table>
+
+<h3>优化器</h3>
+<table class="tab">
+<tr><th>优化器</th><th>特点</th></tr>
+<tr><td>SGD+Momentum</td><td>加速平滑</td></tr>
+<tr><td>AdaGrad</td><td>自适应 lr，适合稀疏数据</td></tr>
+<tr><td>RMSProp</td><td>改进 AdaGrad</td></tr>
+<tr><td>Adam</td><td>Momentum+RMSProp，默认首选</td></tr>
+</table>
+
+<h3>损失函数</h3>
+<ul>
+<li><b>MSE</b>：回归问题</li>
+<li><b>交叉熵 CrossEntropy</b>：分类问题</li>
+</ul>
+</div>
+
+<!-- 易混对比 -->
+<div class="card">
+<h2 class="p">十一、易混点对比 ★ 选择填空</h2>
+
+<table class="tab">
+<tr><th>算法</th><th>核心</th><th>导师</th><th>优点</th><th>缺点</th></tr>
+<tr><td>M-P</td><td>阶跃</td><td>-</td><td>简单</td><td>不能逼近</td></tr>
+<tr><td>BP</td><td>梯度下降</td><td>有</td><td>逼近强</td><td>局部极小</td></tr>
+<tr><td>Hopfield</td><td>能量最小</td><td>无</td><td>联想记忆</td><td>容量有限</td></tr>
+<tr><td>RBF</td><td>径向基</td><td>有</td><td>局部逼近</td><td>中心难定</td></tr>
+<tr><td>SOM</td><td>竞争学习</td><td>无</td><td>拓扑保持</td><td>需调参</td></tr>
+<tr><td>GA</td><td>选交变</td><td>-</td><td>全局搜索</td><td>收敛慢</td></tr>
+<tr><td>PSO</td><td>速度-位置</td><td>-</td><td>简单收束快</td><td>易早熟</td></tr>
+<tr><td>ACO</td><td>信息素</td><td>-</td><td>组合优化强</td><td>计算量大</td></tr>
+<tr><td>SA</td><td>Metropolis</td><td>-</td><td>理论全局最优</td><td>收敛慢</td></tr>
+<tr><td>TS</td><td>禁忌表</td><td>-</td><td>记忆功能</td><td>参数敏感</td></tr>
+<tr><td>SVM</td><td>最大间隔</td><td>有</td><td>小样本强</td><td>大样本慢</td></tr>
+<tr><td>模糊</td><td>隶属度</td><td>-</td><td>处理不确定</td><td>主观强</td></tr>
+</table>
+
+<hr>
+
+<h3>核心概念辨析</h3>
+<table class="tab">
+<tr><th>对比项</th><th>说明</th></tr>
+<tr><td>有导师 vs 无导师</td><td>监督需标注，无导师不需要</td></tr>
+<tr><td>全局 vs 局部逼近</td><td>BP 全局参数影响输出，RBF 仅附近中心</td></tr>
+<tr><td>前馈 vs 反馈</td><td>前馈无环(BP/RBF/CNN)，反馈有环(Hopfield/RNN)</td></tr>
+<tr><td>异步 vs 同步</td><td>Hopfield 异步（一次一个神经元）</td></tr>
+<tr><td>硬聚类 vs 软聚类</td><td>K-means 硬，模糊 C 均值软</td></tr>
+</table>
+</div>
+
+<!-- 填空必背 -->
+<div class="card">
+<h2>十二、填空必背 50 条</h2>
+
+<table class="tab">
+<tr><td>1. BP 误差函数 = ½∑(d−y)²</td><td>2. Sigmoid 导数 f'=f·(1−f)</td></tr>
+<tr><td>3. 轮盘赌 p = fᵢ/∑fⱼ</td><td>4. Hopfield 能量 E = −½∑∑wᵢⱼsᵢsⱼ</td></tr>
+<tr><td>5. ACO 转移 τ°·η^β/求和</td><td>6. SVM 目标 min½‖w‖²</td></tr>
+<tr><td>7. SA 接受 exp(−ΔE/T)</td><td>8. PSO 三部分 = 惯性+认知+社会</td></tr>
+<tr><td>9. 隶属度值域 [0,1]</td><td>10. RBF 激活 = 高斯函数</td></tr>
+<tr><td>11. BP 核心 = 梯度下降+误差反传</td><td>12. GA 三大算子 = 选择交叉变异</td></tr>
+<tr><td>13. 模糊关系合成 = max-min</td><td>14. Hebb 规则 Δw = η·yᵢ·yⱼ</td></tr>
+<tr><td>15. Delta 规则 Δw = η(d−y)·x</td><td>16. 过拟合 = 训练误差小测试大</td></tr>
+<tr><td>17. 早熟 = 种群多样性丧失</td><td>18. 万能逼近 = 3层BP逼近任意连续函数</td></tr>
+<tr><td>19. 动量 = 加速避震荡</td><td>20. 解模糊常用 = 重心法</td></tr>
+<tr><td>21. Mamdani = 输出模糊集</td><td>22. Sugeno = 输出函数</td></tr>
+<tr><td>23. GA 编码 = 二进制/实数/排列</td><td>24. PSO 无交叉变异</td></tr>
+<tr><td>25. ACO 正反馈 = 信息素累积</td><td>26. SVM 核技巧 = 避显式计算</td></tr>
+<tr><td>27. CNN = 局部连接+权值共享</td><td>28. RNN = 反馈处理序列</td></tr>
+<tr><td>29. LSTM 三门 = 输入遗忘输出</td><td>30. Dropout = 随机丢弃防过拟合</td></tr>
+<tr><td>31. 精英保留 = 最优直接复制</td><td>32. 隐含并行 = GA 同时多区域搜索</td></tr>
+<tr><td>33. Hopfield 条件 = 权对称+无自反馈</td><td>34. 异步更新 = 一次一个神经元</td></tr>
+<tr><td>35. SOM = 无导师竞争学习</td><td>36. LVQ = 有导师竞争学习</td></tr>
+<tr><td>37. 卷积核 = 特征检测器</td><td>38. 池化 = 降采样</td></tr>
+<tr><td>39. 交叉熵 = 分类标准损失</td><td>40. Adam = Momentum+RMSProp</td></tr>
+<tr><td>41. 藐视准则 = TS 解禁</td><td>42. ART 警戒参数ρ越大分类越细</td></tr>
+<tr><td>43. 支持向量 = 距SVM面最近的点</td><td>44. 软间隔 C越大惩罚越重</td></tr>
+<tr><td>45. BatchNorm = 每层输出归一化</td><td>46. Mini-batch = 32/64/128</td></tr>
+<tr><td>47. RBF 中心定 = K-means</td><td>48. α 越大路径惯性越强</td></tr>
+<tr><td>49. w 大全局小局部</td><td>50. T 高全局低局部</td></tr>
+</table>
+</div>
+
+<!-- 计算题速查 -->
+<div class="card">
+<h2 class="r">十三、计算题速查 + 考场策略</h2>
+
+<h3>BP 计算 8 步</h3>
+<div class="abox">
+<b>① netⱼ=∑vᵢⱼ·xᵢ → ② zⱼ=1/(1+e<sup>−netⱼ</sup>)</b><br>
+<b>③ netₖ=∑wⱼₖ·zⱼ → ④ yₖ=1/(1+e<sup>−netₖ</sup>)</b><br>
+<b>⑤ δₖ=(dₖ−yₖ)·yₖ·(1−yₖ)</b><br>
+<b>⑥ δⱼ=zⱼ·(1−zⱼ)·∑δₖ·wⱼₖ</b><br>
+<b>⑦ Δwⱼₖ=η·δₖ·zⱼ → w←w+Δw</b><br>
+<b>⑧ Δvᵢⱼ=η·δⱼ·xᵢ → v←v+Δv</b>
+</div>
+
+<h3>PSO 一步</h3>
+<div class="abox">
+v(t+1) = w·v(t) + c₁r₁(pBest−x) + c₂r₂(gBest−x)<br>
+x(t+1) = x(t) + v(t+1)
+</div>
+
+<h3>考场策略</h3>
+<ul>
+<li><span class="tg tg-red">BP 计算</span>：先验算正向，sigmoid 算错全错</li>
+<li><span class="tg tg-blue">PSO</span>：公式长但简单，分三部分加</li>
+<li><span class="tg tg-green">模糊关系</span>：画矩阵，max-min 一行一行算</li>
+<li><span class="tg tg-orange">GA</span>：轮盘赌注意累积概率区间</li>
+<li>时间分配：选择填空30% → 计算50% → 简答20%</li>
+<li>不会的先跳过，计算题步骤分重要</li>
+</ul>
+</div>
+
+</div>
+</div>
+
+</div>
     <svg width="580" height="170" viewBox="0 0 580 170" xmlns="http://www.w3.org/2000/svg">
       <defs><marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#555"/></marker></defs>
       <!-- inputs -->
@@ -1150,7 +1653,7 @@ body{background:#f5f6fa}
 <script>
 (function() {
   var url = window.location.origin + window.location.pathname;
-  var shareTxt = '📚 计算智能期末复习——神经网络·进化计算·群体智能·模糊系统，知识点+例题+练习全覆盖！ ' + url;
+  var shareTxt = '🧠 计算智能·考前速通——神经网络·进化计算·群体智能·模糊逻辑·SVM·深度学习，考点速记+计算例题+填空50条！ ' + url;
   var hasCopied = false;
   var overlay = document.getElementById('shareOverlay') || (function(){
     var el = document.createElement('div'); el.className = 'share-overlay'; el.id = 'shareOverlay';
