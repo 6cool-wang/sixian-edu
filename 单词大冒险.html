@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>单词大冒险</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg1:#e8f4f8;--bg2:#fce4ec;--card:#fff;--shadow:0 8px 32px rgba(0,0,0,.08);--primary:#ff6b6b;--primary2:#ffa502;--sec:#4ecdc4;--gold:#ffd700;--text:#2d3436;--sub:#b2bec3;--radius:16px;--purple:#a29bfe;--pink:#fd79a8}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2));color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden}
+#app{width:100%;max-width:420px;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg1),var(--bg2))}
+.bg-deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-deco .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15}
+.bg-deco .orb:nth-child(1){width:260px;height:260px;background:var(--gold);top:-100px;right:-80px}
+.bg-deco .orb:nth-child(2){width:220px;height:220px;background:var(--pink);bottom:-60px;left:-60px}
+.bg-deco .orb:nth-child(3){width:180px;height:180px;background:var(--sec);top:40%;left:20%}
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 6px;z-index:10;position:relative}
+.rank-badge{display:flex;align-items:center;gap:8px}
+.rank-badge .icon{font-size:28px}
+.rank-badge .name{font-size:17px;font-weight:700}
+.rank-badge .lvl{font-size:11px;color:var(--sub);margin-top:-2px}
+.stage-info{text-align:right;font-size:12px;color:var(--sub);line-height:1.3}
+.stage-info .num{font-size:20px;font-weight:800;color:var(--text)}
+.hp-row{display:flex;justify-content:space-between;align-items:center;padding:4px 18px 8px;z-index:10}
+.hp-bar{display:flex;gap:3px}
+.hp-bar .heart{font-size:20px;transition:all .3s}
+.hp-bar .heart.lost{opacity:.15;transform:scale(.7)}
+.combo-display{font-size:16px;font-weight:800;color:var(--gold);opacity:0;transition:all .2s;min-width:60px;text-align:right}
+.combo-display.active{opacity:1}
+.timer-wrap{padding:0 18px 6px;z-index:10}
+.timer-bar{height:6px;border-radius:3px;background:rgba(0,0,0,.06);overflow:hidden}
+.timer-bar .fill{height:100%;border-radius:3px;transition:width .1s linear;background:var(--sec)}
+.timer-bar .fill.warning{background:var(--gold)}
+.timer-bar .fill.danger{background:var(--primary)}
+.progress-wrap{padding:0 18px 8px;z-index:10}
+.progress-bar{height:6px;background:rgba(0,0,0,.05);border-radius:3px;overflow:hidden}
+.progress-bar .fill{height:100%;background:linear-gradient(90deg,var(--sec),#81ecec);border-radius:3px;transition:width .35s ease;width:0%}
+.progress-row{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-top:3px}
+.game-area{flex:1;display:flex;flex-direction:column;justify-content:center;padding:0 16px 16px;z-index:10}
+.card{background:var(--card);border-radius:var(--radius);padding:24px 20px;box-shadow:var(--shadow);animation:fadeUp .35s ease;position:relative;overflow:hidden}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{translate:0}20%{translate:-7px}40%{translate:7px}60%{translate:-5px}80%{translate:5px}}
+@keyframes comboPop{0%{transform:scale(.3);opacity:0}50%{transform:scale(1.3)}100%{transform:scale(1);opacity:1}}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-40px)}}
+.word-display{text-align:center;margin-bottom:18px}
+.word-display .word{font-size:36px;font-weight:800;letter-spacing:.5px;color:var(--text)}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice-btn{background:#f8f9fa;border:2px solid #e9ecef;border-radius:12px;padding:14px 8px;font-size:16px;color:var(--text);cursor:pointer;transition:all .15s;text-align:center;line-height:1.3;position:relative;font-weight:600}
+.choice-btn:active{transform:scale(.95)}
+.choice-btn .tag{font-size:11px;color:var(--sub);display:block;margin-bottom:3px;font-weight:400}
+.choice-btn.correct{background:#d4edda;border-color:var(--sec);animation:fadeUp .25s}
+.choice-btn.wrong{background:#f8d7da;border-color:var(--primary);animation:shake .35s}
+.choice-btn.disabled{pointer-events:none;opacity:.6}
+.float-score{position:absolute;font-size:24px;font-weight:900;pointer-events:none;z-index:50;animation:floatUp .8s ease-out forwards}
+.float-score.bonus{color:var(--gold)}
+.particles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:2}
+.particle{position:absolute;width:8px;height:8px;border-radius:50%;animation:particleFly .6s ease-out forwards}
+@keyframes particleFly{0%{opacity:1;transform:translate(0,0) scale(1)}100%{opacity:0;transform:translate(var(--tx),var(--ty)) scale(0)}}
+.result-screen{text-align:center}
+.result-screen .big-icon{font-size:60px;margin-bottom:8px}
+.result-screen .title{font-size:24px;font-weight:800;margin-bottom:2px}
+.result-screen .sub{color:var(--sub);font-size:14px;margin-bottom:16px}
+.result-screen .score{font-size:48px;font-weight:800;color:var(--gold)}
+.result-screen .score-label{font-size:13px;color:var(--sub);margin-bottom:14px}
+.stat-row{display:flex;justify-content:center;gap:24px;margin-bottom:16px}
+.stat-item{text-align:center}
+.stat-item .val{font-size:22px;font-weight:700}
+.stat-item .lbl{font-size:11px;color:var(--sub)}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff}
+.btn-success{background:linear-gradient(135deg,var(--sec),#81ecec);color:#fff}
+.btn-outline{background:transparent;border:2.5px solid #dfe6e9;color:var(--text)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#f9ca24);color:#fff}
+.btn-group{display:flex;gap:8px;margin-top:10px}
+.btn-group .btn{flex:1}
+.home-screen{text-align:center;padding:30px 18px;flex:1;display:flex;flex-direction:column;justify-content:center}
+.home-screen h1{font-size:34px;font-weight:900;margin-bottom:2px;background:linear-gradient(135deg,var(--primary),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-screen .subtitle{color:var(--sub);font-size:14px;margin-bottom:18px}
+/* 年级选择 */
+.grade-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.grade-btn{padding:18px 10px;border:none;border-radius:14px;font-size:20px;font-weight:800;cursor:pointer;transition:all .15s;text-align:center;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.grade-btn:active{transform:scale(.95)}
+.grade-btn .gsub{display:block;font-size:12px;font-weight:400;opacity:.85;margin-top:2px}
+.grade-btn.g3{background:linear-gradient(135deg,#74b9ff,#0984e3)}
+.grade-btn.g4{background:linear-gradient(135deg,#a29bfe,#6c5ce7)}
+.grade-btn.g5{background:linear-gradient(135deg,#fd79a8,#e84393)}
+.grade-btn.g6{background:linear-gradient(135deg,#fdcb6e,#e17055)}
+.grade-btn.active{transform:scale(.95);opacity:.7}
+.selected-grade{display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,.04);padding:6px 14px;border-radius:20px;font-size:14px;font-weight:600;margin-bottom:14px;cursor:pointer;border:2px dashed #dfe6e9;transition:all .15s}
+.selected-grade:active{transform:scale(.95)}
+/* 塔楼 */
+.floor-colors{display:flex;flex-direction:column;align-items:center;gap:5px;margin:0 auto 18px}
+.floor-colors .f{width:200px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;opacity:.35;transition:all .4s}
+.floor-colors .f.reached{opacity:1;box-shadow:0 0 20px rgba(255,255,255,.1)}
+.floor-colors .f.current{opacity:1;transform:scale(1.06);animation:pulse 1.5s ease-in-out infinite;box-shadow:0 0 30px rgba(255,255,255,.2)}
+@keyframes pulse{0%,100%{box-shadow:0 0 12px rgba(0,0,0,.08)}50%{box-shadow:0 0 24px rgba(0,0,0,.15)}}
+.features{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;text-align:left}
+.features .feat{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--text);background:rgba(0,0,0,.02);padding:10px 14px;border-radius:10px}
+.points-display{display:flex;align-items:center;gap:4px;font-size:15px;font-weight:700;color:#f39c12}
+.points-display .picon{font-size:18px}
+/* 天梯条 */
+.lt-row{display:flex;gap:3px;height:20px;padding:0 2px}
+.lt-row .seg{flex:1;border-radius:4px;transition:all .3s}
+.lt-label{font-size:11px;color:var(--sub);text-align:center;margin-top:2px}
+/* 怪物战斗 */
+.battle-area{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:12px 16px;background:#f8f9fa;border-radius:12px;border:2px solid #e9ecef;position:relative}
+.battle-area .monster{font-size:36px;min-width:48px;text-align:center;animation:monsterIdle 1.5s ease-in-out infinite}
+@keyframes monsterIdle{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.battle-area .monster.atk{animation:monsterAtk .35s ease}
+@keyframes monsterAtk{0%{transform:translateX(0)}30%{transform:translateX(15px) scale(1.1)}60%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+.battle-area .monster.hit{animation:monsterHit .4s ease}
+@keyframes monsterHit{0%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(8px)}60%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+.battle-info{flex:1;min-width:0}
+.battle-info .mname{font-size:15px;font-weight:700;margin-bottom:3px}
+.battle-hp{height:8px;background:rgba(0,0,0,.06);border-radius:4px;overflow:hidden;position:relative}
+.battle-hp .fill{height:100%;border-radius:4px;transition:width .4s ease;background:linear-gradient(90deg,var(--primary),var(--primary2))}
+.battle-hp .fill.warning{background:linear-gradient(90deg,var(--gold),#f9ca24)}
+.battle-hp .fill.safe{background:linear-gradient(90deg,var(--sec),#81ecec)}
+.battle-hp-text{font-size:11px;color:var(--sub);margin-top:1px;display:flex;justify-content:space-between}
+.dmg-num{position:absolute;font-size:28px;font-weight:900;color:var(--sec);z-index:5;pointer-events:none;animation:dmgFloat .6s ease-out forwards}
+.dmg-num.taken{color:var(--primary)}
+@keyframes dmgFloat{0%{opacity:1;transform:translateY(0) scale(1)}100%{opacity:0;transform:translateY(-35px) scale(1.3)}}
+.demotion-overlay{text-align:center}.demotion-overlay .big{font-size:48px;margin-bottom:6px}
+.chest-screen{text-align:center}
+.chest-screen .chest-icon{font-size:60px;margin-bottom:6px;cursor:pointer;transition:transform .2s}
+.chest-screen .chest-icon:active{transform:scale(.9)}
+.chest-screen .chest-icon.opened{animation:chestOpen .5s ease}
+@keyframes chestOpen{0%{transform:scale(1) rotate(0)}30%{transform:scale(1.2) rotate(-5deg)}60%{transform:scale(1.3) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
+.chest-screen .reward{font-size:30px;font-weight:800;color:var(--gold);margin:8px 0}
+.chest-screen .reward-sub{font-size:14px;color:var(--sub);margin-bottom:12px}
+.max-rank{text-align:center;padding:30px 18px}
+.max-rank .big{font-size:72px;margin-bottom:8px}
+.max-rank h2{font-size:28px;font-weight:900;background:linear-gradient(135deg,var(--gold),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+.max-rank p{color:var(--sub);font-size:14px;margin-bottom:16px}
+.hidden{display:none !important}
+@media(max-width:420px){#app{max-width:100%}.word-display .word{font-size:30px}.choices{gap:8px}.choice-btn{padding:12px 6px;font-size:15px}.card{padding:18px 14px}}
+</style>
+</head>
+<body>
+
+<div class="bg-deco"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<div id="app">
+
+  <!-- 顶部栏 -->
+  <header id="gameHeader" class="hidden">
+    <div class="rank-badge">
+      <span class="icon" id="rankIcon">🥉</span>
+      <div>
+        <div class="name" id="rankName">青铜小将</div>
+        <div class="lvl" id="rankLvl">Lv.1</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="points-display"><span class="picon">⭐</span><span id="pointsDisplay">0</span></div>
+      <div class="stage-info"><span class="num" id="stageNum">第 1 关</span><span id="stageSep"> / <span id="totalStages">9</span></span></div>
+    </div>
+  </header>
+
+  <!-- HP + Combo -->
+  <div id="hpRow" class="hp-row hidden">
+    <div class="hp-bar" id="hpContainer"></div>
+    <div class="combo-display" id="comboDisplay">🔥 <span id="comboCount">2</span>x</div>
+  </div>
+
+  <!-- 计时条 -->
+  <div id="timerWrap" class="timer-wrap hidden">
+    <div class="timer-bar"><div class="fill" id="timerFill"></div></div>
+  </div>
+
+  <!-- 进度 -->
+  <div id="progressWrap" class="progress-wrap hidden">
+    <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
+    <div class="progress-row">
+      <span id="progressLabel">第 1 / 5 题</span>
+      <span id="progressCorrect">✅ 0</span>
+    </div>
+  </div>
+
+  <!-- 游戏主区域 -->
+  <div class="game-area" id="gameArea">
+
+    <!-- 首页 -->
+    <div id="homeScreen">
+      <div style="text-align:center;padding:24px 18px">
+        <h1>单词大冒险</h1>
+        <div class="subtitle">小学英语闯关 · 边玩边学</div>
+
+        <!-- 年级选择 -->
+        <div style="margin-bottom:14px">
+          <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--sub)">选择年级</div>
+          <div class="grade-select" id="gradeSelector">
+            <button class="grade-btn g3" data-grade="3">三年级<span class="gsub">入门</span></button>
+            <button class="grade-btn g4" data-grade="4">四年级<span class="gsub">进阶</span></button>
+            <button class="grade-btn g5" data-grade="5">五年级<span class="gsub">提高</span></button>
+            <button class="grade-btn g6" data-grade="6">六年级<span class="gsub">冲刺</span></button>
+          </div>
+        </div>
+
+        <!-- 已选年级 + 开始按钮 -->
+        <div id="startArea" class="hidden">
+          <div class="selected-grade" id="changeGradeBtn"><span>📚</span> <span id="currentGradeLabel">三年级</span> <span style="font-size:11px;color:var(--sub)">点此切换</span></div>
+          <div class="floor-colors" id="towerDisplay"></div>
+          <div style="display:flex;gap:8px;margin-bottom:14px">
+            <button class="btn btn-primary" id="startBtn" style="flex:1">🚀 开始闯关</button>
+          </div>
+          <div class="features">
+            <div class="feat"><span>⏱️</span>每题 15 秒倒计时</div>
+            <div class="feat"><span>🔥</span>连续答对触发连击加分</div>
+            <div class="feat"><span>🎁</span>每段通关领取奖励</div>
+            <div class="feat"><span>💾</span>自动存档，随时继续</div>
+          </div>
+          <div style="display:flex;justify-content:center;align-items:center;gap:12px;margin-top:4px">
+            <div class="points-display"><span class="picon">⭐</span><span id="homePoints">0</span></div>
+            <div style="font-size:12px;color:var(--sub)">积分</div>
+          </div>
+          <button class="btn btn-outline" id="resetBtn" style="margin-top:8px;font-size:13px;padding:10px">重置进度</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 答题 -->
+    <div id="quizScreen" class="hidden">
+      <div id="ladderTower" class="hidden" style="padding:0 4px 6px;z-index:10">
+        <div class="lt-row" id="ltRow"></div>
+        <div class="lt-label" id="ltLabel"></div>
+      </div>
+      <div class="card" id="questionCard">
+        <div class="battle-area" id="battleArea">
+          <div class="monster" id="monsterIcon">🟤</div>
+          <div class="battle-info">
+            <div class="mname" id="monsterName">泥巴怪</div>
+            <div class="battle-hp"><div class="fill" id="monsterHpFill" style="width:100%"></div></div>
+            <div class="battle-hp-text"><span id="monsterHpLabel">3/3</span><span>❤️×<span id="battleLives">3</span></span></div>
+          </div>
+        </div>
+        <div class="word-display">
+          <div class="word" id="currentWord">red</div>
+        </div>
+        <div class="choices" id="choicesContainer"></div>
+        <div class="particles" id="particles"></div>
+      </div>
+    </div>
+
+    <!-- 过关结果 -->
+    <div id="resultScreen" class="hidden result-screen">
+      <div class="card">
+        <div class="big-icon" id="resultIcon">🎯</div>
+        <div class="title" id="resultTitle">过关！</div>
+        <div class="sub" id="resultSub">进入下一关</div>
+        <div class="score" id="resultScore">0</div>
+        <div class="score-label">总正确数</div>
+        <div class="stat-row">
+          <div class="stat-item"><div class="val" id="statCorrect">0</div><div class="lbl">本关正确</div></div>
+          <div class="stat-item"><div class="val" id="statWrong">0</div><div class="lbl">本关错误</div></div>
+          <div class="stat-item"><div class="val" id="statStreak">0</div><div class="lbl">最大连击</div></div>
+        </div>
+        <button class="btn btn-success" id="nextBtn">继续</button>
+        <button class="btn btn-outline" id="resultHomeBtn" style="margin-top:6px;font-size:13px">回到首页</button>
+      </div>
+    </div>
+
+    <!-- 宝箱 -->
+    <div id="chestScreen" class="hidden chest-screen">
+      <div class="card">
+        <div style="font-size:14px;color:var(--sub);margin-bottom:6px" id="chestTitle">段位通关奖励</div>
+        <div class="chest-icon" id="chestIcon">🎁</div>
+        <div class="reward" id="chestReward">+0</div>
+        <div class="reward-sub" id="chestSub">额外奖励分</div>
+        <button class="btn btn-gold" id="chestBtn">领取</button>
+      </div>
+    </div>
+
+    <!-- 降段 -->
+    <div id="demotionScreen" class="hidden demotion-overlay">
+      <div class="card" style="border-color:var(--primary)">
+        <div class="big">💪</div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:2px">没关系，再来一次！</div>
+        <div style="font-size:14px;color:var(--sub);margin-bottom:10px" id="demotionText">回到 青铜小将</div>
+        <div class="rank-display" style="margin-bottom:8px">
+          <div style="font-size:44px" id="demotionIcon">🥉</div>
+          <div style="font-size:20px;font-weight:800" id="demotionName">青铜小将</div>
+        </div>
+        <div style="margin-top:14px">
+          <button class="btn btn-primary" id="demotionBtn">重新挑战</button>
+          <button class="btn btn-outline" id="demotionHomeBtn" style="margin-top:6px">返回首页</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 封顶 -->
+    <div id="maxRankScreen" class="hidden max-rank">
+      <div class="big">👑</div>
+      <h2>恭喜通关！</h2>
+      <p id="maxGradeLabel">三年级单词全部掌握</p>
+      <div class="card" style="margin-bottom:14px">
+        <div style="font-size:48px">👑</div>
+        <div style="font-size:24px;font-weight:800;color:var(--gold)">单词王</div>
+        <div class="stat-row" style="margin-top:10px">
+          <div class="stat-item"><div class="val" id="maxCorrect">0</div><div class="lbl">总正确</div></div>
+          <div class="stat-item"><div class="val" id="maxWrong">0</div><div class="lbl">总错误</div></div>
+          <div class="stat-item"><div class="val" id="maxStreak">0</div><div class="lbl">最大连击</div></div>
+        </div>
+      </div>
+      <button class="btn btn-gold" id="maxReplayBtn">再玩一次</button>
+      <button class="btn btn-outline" id="maxHomeBtn" style="margin-top:6px">返回首页</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════
+//  词汇数据（按年级）
+// ═══════════════════════════════════
+const GRADE_WORDS = {
+  3: [
+    {w:'red', d:'红色'},{w:'yellow', d:'黄色'},{w:'green', d:'绿色'},{w:'blue', d:'蓝色'},{w:'white', d:'白色'},
+    {w:'black', d:'黑色'},{w:'orange', d:'橙色'},{w:'brown', d:'棕色'},{w:'pink', d:'粉色'},{w:'purple', d:'紫色'},
+    {w:'cat', d:'猫'},{w:'dog', d:'狗'},{w:'monkey', d:'猴子'},{w:'panda', d:'熊猫'},{w:'bear', d:'熊'},
+    {w:'duck', d:'鸭子'},{w:'pig', d:'猪'},{w:'bird', d:'鸟'},{w:'tiger', d:'老虎'},{w:'elephant', d:'大象'},
+    {w:'fish', d:'鱼'},{w:'rabbit', d:'兔子'},{w:'mouse', d:'老鼠'},{w:'frog', d:'青蛙'},{w:'snake', d:'蛇'},
+    {w:'book', d:'书'},{w:'bag', d:'书包'},{w:'pen', d:'钢笔'},{w:'pencil', d:'铅笔'},{w:'ruler', d:'尺子'},
+    {w:'eraser', d:'橡皮'},{w:'crayon', d:'蜡笔'},{w:'head', d:'头'},{w:'face', d:'脸'},{w:'nose', d:'鼻子'},
+    {w:'mouth', d:'嘴'},{w:'eye', d:'眼睛'},{w:'ear', d:'耳朵'},{w:'arm', d:'胳膊'},{w:'hand', d:'手'},
+    {w:'leg', d:'腿'},{w:'foot', d:'脚'},{w:'one', d:'一'},{w:'two', d:'二'},{w:'three', d:'三'},
+    {w:'four', d:'四'},{w:'five', d:'五'},{w:'six', d:'六'},{w:'seven', d:'七'},{w:'eight', d:'八'},
+    {w:'nine', d:'九'},{w:'ten', d:'十'},{w:'cake', d:'蛋糕'},{w:'bread', d:'面包'},{w:'rice', d:'米饭'},
+    {w:'egg', d:'鸡蛋'},{w:'milk', d:'牛奶'},{w:'water', d:'水'},{w:'juice', d:'果汁'},{w:'apple', d:'苹果'},
+    {w:'banana', d:'香蕉'},{w:'orange', d:'橙子'},{w:'pear', d:'梨'},{w:'mother', d:'妈妈'},{w:'father', d:'爸爸'},
+    {w:'sister', d:'姐妹'},{w:'brother', d:'兄弟'},{w:'grandma', d:'奶奶'},{w:'grandpa', d:'爷爷'},
+    {w:'big', d:'大的'},{w:'small', d:'小的'},{w:'long', d:'长的'},{w:'short', d:'短的'},{w:'tall', d:'高的'},
+    {w:'fat', d:'胖的'},{w:'thin', d:'瘦的'},{w:'new', d:'新的'},{w:'old', d:'旧的'},{w:'happy', d:'开心的'},
+    {w:'nice', d:'好的'},{w:'cute', d:'可爱的'},{w:'hot', d:'热的'},{w:'cold', d:'冷的'},
+  ],
+  4: [
+    {w:'window', d:'窗户'},{w:'door', d:'门'},{w:'desk', d:'书桌'},{w:'chair', d:'椅子'},{w:'blackboard', d:'黑板'},
+    {w:'light', d:'灯'},{w:'picture', d:'图画'},{w:'wall', d:'墙'},{w:'floor', d:'地板'},{w:'computer', d:'电脑'},
+    {w:'Chinese', d:'语文'},{w:'English', d:'英语'},{w:'math', d:'数学'},{w:'music', d:'音乐'},{w:'science', d:'科学'},
+    {w:'sunny', d:'晴朗的'},{w:'cloudy', d:'多云的'},{w:'windy', d:'有风的'},{w:'rainy', d:'下雨的'},{w:'snowy', d:'下雪的'},
+    {w:'warm', d:'温暖的'},{w:'cool', d:'凉爽的'},{w:'shirt', d:'衬衫'},{w:'pants', d:'裤子'},{w:'shoes', d:'鞋子'},
+    {w:'socks', d:'袜子'},{w:'dress', d:'连衣裙'},{w:'skirt', d:'短裙'},{w:'hat', d:'帽子'},{w:'coat', d:'外套'},
+    {w:'sweater', d:'毛衣'},{w:'bedroom', d:'卧室'},{w:'bathroom', d:'浴室'},{w:'kitchen', d:'厨房'},{w:'living room', d:'客厅'},
+    {w:'study', d:'书房'},{w:'bed', d:'床'},{w:'table', d:'桌子'},{w:'sofa', d:'沙发'},{w:'phone', d:'电话'},
+    {w:'TV', d:'电视'},{w:'morning', d:'早上'},{w:'afternoon', d:'下午'},{w:'evening', d:'晚上'},{w:'night', d:'夜晚'},
+    {w:'today', d:'今天'},{w:'clean', d:'干净的'},{w:'dirty', d:'脏的'},{w:'beautiful', d:'美丽的'},{w:'young', d:'年轻的'},
+    {w:'strong', d:'强壮的'},{w:'fast', d:'快的'},{w:'slow', d:'慢的'},{w:'in', d:'在……里面'},{w:'on', d:'在……上面'},
+    {w:'under', d:'在……下面'},{w:'near', d:'在……附近'},{w:'behind', d:'在……后面'},{w:'between', d:'在……之间'},
+    {w:'beside', d:'在……旁边'},{w:'garden', d:'花园'},{w:'playground', d:'操场'},{w:'library', d:'图书馆'},
+    {w:'teacher\'s office', d:'办公室'},{w:'first', d:'第一'},{w:'second', d:'第二'},{w:'third', d:'第三'},
+    {w:'gloves', d:'手套'},{w:'scarf', d:'围巾'},{w:'umbrella', d:'雨伞'},
+  ],
+  5: [
+    {w:'get up', d:'起床'},{w:'go to school', d:'上学'},{w:'go home', d:'回家'},{w:'go to bed', d:'睡觉'},
+    {w:'have breakfast', d:'吃早餐'},{w:'have lunch', d:'吃午饭'},{w:'have dinner', d:'吃晚饭'},{w:'do homework', d:'做作业'},
+    {w:'watch TV', d:'看电视'},{w:'read books', d:'读书'},{w:'Monday', d:'星期一'},{w:'Tuesday', d:'星期二'},
+    {w:'Wednesday', d:'星期三'},{w:'Thursday', d:'星期四'},{w:'Friday', d:'星期五'},{w:'Saturday', d:'星期六'},
+    {w:'Sunday', d:'星期天'},{w:'sing', d:'唱歌'},{w:'dance', d:'跳舞'},{w:'draw', d:'画画'},{w:'swim', d:'游泳'},
+    {w:'skate', d:'滑冰'},{w:'cook', d:'做饭'},{w:'play basketball', d:'打篮球'},{w:'play football', d:'踢足球'},
+    {w:'play ping-pong', d:'打乒乓球'},{w:'flower', d:'花'},{w:'grass', d:'草'},{w:'tree', d:'树'},{w:'river', d:'河流'},
+    {w:'lake', d:'湖'},{w:'mountain', d:'山'},{w:'forest', d:'森林'},{w:'sky', d:'天空'},{w:'cloud', d:'云'},
+    {w:'rain', d:'雨'},{w:'snow', d:'雪'},{w:'sun', d:'太阳'},{w:'moon', d:'月亮'},{w:'star', d:'星星'},
+    {w:'teacher', d:'老师'},{w:'doctor', d:'医生'},{w:'nurse', d:'护士'},{w:'driver', d:'司机'},{w:'farmer', d:'农民'},
+    {w:'cook', d:'厨师'},{w:'policeman', d:'警察'},{w:'worker', d:'工人'},{w:'student', d:'学生'},
+    {w:'beef', d:'牛肉'},{w:'chicken', d:'鸡肉'},{w:'noodles', d:'面条'},{w:'tomato', d:'西红柿'},{w:'potato', d:'土豆'},
+    {w:'salad', d:'沙拉'},{w:'sandwich', d:'三明治'},{w:'hamburger', d:'汉堡'},{w:'ice cream', d:'冰淇淋'},
+    {w:'tea', d:'茶'},{w:'coffee', d:'咖啡'},{w:'clean', d:'打扫'},{w:'wash', d:'洗'},{w:'help', d:'帮助'},
+    {w:'carry', d:'搬运'},{w:'show', d:'展示'},{w:'give', d:'给'},{w:'learn', d:'学习'},{w:'teach', d:'教'},
+    {w:'use', d:'使用'},{w:'clever', d:'聪明的'},{w:'kind', d:'善良的'},{w:'hard-working', d:'勤奋的'},
+    {w:'shy', d:'害羞的'},{w:'helpful', d:'乐于助人的'},
+  ],
+  6: [
+    {w:'hospital', d:'医院'},{w:'cinema', d:'电影院'},{w:'post office', d:'邮局'},{w:'bookstore', d:'书店'},
+    {w:'museum', d:'博物馆'},{w:'park', d:'公园'},{w:'zoo', d:'动物园'},{w:'supermarket', d:'超市'},{w:'gym', d:'体育馆'},
+    {w:'bus', d:'公共汽车'},{w:'train', d:'火车'},{w:'plane', d:'飞机'},{w:'ship', d:'轮船'},{w:'bike', d:'自行车'},
+    {w:'taxi', d:'出租车'},{w:'subway', d:'地铁'},{w:'happy', d:'高兴的'},{w:'sad', d:'难过的'},{w:'angry', d:'生气的'},
+    {w:'tired', d:'累的'},{w:'hungry', d:'饿的'},{w:'thirsty', d:'渴的'},{w:'excited', d:'兴奋的'},{w:'bored', d:'无聊的'},
+    {w:'scared', d:'害怕的'},{w:'worried', d:'担心的'},{w:'proud', d:'自豪的'},{w:'bigger', d:'更大的'},
+    {w:'smaller', d:'更小的'},{w:'taller', d:'更高的'},{w:'shorter', d:'更矮的'},{w:'longer', d:'更长的'},
+    {w:'faster', d:'更快的'},{w:'higher', d:'更高的'},{w:'stronger', d:'更强壮的'},{w:'left', d:'左'},{w:'right', d:'右'},
+    {w:'straight', d:'直走'},{w:'north', d:'北'},{w:'south', d:'南'},{w:'east', d:'东'},{w:'west', d:'西'},
+    {w:'crossing', d:'十字路口'},{w:'climb mountains', d:'爬山'},{w:'go hiking', d:'远足'},{w:'fly kites', d:'放风筝'},
+    {w:'have a picnic', d:'野餐'},{w:'take pictures', d:'拍照'},{w:'play chess', d:'下棋'},{w:'do kung fu', d:'练功夫'},
+    {w:'went', d:'去（过去式）'},{w:'had', d:'有（过去式）'},{w:'saw', d:'看见（过去式）'},{w:'ate', d:'吃（过去式）'},
+    {w:'took', d:'拿（过去式）'},{w:'bought', d:'买（过去式）'},{w:'read', d:'读（过去式）'},
+    {w:'scientist', d:'科学家'},{w:'coach', d:'教练'},{w:'secretary', d:'秘书'},{w:'university', d:'大学'},
+    {w:'factory', d:'工厂'},{w:'fisherman', d:'渔民'},{w:'head teacher', d:'校长'},{w:'businessman', d:'商人'},
+    {w:'better', d:'更好的'},{w:'more', d:'更多的'},{w:'bad', d:'坏的'},{w:'ill', d:'生病的'},
+    {w:'wear', d:'穿'},{w:'remember', d:'记住'},{w:'forget', d:'忘记'},{w:'believe', d:'相信'},
+    {w:'different', d:'不同的'},{w:'important', d:'重要的'},{w:'popular', d:'流行的'},{w:'dangerous', d:'危险的'},
+    {w:'easy', d:'容易的'},{w:'difficult', d:'困难的'},
+  ]
+};
+
+// ═══════════════════════════════════
+//  配置
+// ═══════════════════════════════════
+const RANKS = [
+  { id:'bronze', name:'青铜小将', icon:'🥉', color:'#cd7f32', stages:2, passCount:3, lives:3 },
+  { id:'silver', name:'白银小将', icon:'🥈', color:'#bdc3c7', stages:2, passCount:3, lives:3 },
+  { id:'gold',   name:'黄金小将', icon:'🥇', color:'#f1c40f', stages:2, passCount:4, lives:3 },
+  { id:'diamond', name:'钻石小将', icon:'💎', color:'#a29bfe', stages:3, passCount:4, lives:3 },
+  { id:'king',   name:'单词王',   icon:'👑', color:'#e17055', stages:0, passCount:0, lives:0 }
+];
+
+const MONSTERS = {
+  bronze:  [{n:'泥巴怪',i:'🟤'},{n:'果冻怪',i:'🟣'},{n:'云朵怪',i:'☁️'}],
+  silver:  [{n:'仙人掌',i:'🌵'},{n:'小蘑菇',i:'🍄'},{n:'雪花怪',i:'❄️'}],
+  gold:    [{n:'纸箱怪',i:'📦'},{n:'枕头怪',i:'🛏️'},{n:'毛球怪',i:'🧶'}],
+  diamond: [{n:'小幽灵',i:'👻'},{n:'木乃伊',i:'🧻'},{n:'小恶魔',i:'👺'}],
+  king:    [{n:'石头巨人',i:'🗿'},{n:'冰霜巨人',i:'🧊'},{n:'暗影领主',i:'🌑'}],
+};
+
+const QS = 5;
+const TIME_LIMIT = 15;
+const MAX_RANK = RANKS.length - 2;
+const SAVE_KEY = 'word_adventure_save';
+
+// ═══════════════════════════════════
+//  游戏状态
+// ═══════════════════════════════════
+function defaultState(){
+  return {
+    grade: 0, rankIdx: 0, stage: 0, lives: 3, qi: 0, correct: 0, wrong: 0,
+    totalCorrect: 0, totalWrong: 0, streak: 0, maxStreak: 0,
+    answered: false, gameOver: false, usedWords: {},
+    chests: 0, points: 0
+  };
+}
+
+let S = loadState() || defaultState();
+let questions = [];
+let timer = null, timeLeft = TIME_LIMIT;
+
+function saveState(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){}
+}
+function loadState(){
+  try{
+    const r = localStorage.getItem(SAVE_KEY);
+    if(!r) return null;
+    const s = JSON.parse(r);
+    if(typeof s.usedWords === 'undefined') s.usedWords = {};
+    if(typeof s.chests === 'undefined') s.chests = 0;
+    if(typeof s.points === 'undefined') s.points = 0;
+    if(typeof s.grade === 'undefined') s.grade = 0;
+    return s;
+  }catch(e){ return null; }
+}
+function clearState(){ localStorage.removeItem(SAVE_KEY); }
+
+function getVocab(){
+  return GRADE_WORDS[S.grade] || [];
+}
+
+function pickQuestions(){
+  const rank = RANKS[S.rankIdx];
+  const pool = getVocab();
+  if(!pool || pool.length < QS) return [];
+  let avail = pool.filter((_, i) => !S.usedWords[rank.id + '_' + i]);
+  if(avail.length < QS){
+    Object.keys(S.usedWords).forEach(k => { if(k.startsWith(rank.id + '_')) delete S.usedWords[k]; });
+    avail = pool;
+  }
+  const shuffled = [...avail].sort(() => Math.random() - 0.5);
+  const selected = shuffled.slice(0, QS);
+  selected.forEach(item => {
+    const idx = pool.indexOf(item);
+    if(idx >= 0) S.usedWords[rank.id + '_' + idx] = true;
+  });
+  return selected.map(item => {
+    const others = pool.filter(w => w.w !== item.w);
+    const wrongs = [...others].sort(() => Math.random() - 0.5).slice(0, 3).map(w => w.d);
+    const opts = [item.d, ...wrongs].sort(() => Math.random() - 0.5);
+    return { word: item.w, options: opts, correctIdx: opts.indexOf(item.d) };
+  });
+}
+
+// ═══════════════════════════════════
+//  音效
+// ═══════════════════════════════════
+let ac = null;
+function tone(f, d, t = 'sine'){
+  try{
+    if(!ac) ac = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = t; o.frequency.value = f; g.gain.value = 0.08;
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + d);
+    o.connect(g); g.connect(ac.destination); o.start(); o.stop(ac.currentTime + d);
+  }catch(e){}
+}
+function sfxOk(){ tone(880, 0.12); setTimeout(() => tone(1100, 0.15), 80); }
+function sfxBad(){ tone(300, 0.2, 'sawtooth'); }
+function sfxPass(){ tone(660, 0.1); setTimeout(() => tone(880, 0.1), 100); setTimeout(() => tone(1100, 0.2), 200); }
+function sfxDrop(){ tone(400, 0.15); setTimeout(() => tone(300, 0.25), 120); }
+function sfxChest(){ tone(523, 0.1); setTimeout(() => tone(659, 0.1), 100); setTimeout(() => tone(784, 0.15), 200); setTimeout(() => tone(1047, 0.25), 300); }
+
+const $ = id => document.getElementById(id);
+
+// ═══════════════════════════════════
+//  渲染
+// ═══════════════════════════════════
+function render(){
+  S.answered = false;
+  if(S.gameOver || S.rankIdx >= RANKS.length - 1) return showMax();
+  const rank = RANKS[S.rankIdx];
+  if(S.stage >= rank.stages){
+    S.rankIdx++; S.stage = 0; S.lives = (RANKS[S.rankIdx] || {}).lives || 3;
+    S.qi = 0; S.correct = 0; S.wrong = 0; S.answered = false; questions = [];
+    saveState();
+    if(S.rankIdx >= RANKS.length - 1) return showMax();
+    return render();
+  }
+  if(S.lives <= 0) return showDemo();
+  if(questions.length === 0) questions = pickQuestions();
+  showGame();
+  renderLadderTower();
+  updateHUD();
+  renderQ();
+  startTimer();
+}
+
+function showGame(){
+  $('homeScreen').classList.add('hidden');
+  $('quizScreen').classList.remove('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.add('hidden');
+  $('demotionScreen').classList.add('hidden');
+  $('maxRankScreen').classList.add('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('hpRow').classList.remove('hidden');
+  $('timerWrap').classList.remove('hidden');
+  $('progressWrap').classList.remove('hidden');
+  $('ladderTower').classList.remove('hidden');
+}
+
+function renderLadderTower(){
+  const row = $('ltRow'); row.innerHTML = '';
+  RANKS.forEach((r, i) => {
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    const op = i < S.rankIdx ? 0.6 : i === S.rankIdx ? 1 : 0.12;
+    let extra = i === S.rankIdx ? 'transform:scale(1.05);box-shadow:0 0 8px rgba(0,0,0,.1);' : '';
+    seg.style.cssText = 'background:' + r.color + ';opacity:' + op + ';' + extra;
+    row.appendChild(seg);
+  });
+  const total = RANKS.slice(0, -1).reduce((a, b) => a + b.stages, 0);
+  const cur = RANKS.slice(0, S.rankIdx).reduce((a, b) => a + b.stages, 0) + S.stage + 1;
+  $('ltLabel').textContent = '第 ' + cur + '/' + total + ' 关';
+}
+
+function updateHUD(){
+  const r = RANKS[S.rankIdx];
+  $('rankIcon').textContent = r.icon;
+  $('rankName').textContent = r.name;
+  $('rankLvl').textContent = 'Lv.' + (S.rankIdx + 1);
+  $('pointsDisplay').textContent = S.points;
+  const total = RANKS.slice(0, -1).reduce((a, b) => a + b.stages, 0);
+  const cur = RANKS.slice(0, S.rankIdx).reduce((a, b) => a + b.stages, 0) + S.stage + 1;
+  $('stageNum').textContent = '第 ' + cur + ' 关';
+  $('stageSep').style.display = '';
+  $('totalStages').textContent = total;
+  $('hpContainer').innerHTML = '';
+  for(let i = 0; i < r.lives; i++){
+    const e = document.createElement('span');
+    e.className = 'heart' + (i >= S.lives ? ' lost' : '');
+    e.textContent = '❤️';
+    $('hpContainer').appendChild(e);
+  }
+  const comboEl = $('comboDisplay');
+  if(S.streak >= 2){
+    comboEl.classList.add('active');
+    comboEl.innerHTML = '🔥 ' + S.streak + 'x';
+  } else {
+    comboEl.classList.remove('active');
+  }
+  const pct = S.qi > 0 ? (S.qi / QS) * 100 : 0;
+  $('progressFill').style.width = Math.min(pct, 100) + '%';
+  $('progressLabel').textContent = '第 ' + Math.min(S.qi + 1, QS) + ' / ' + QS + ' 题';
+  $('progressCorrect').textContent = '✅ ' + S.correct;
+}
+
+function getMonster(){
+  const rank = RANKS[S.rankIdx];
+  const pool = MONSTERS[rank.id];
+  if(!pool || pool.length === 0) return { n: '???', i: '👾' };
+  return pool[S.stage % pool.length];
+}
+
+function renderQ(){
+  const q = questions[S.qi];
+  if(!q) return;
+  $('currentWord').textContent = q.word;
+  $('particles').innerHTML = '';
+  const mon = getMonster();
+  $('monsterIcon').textContent = mon.i;
+  $('monsterName').textContent = mon.n;
+  updateMonsterHP();
+  // 朗读单词
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(q.word);
+    u.lang = 'en-US'; u.rate = 0.8; u.pitch = 1.1;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+  $('questionCard').style.animation = 'none';
+  void $('questionCard').offsetHeight;
+  $('questionCard').style.animation = 'fadeUp .35s ease';
+  const c = $('choicesContainer'); c.innerHTML = '';
+  const lbs = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'choice-btn';
+    b.innerHTML = '<span class="tag">' + lbs[i] + '</span>' + opt;
+    b.dataset.idx = i;
+    b.addEventListener('click', () => handleChoice(i));
+    c.appendChild(b);
+  });
+}
+
+function updateMonsterHP(){
+  const rank = RANKS[S.rankIdx];
+  const maxHp = rank.passCount;
+  const curHp = Math.max(0, maxHp - S.correct);
+  const pct = (curHp / maxHp) * 100;
+  const fill = $('monsterHpFill');
+  fill.style.width = pct + '%';
+  fill.className = 'fill' + (pct > 60 ? ' safe' : pct > 30 ? ' warning' : '');
+  $('monsterHpLabel').textContent = curHp + '/' + maxHp;
+  $('battleLives').textContent = S.lives;
+}
+
+function startTimer(){
+  stopTimer();
+  timeLeft = TIME_LIMIT;
+  updateTimerBar();
+  timer = setInterval(() => {
+    timeLeft--;
+    updateTimerBar();
+    if(timeLeft <= 0){
+      stopTimer();
+      if(!S.answered) handleChoice(-1);
+    }
+  }, 1000);
+}
+function stopTimer(){ if(timer){ clearInterval(timer); timer = null; } }
+function updateTimerBar(){
+  const pct = (timeLeft / TIME_LIMIT) * 100;
+  const fill = $('timerFill');
+  fill.style.width = pct + '%';
+  fill.className = 'fill';
+  if(timeLeft <= 3) fill.classList.add('danger');
+  else if(timeLeft <= 5) fill.classList.add('warning');
+}
+
+function spawnParticles(cx, cy, color){
+  const box = $('particles');
+  for(let i = 0; i < 12; i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const angle = Math.random() * 360;
+    const dist = 40 + Math.random() * 60;
+    p.style.cssText = '--tx:' + Math.cos(angle) * dist + 'px;--ty:' + Math.sin(angle) * dist + 'px;background:' + color + ';left:' + cx + 'px;top:' + cy + 'px';
+    box.appendChild(p);
+    setTimeout(() => p.remove(), 600);
+  }
+}
+
+function floatScore(x, y, text, bonus){
+  const el = document.createElement('div');
+  el.className = 'float-score' + (bonus ? ' bonus' : '');
+  el.textContent = text;
+  el.style.cssText = 'left:' + x + 'px;top:' + y + 'px';
+  $('questionCard').appendChild(el);
+  setTimeout(() => el.remove(), 800);
+}
+
+function handleChoice(idx){
+  if(S.answered) return;
+  S.answered = true;
+  stopTimer();
+  const q = questions[S.qi];
+  const btns = $('choicesContainer').querySelectorAll('.choice-btn');
+  const isCorrect = idx >= 0 && idx === q.correctIdx;
+  btns.forEach((b, i) => {
+    b.classList.add('disabled');
+    if(i === q.correctIdx) b.classList.add('correct');
+    if(i === idx && !isCorrect) b.classList.add('wrong');
+  });
+  if(isCorrect){
+    const speedBonus = Math.round((timeLeft / TIME_LIMIT) * 40);
+    const comboBonus = Math.min(S.streak, 8) * 5;
+    const totalBonus = speedBonus + comboBonus;
+    S.points += totalBonus;
+    S.correct++; S.totalCorrect++; S.streak++;
+    if(S.streak > S.maxStreak) S.maxStreak = S.streak;
+    sfxOk();
+    const mi = $('monsterIcon');
+    mi.className = 'monster hit';
+    const dmg = document.createElement('div');
+    dmg.className = 'dmg-num';
+    dmg.textContent = '-1';
+    dmg.style.cssText = 'left:30px;top:10px';
+    $('battleArea').appendChild(dmg);
+    setTimeout(() => dmg.remove(), 600);
+    updateMonsterHP();
+    const card = $('questionCard').getBoundingClientRect();
+    spawnParticles(card.width / 2, card.height / 2, '#4ecdc4');
+    floatScore(card.width / 2 - 20, card.height / 2 - 30, '+' + totalBonus, true);
+    if(S.streak >= 2){
+      floatScore(card.width / 2 - 30, card.height / 2 - 60, '🔥 ' + S.streak + '连击!', true);
+    }
+  } else {
+    S.wrong++; S.totalWrong++; S.lives--; S.streak = 0;
+    sfxBad();
+    const mi = $('monsterIcon');
+    mi.className = 'monster atk';
+    const dmg = document.createElement('div');
+    dmg.className = 'dmg-num taken';
+    dmg.textContent = '-❤️';
+    dmg.style.cssText = 'right:10px;top:10px';
+    $('battleArea').appendChild(dmg);
+    setTimeout(() => dmg.remove(), 600);
+    updateMonsterHP();
+    if(idx < 0) btns.forEach(b => b.classList.add('disabled'));
+  }
+  saveState();
+  updateHUD();
+  setTimeout(() => {
+    S.qi++;
+    if(S.lives <= 0){ questions = []; render(); return; }
+    if(S.qi >= QS){
+      const rank = RANKS[S.rankIdx];
+      const passed = S.correct >= rank.passCount;
+      if(passed){ setTimeout(showPass, 300); }
+      else {
+        S.qi = 0; S.correct = 0; S.wrong = 0; S.answered = false; questions = [];
+        saveState(); render();
+      }
+      return;
+    }
+    S.answered = false;
+    saveState();
+    renderQ();
+    startTimer();
+    updateHUD();
+  }, isCorrect ? 600 : 1000);
+}
+
+function showPass(){
+  sfxPass();
+  const rank = RANKS[S.rankIdx];
+  const isLast = S.stage + 1 >= rank.stages;
+  const nextIdx = S.rankIdx + 1;
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.remove('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  if(isLast && nextIdx < RANKS.length - 1){
+    const nr = RANKS[nextIdx];
+    $('resultIcon').textContent = '🎉';
+    $('resultTitle').textContent = '晋升 ' + nr.name + '！';
+    $('resultSub').textContent = rank.name + '通关，进入' + nr.name;
+  } else if(isLast && nextIdx >= RANKS.length - 1){
+    $('resultIcon').textContent = '👑';
+    $('resultTitle').textContent = '恭喜通关！';
+    $('resultSub').textContent = '即将成为单词王';
+  } else {
+    $('resultIcon').textContent = '🎯';
+    $('resultTitle').textContent = '过关！';
+    $('resultSub').textContent = '进入下一关';
+  }
+  document.querySelector('.score-label').textContent = '总正确数';
+  $('resultScore').textContent = S.totalCorrect;
+  $('statCorrect').textContent = S.correct;
+  $('statWrong').textContent = S.wrong;
+  $('statStreak').textContent = S.maxStreak;
+  $('nextBtn').onclick = () => {
+    S.stage++; S.qi = 0; S.correct = 0; S.wrong = 0; S.answered = false; questions = [];
+    S.lives = RANKS[S.rankIdx].lives;
+    if(isLast && nextIdx < RANKS.length - 1){
+      S.rankIdx = nextIdx;
+      showChest();
+      return;
+    }
+    if(isLast && nextIdx >= RANKS.length - 1){ S.gameOver = true; saveState(); render(); return; }
+    saveState(); render();
+  };
+  $('resultHomeBtn').onclick = goHome;
+}
+
+function showChest(){
+  sfxChest();
+  const bonus = 15 + S.rankIdx * 8;
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.remove('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('chestTitle').textContent = RANKS[S.rankIdx].name + '通关奖励';
+  const icon = $('chestIcon');
+  icon.textContent = '🎁';
+  icon.className = 'chest-icon';
+  $('chestReward').textContent = '+' + bonus;
+  $('chestSub').textContent = '⭐ 积分奖励已到账';
+  $('chestBtn').onclick = () => {
+    icon.textContent = '💎';
+    icon.classList.add('opened');
+    S.points += bonus;
+    S.chests++;
+    saveState();
+    $('chestBtn').textContent = '继续闯关';
+    $('chestReward').textContent = '已领取！';
+    $('chestBtn').onclick = () => { render(); };
+  };
+}
+
+function showDemo(){
+  sfxDrop();
+  const prev = Math.max(0, S.rankIdx - 1);
+  const pr = RANKS[prev];
+  $('quizScreen').classList.add('hidden');
+  $('demotionScreen').classList.remove('hidden');
+  $('gameHeader').classList.remove('hidden');
+  $('ladderTower').classList.add('hidden');
+  $('demotionText').textContent = '回到 ' + (prev >= 0 ? pr.name : '青铜小将');
+  $('demotionIcon').textContent = pr.icon;
+  $('demotionName').textContent = pr.name;
+  $('demotionBtn').onclick = () => {
+    S.rankIdx = prev; S.stage = 0; S.lives = RANKS[prev].lives;
+    S.qi = 0; S.correct = 0; S.wrong = 0; S.answered = false; questions = [];
+    saveState(); render();
+  };
+  $('demotionHomeBtn').onclick = goHome;
+}
+
+function showMax(){
+  $('homeScreen').classList.add('hidden');
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.add('hidden');
+  $('demotionScreen').classList.add('hidden');
+  $('maxRankScreen').classList.remove('hidden');
+  $('gameHeader').classList.add('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('maxCorrect').textContent = S.totalCorrect;
+  $('maxWrong').textContent = S.totalWrong;
+  $('maxStreak').textContent = S.maxStreak;
+  $('maxGradeLabel').textContent = '三年级到六年级全部通关！🎉';
+  $('maxReplayBtn').onclick = () => { resetGame(); goHome(); };
+  $('maxHomeBtn').onclick = goHome;
+}
+
+function goHome(){
+  S.answered = false; questions = [];
+  $('homeScreen').classList.remove('hidden');
+  $('quizScreen').classList.add('hidden');
+  $('resultScreen').classList.add('hidden');
+  $('chestScreen').classList.add('hidden');
+  $('demotionScreen').classList.add('hidden');
+  $('maxRankScreen').classList.add('hidden');
+  $('shopScreen') && $('shopScreen').classList.add('hidden');
+  $('gameHeader').classList.add('hidden');
+  $('hpRow').classList.add('hidden');
+  $('timerWrap').classList.add('hidden');
+  $('progressWrap').classList.add('hidden');
+  $('homePoints').textContent = S.points;
+  renderTower();
+  updateGradeUI();
+  saveState();
+}
+
+function resetGame(){
+  clearState();
+  S = defaultState();
+  questions = [];
+}
+
+// ═══════════════════════════════════
+//  年级选择相关
+// ═══════════════════════════════════
+const GRADE_LABELS = { 3: '三年级', 4: '四年级', 5: '五年级', 6: '六年级' };
+
+document.querySelectorAll('.grade-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const grade = parseInt(btn.dataset.grade);
+    if(S.grade === grade) return;
+    // 如果切换年级，重置进度但保留积分
+    const oldPoints = S.points;
+    const oldChests = S.chests;
+    clearState();
+    S = defaultState();
+    S.points = oldPoints;
+    S.chests = oldChests;
+    S.grade = grade;
+    saveState();
+    // 标记选中
+    document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateGradeUI();
+    goHome();
+  });
+});
+
+function updateGradeUI(){
+  if(S.grade > 0){
+    $('startArea').classList.remove('hidden');
+    $('currentGradeLabel').textContent = GRADE_LABELS[S.grade] || ('Grade ' + S.grade);
+    document.querySelectorAll('.grade-btn').forEach(b => {
+      if(parseInt(b.dataset.grade) === S.grade) b.classList.add('active');
+      else b.classList.remove('active');
+    });
+    renderTower();
+  } else {
+    $('startArea').classList.add('hidden');
+  }
+}
+
+$('changeGradeBtn').addEventListener('click', () => {
+  // 如果已有进度，确认切换
+  if(S.totalCorrect > 0 && !confirm('切换年级将重置当前闯关进度，积分保留。确定切换？')) return;
+  S.grade = 0;
+  clearState();
+  S = defaultState();
+  document.querySelectorAll('.grade-btn').forEach(b => b.classList.remove('active'));
+  goHome();
+});
+
+$('startBtn').addEventListener('click', () => {
+  if(!S.grade) return alert('请先选择年级！');
+  S.rankIdx = 0; S.stage = 0; S.lives = RANKS[0].lives;
+  S.qi = 0; S.correct = 0; S.wrong = 0; S.answered = false; S.gameOver = false;
+  questions = [];
+  saveState();
+  render();
+});
+
+$('resetBtn').addEventListener('click', () => {
+  if(!confirm('确定重置当前年级的所有闯关进度？（积分保留）')) return;
+  const g = S.grade;
+  const p = S.points;
+  const c = S.chests;
+  clearState();
+  S = defaultState();
+  S.grade = g; S.points = p; S.chests = c;
+  saveState();
+  goHome();
+});
+
+// ═══════════════════════════════════
+//  塔楼显示
+// ═══════════════════════════════════
+function renderTower(){
+  const el = $('towerDisplay'); el.innerHTML = '';
+  const towerRanks = [...RANKS].reverse();
+  towerRanks.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.className = 'f';
+    const globalIdx = RANKS.length - 1 - i;
+    if(globalIdx < S.rankIdx) div.classList.add('reached');
+    else if(globalIdx === S.rankIdx) div.classList.add('current');
+    if(globalIdx < S.rankIdx){
+      div.style.cursor = 'pointer';
+      div.title = '点击重玩此段位';
+      div.onclick = () => replayRank(globalIdx);
+    }
+    div.style.background = r.color;
+    div.style.width = (220 - i * 20) + 'px';
+    let label = r.icon + ' ' + r.name;
+    if(globalIdx < S.rankIdx) label += ' ✅';
+    div.textContent = label;
+    el.appendChild(div);
+  });
+}
+
+function replayRank(idx){
+  const rank = RANKS[idx];
+  if(!confirm('重新挑战「' + rank.name + '」段位？\n（当前更高段位的进度将重置，积分保留）')) return;
+  S.rankIdx = idx; S.stage = 0; S.qi = 0; S.correct = 0; S.wrong = 0;
+  S.streak = 0; S.maxStreak = 0; S.answered = false; S.gameOver = false; questions = []; S.usedWords = {};
+  S.lives = RANKS[idx].lives;
+  saveState();
+  render();
+}
+
+// ═══════════════════════════════════
+//  初始化
+// ═══════════════════════════════════
+function initHome(){
+  if(!loadState()) return;
+  $('homePoints').textContent = S.points;
+  if(S.grade && (S.rankIdx > 0 || S.totalCorrect > 0)){
+    const r = RANKS[S.rankIdx];
+    const featDiv = document.querySelector('.features');
+    if(featDiv && !document.querySelector('.save-info')){
+      const info = document.createElement('div');
+      info.className = 'feat save-info';
+      info.style.cssText = 'border:1px solid rgba(0,0,0,.06);margin-top:4px';
+      info.innerHTML = '<span>📊</span><span>' + (GRADE_LABELS[S.grade] || '') + ' · ' + r.icon + ' ' + r.name + ' · 累计答对 ' + S.totalCorrect + ' 题</span>';
+      featDiv.appendChild(info);
+    }
+  }
+  updateGradeUI();
+  renderTower();
+}
+
+$('resultHomeBtn').onclick = goHome;
+$('demotionHomeBtn').onclick = goHome;
+$('maxHomeBtn').onclick = goHome;
+
+initHome();
+</script>
+</body>
+</html>
