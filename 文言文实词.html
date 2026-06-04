@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>文言文实词闯关 · 思贤学习站</title>
+<style>
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}
+.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr:not(.active){display:none}
+#mapScr.active{display:flex;flex-direction:column;align-items:center}
+#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#b8860b33}
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:12px 0 20px;width:100%}
+.q-prompt .q-tag{font-size:11px;color:var(--accent);background:#b8860b15;padding:2px 10px;border-radius:10px;display:inline-block;margin-bottom:8px}
+.q-prompt .q-word{font-size:44px;font-weight:700;color:var(--text);line-height:1.3;letter-spacing:4px}
+.q-prompt .q-sent{font-size:16px;color:var(--text2);line-height:1.6;margin-top:8px;padding:10px;background:var(--bg2);border-radius:8px;border:1px solid var(--border)}
+.q-prompt .q-sent .hl{color:var(--accent);font-weight:700}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:16px;cursor:pointer;transition:.1s;box-shadow:var(--shadow)}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+@media(max-width:420px){.q-word{font-size:36px!important}.q-sent{font-size:14px!important}.opt{font-size:14px;padding:10px 6px}}
+</style>
+</head>
+<body>
+<div id="mapScr" class="active">
+  <h1>文言文实词闯关</h1>
+  <p class="sub">高考120文言实词 · 释义配对</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+<script>
+const CI = [
+  {w:'爱',s:'爱其子，择师而教之',m:'疼爱'},{w:'爱',s:'齐国虽褊小，吾何爱一牛',m:'吝惜'},{w:'爱',s:'爱而不见，搔首踟蹰',m:'通"薆"，隐藏'},
+  {w:'安',s:'燕雀安知鸿鹄之志哉',m:'怎么'},{w:'安',s:'项王曰："沛公安在？"',m:'哪里'},{w:'安',s:'思国之安者，必积其德义',m:'安稳，安定'},
+  {w:'被',s:'屈原至于江滨，被发行吟泽畔',m:'通"披"，披散'},{w:'被',s:'将军身被坚执锐',m:'通"披"，穿'},{w:'被',s:'泽被天下',m:'覆盖'},
+  {w:'倍',s:'愿伯具言臣之不敢倍德也',m:'通"背"，违背'},{w:'倍',s:'每逢佳节倍思亲',m:'更加'},{w:'倍',s:'其实百倍',m:'倍数'},
+  {w:'本',s:'本无可采',m:'本来'},{w:'本',s:'人穷则反本',m:'根本'},{w:'本',s:'今其本乃在',m:'版本，稿本'},
+  {w:'比',s:'比及三年，可使足民',m:'等到'},{w:'比',s:'其两膝相比者',m:'靠近'},{w:'比',s:'比吾乡邻之死则已后矣',m:'比起'},
+  {w:'兵',s:'收天下之兵',m:'兵器'},{w:'兵',s:'赵兵果败',m:'士兵'},{w:'兵',s:'兵旱相乘',m:'战争，军事'},
+  {w:'病',s:'君之病在肠胃',m:'疾病'},{w:'病',s:'向吾不为斯役，则久已病矣',m:'困苦'},{w:'病',s:'君子病无能焉',m:'担心，忧虑'},
+  {w:'察',s:'明察秋毫',m:'看清'},{w:'察',s:'察邻国之政',m:'考察'},{w:'察',s:'前太守臣逵察臣孝廉',m:'考察后举荐'},
+  {w:'朝',s:'朝服衣冠',m:'早晨'},{w:'朝',s:'序八州而朝同列',m:'使…朝见'},{w:'朝',s:'两朝开济老臣心',m:'朝代'},
+  {w:'曾',s:'曾不能毁山之一毛',m:'竟然'},{w:'曾',s:'曾益其所不能',m:'通"增"，增加'},{w:'曾',s:'高曾之时',m:'与自己隔两代的亲属'},
+  {w:'乘',s:'因利乘便，宰割天下',m:'趁着'},{w:'乘',s:'乘彼垝垣，以望复关',m:'登上'},{w:'乘',s:'以乘韦先，牛十二犒师',m:'四（辆）'},
+  {w:'诚',s:'帝感其诚',m:'真诚'},{w:'诚',s:'臣诚知不如徐公美',m:'确实'},{w:'诚',s:'楚诚能绝齐',m:'如果，果真'},
+  {w:'除',s:'予除右丞相兼枢密使',m:'授予官职'},{w:'除',s:'爆竹声中一岁除',m:'逝去'},{w:'除',s:'即除逆贼',m:'清除，铲除'},
+  {w:'辞',s:'旦辞爷娘去',m:'告别'},{w:'辞',s:'其辞微',m:'言辞，文辞'},{w:'辞',s:'秦王恐其破璧，乃辞谢',m:'推辞，辞谢'},
+  {w:'从',s:'沛公从百余骑',m:'使…跟从'},{w:'从',s:'惑而不从师',m:'跟从，跟随'},{w:'从',s:'于是从散约败',m:'合纵'},
+  {w:'殆',s:'且燕赵处秦革灭殆尽之际',m:'几乎，近乎'},{w:'殆',s:'思而不学则殆',m:'通"怠"，懈怠'},{w:'殆',s:'殆有甚焉',m:'大概，恐怕'},
+  {w:'当',s:'当奖率三军',m:'应当'},{w:'当',s:'木兰当户织',m:'对着'},{w:'当',s:'一夫当关，万夫莫开',m:'把守'},
+  {w:'道',s:'师者，所以传道受业解惑也',m:'道理'},{w:'道',s:'何可胜道也哉',m:'说，讲'},{w:'道',s:'从郦山下，道芷阳间行',m:'取道'},
+  {w:'得',s:'既得志，则纵情以傲物',m:'实现'},{w:'得',s:'积善成德，而神明自得',m:'获得'},{w:'得',s:'犹得备晨炊',m:'能够，可以'},
+  {w:'度',s:'试使山东之国与陈涉度长絜大',m:'衡量'},{w:'度',s:'度我至军中，公乃入',m:'推测'},{w:'度',s:'崔九堂前几度闻',m:'次'},
+  {w:'故',s:'既克，公问其故',m:'原因'},{w:'故',s:'温故而知新',m:'旧的'},{w:'故',s:'故遣将守关者',m:'特意'},
+  {w:'固',s:'秦孝公据崤函之固',m:'险要'},{w:'固',s:'汝心之固，固不可彻',m:'顽固'},{w:'固',s:'固国不以山溪之险',m:'巩固，安定'},
+  {w:'顾',s:'大行不顾细谨',m:'顾及'},{w:'顾',s:'顾吾念之',m:'只是，不过'},{w:'顾',s:'顾野有麦场',m:'看'},
+  {w:'归',s:'众士慕仰，若水之归海',m:'归向'},{w:'归',s:'完璧归赵',m:'归还'},{w:'归',s:'吾妻来归',m:'女子出嫁'},
+  {w:'过',s:'闻过则喜',m:'过错'},{w:'过',s:'过秦论',m:'指出过失'},{w:'过',s:'愿枉车骑过之',m:'拜访'},
+  {w:'何',s:'徐公何能及君也',m:'怎么'},{w:'何',s:'豫州今欲何至',m:'哪里'},{w:'何',s:'水何澹澹',m:'多么'},
+  {w:'恨',s:'未尝不叹息痛恨于桓灵也',m:'遗憾'},{w:'恨',s:'商女不知亡国恨',m:'怨恨'},{w:'恨',s:'恨恨那可论',m:'悲伤'},
+  {w:'胡',s:'国胡以相恤',m:'怎么'},{w:'胡',s:'胡人不敢南下而牧马',m:'古代西北部民族'},
+  {w:'患',s:'欲勿予，即患秦兵之来',m:'忧虑，担心'},{w:'患',s:'有备无患',m:'祸患'},{w:'患',s:'此数者用兵之患也',m:'忌讳，顾忌'},
+  {w:'或',s:'或以为死，或以为亡',m:'有的'},{w:'或',s:'莫或止之',m:'语气词'},{w:'或',s:'或王命急宣',m:'如果'},
+  {w:'疾',s:'庞涓恐其贤于己，疾之',m:'嫉妒'},{w:'疾',s:'屈平疾王听之不聪也',m:'痛心'},{w:'疾',s:'虽乘奔御风，不以疾也',m:'快'},
+  {w:'及',s:'怀王悔，追张仪不及',m:'赶上'},{w:'及',s:'及其所之既倦',m:'等到'},{w:'及',s:'今其智乃反不能及',m:'比得上'},
+  {w:'即',s:'即捕得三两头',m:'即使'},{w:'即',s:'即除魏阉废祠之址以葬之',m:'就'},{w:'即',s:'即今之傫然在墓者也',m:'就是'},
+  {w:'既',s:'既其出，则或咎其欲出者',m:'已经'},{w:'既',s:'既得志，则纵情以傲物',m:'已经'},{w:'既',s:'既而儿醒',m:'不久'},
+  {w:'假',s:'假舆马者，非利足也',m:'借助'},{w:'假',s:'乃悟前狼假寐',m:'假装'},{w:'假',s:'以是人多以书假余',m:'借'},
+  {w:'间',s:'中间力拉崩倒之声',m:'夹杂'},{w:'间',s:'谗人间之，可谓穷矣',m:'离间'},{w:'间',s:'肉食者谋之，又何间焉',m:'参与'},
+  {w:'见',s:'冀君实或见恕也',m:'用在动词前表示对己'},{w:'见',s:'众人皆醉我独醒，是以见放',m:'被'},{w:'见',s:'风吹草低见牛羊',m:'通"现"，显现'},
+  {w:'解',s:'庖丁为文惠君解牛',m:'分割'},{w:'解',s:'师者，所以传道受业解惑也',m:'解答'},{w:'解',s:'天下土崩瓦解',m:'分裂，涣散'},
+  {w:'就',s:'金就砺则利',m:'接近'},{w:'就',s:'连辟公府不就',m:'就任'},{w:'就',s:'轲自知事不就',m:'完成'},
+  {w:'举',s:'杀人如不能举',m:'尽'},{w:'举',s:'举孝廉不行',m:'举荐'},{w:'举',s:'杀人如不能举',m:'尽，全部'},
+  {w:'绝',s:'率妻子邑人来此绝境',m:'隔绝'},{w:'绝',s:'忽然抚尺一下，群响毕绝',m:'停止'},{w:'绝',s:'佛印绝类弥勒',m:'极，非常'},
+  {w:'堪',s:'更那堪冷落清秋节',m:'经得起，忍受'},{w:'堪',s:'出师一表真名世，千载谁堪伯仲间',m:'能够，可以'},
+  {w:'克',s:'既克，公问其故',m:'战胜'},{w:'克',s:'克勤克俭',m:'能够'},{w:'克',s:'与克期俱至',m:'限定（日期）'},
+  {w:'类',s:'不类春风时',m:'像'},{w:'类',s:'臣以王之攻宋也，为与此同类',m:'种类'},{w:'类',s:'义不杀少而杀众，不可谓知类',m:'事理'},
+  {w:'怜',s:'丈夫亦爱怜其少子乎',m:'爱'},{w:'怜',s:'可怜身上衣正单',m:'令人怜悯'},{w:'怜',s:'项燕为楚将，数有功，爱士卒，楚人怜之',m:'爱戴'},
+  {w:'弥',s:'奉之弥繁，侵之愈急',m:'更加'},{w:'弥',s:'夜雪初霁，荠麦弥望',m:'满'},{w:'弥',s:'弥留之际',m:'久长'},
+  {w:'莫',s:'至莫夜月明',m:'通"暮"，傍晚'},{w:'莫',s:'初七及下九，嬉戏莫相忘',m:'不要'},{w:'莫',s:'盈虚者如彼，而卒莫消长也',m:'没有谁'},
+  {w:'内',s:'内人于罪',m:'通"纳"，使进入'},{w:'内',s:'内行则相谗',m:'内部'},
+  {w:'期',s:'期年之后',m:'满，一周年'},{w:'期',s:'期山东为三处',m:'约定'},{w:'期',s:'良剑期乎断',m:'期望'},
+  {w:'奇',s:'其进愈难，而其见愈奇',m:'奇特'},{w:'奇',s:'大将军邓骘奇其才',m:'以…为奇'},{w:'奇',s:'舟首尾长约八分有奇',m:'零数'},
+  {w:'迁',s:'再迁为太史令',m:'升迁'},{w:'迁',s:'顷襄王怒而迁之',m:'放逐'},{w:'迁',s:'时北兵已迫修门外，战、守、迁皆不及施',m:'迁都'},
+  {w:'请',s:'请奉盆缶秦王',m:'请允许我'},{w:'请',s:'乃请宾客',m:'邀请'},{w:'请',s:'请辞决矣',m:'告辞，请求'},
+  {w:'穷',s:'穷则独善其身',m:'不得志'},{w:'穷',s:'穷予生之光阴以疗梅也哉',m:'耗尽'},{w:'穷',s:'日暮途穷',m:'穷尽'},
+  {w:'去',s:'欲呼张良与俱去',m:'离开'},{w:'去',s:'我从去年辞帝京',m:'过去的'},{w:'去',s:'公然抱茅入竹去',m:'前往'},
+  {w:'劝',s:'一曰主用足，二曰民赋少，三曰劝农功',m:'劝勉，鼓励'},{w:'劝',s:'劝君更尽一杯酒',m:'劝说'},
+  {w:'却',s:'却匈奴七百余里',m:'击退'},{w:'却',s:'相如因持璧却立',m:'退后'},{w:'却',s:'却话巴山夜雨时',m:'还，再'},
+  {w:'如',s:'如使人之所欲莫甚于生',m:'如果'},{w:'如',s:'沛公默然，曰："固不如也"',m:'比得上'},{w:'如',s:'纵一苇之所如',m:'到，往'},
+  {w:'若',s:'若入前为寿',m:'你'},{w:'若',s:'天涯若比邻',m:'像'},{w:'若',s:'若止印三二本，未为简易',m:'如果'},
+  {w:'善',s:'积善成德',m:'好的'},{w:'善',s:'善万物之得时',m:'羡慕'},{w:'善',s:'善刀而藏之',m:'通"缮"，擦拭'},
+  {w:'少',s:'少时，一狼径去',m:'不多时'},{w:'少',s:'山多石，少土',m:'不多'},{w:'少',s:'少仲尼之闻而轻伯夷之义',m:'认为…少，小看'},
+  {w:'涉',s:'楚人有涉江者',m:'渡过'},{w:'涉',s:'涉猎群书',m:'阅览'},
+  {w:'胜',s:'沛公不胜杯杓',m:'禁得住'},{w:'胜',s:'何可胜道也哉',m:'尽'},{w:'胜',s:'予观夫巴陵胜状',m:'优美的'},
+  {w:'识',s:'新妇识马声',m:'识别'},{w:'识',s:'默而识之',m:'通"志"，记住'},{w:'识',s:'博闻强识',m:'通"志"，记住'},
+  {w:'使',s:'使六国各爱其人',m:'假使'},{w:'使',s:'沛公左司马曹无伤使人言于项羽曰',m:'派'},{w:'使',s:'使于四方',m:'出使'},
+  {w:'是',s:'世之谬其传而莫能名者，何可胜道也哉',m:'这，这个'},{w:'是',s:'不知木兰是女郎',m:'是（判断）'},{w:'是',s:'唯命是从',m:'结构助词，帮助宾语前置'},
+  {w:'适',s:'余自齐安舟行适临汝',m:'到'},{w:'适',s:'处分适兄意',m:'顺从'},{w:'适',s:'始适还家门',m:'女子出嫁'},
+  {w:'书',s:'乃丹书帛曰"陈胜王"',m:'写'},{w:'书',s:'烽火连三月，家书抵万金',m:'书信'},{w:'书',s:'授之书而习其句读者',m:'文字'},
+  {w:'孰',s:'唯大王与群臣孰计议之',m:'通"熟"，仔细'},{w:'孰',s:'人非生而知之者，孰能无惑',m:'谁'},
+  {w:'属',s:'屈平属草稿未定',m:'撰写'},{w:'属',s:'属予作文以记之',m:'通"嘱"，嘱托'},{w:'属',s:'有良田美池桑竹之属',m:'类'},
+  {w:'数',s:'数罟不入洿池',m:'cù，细密'},{w:'数',s:'数口之家，可以无饥矣',m:'几'},{w:'数',s:'范增数目项王',m:'shuò，屡次'},
+  {w:'率',s:'六国互丧，率赂秦耶',m:'大概，全都'},{w:'率',s:'遂率子孙荷担者三夫',m:'带领'},{w:'率',s:'大率不能过',m:'大概'},
+  {w:'说',s:'稻花香里说丰年',m:'谈论'},{w:'说',s:'秦王必说见臣',m:'通"悦"，高兴'},{w:'说',s:'是说也，人常疑之',m:'说法，主张'},
+  {w:'素',s:'且相如素贱人',m:'本来'},{w:'素',s:'十三能织素',m:'白色的绢'},{w:'素',s:'吴广素爱人',m:'一向，向来'},
+  {w:'汤',s:'汤汤乎若流水',m:'shāng，水大流急'},{w:'汤',s:'媵人持汤沃灌',m:'热水'},{w:'汤',s:'浩浩汤汤',m:'水流盛大的样子'},
+  {w:'涕',s:'蒋氏大戚，汪然出涕曰',m:'眼泪'},{w:'涕',s:'临表涕零，不知所言',m:'流泪'},
+  {w:'徒',s:'徒慕君之高义也',m:'只，仅仅'},{w:'徒',s:'徒属皆曰："敬受命"',m:'同伙'},{w:'徒',s:'免冠徒跣',m:'光着'},
+  {w:'亡',s:'今亡亦死，举大计亦死',m:'逃跑'},{w:'亡',s:'河曲智叟亡以应',m:'通"无"，没有'},{w:'亡',s:'日削月割，以趋于亡',m:'灭亡'},
+  {w:'王',s:'沛公欲王关中',m:'称王'},{w:'王',s:'太医以王命聚之',m:'君王'},
+  {w:'望',s:'日夜望将军至',m:'盼望'},{w:'望',s:'先达德隆望尊',m:'名望'},{w:'望',s:'望其旗靡',m:'看'},
+  {w:'恶',s:'廉君宣恶言',m:'不好的'},{w:'恶',s:'以小易大，彼恶知之',m:'怎么'},{w:'恶',s:'死亦我所恶',m:'讨厌'},
+  {w:'微',s:'微斯人，吾谁与归',m:'没有'},{w:'微',s:'微察公子，公子颜色愈和',m:'隐蔽地，暗暗地'},{w:'微',s:'其文约，其辞微',m:'含蓄，深奥'},
+  {w:'悉',s:'古之治天下，朝令而夕悉',m:'详尽'},{w:'悉',s:'悉使羸兵负草填之',m:'全部'},
+  {w:'相',s:'儿已薄禄相',m:'容貌'},{w:'相',s:'至于幽暗昏惑而无物以相之',m:'帮助，辅助'},{w:'相',s:'及时相遣归',m:'表示动作偏指一方'},
+  {w:'谢',s:'旦日不可不蚤自来谢项王',m:'道歉'},{w:'谢',s:'多谢后世人',m:'告诉'},{w:'谢',s:'阿母谢媒人',m:'推辞，谢绝'},
+  {w:'信',s:'牺牲玉帛，弗敢加也，必以信',m:'诚实'},{w:'信',s:'低眉信手续续弹',m:'随意'},{w:'信',s:'信臣精卒陈利兵而谁何',m:'可靠的'},
+  {w:'兴',s:'忧劳可以兴国，逸豫可以亡身',m:'使…兴盛'},{w:'兴',s:'清风徐来，水波不兴',m:'起'},{w:'兴',s:'大兴师伐秦',m:'发动'},
+  {w:'行',s:'太祖行奋武将军',m:'代理'},{w:'行',s:'三人行，必有我师焉',m:'行走'},{w:'行',s:'善万物之得时，感吾生之行休',m:'将要'},
+  {w:'幸',s:'今事有急，故幸来告良',m:'幸而'},{w:'幸',s:'缦立远视，而望幸焉',m:'驾临'},{w:'幸',s:'幸可广问讯',m:'希望'},
+  {w:'修',s:'议法度而修之于朝廷',m:'修订'},{w:'修',s:'邹忌修八尺有余',m:'身高'},{w:'修',s:'修守战之具',m:'修理，整治'},
+  {w:'徐',s:'清风徐来，水波不兴',m:'慢慢地'},{w:'徐',s:'徐公孰美',m:'姓'},
+  {w:'许',s:'秦晋之好，许之',m:'答应'},{w:'许',s:'先生不知何许人也',m:'处所'},{w:'许',s:'大铁椎，不知何许人',m:'地方'},
+  {w:'阳',s:'其阳，多石，少土',m:'山的南面'},{w:'阳',s:'斜阳草树',m:'太阳'},{w:'阳',s:'则阳收其身',m:'通"佯"，假装'},
+  {w:'要',s:'张良出，要项伯',m:'通"邀"，邀请'},{w:'要',s:'虽曰不要君，吾不信也',m:'要挟'},{w:'要',s:'北收要害之郡',m:'重要的'},
+  {w:'宜',s:'诚宜开张圣听',m:'应该'},{w:'宜',s:'宜其渥然丹者为槁木',m:'合适'},{w:'宜',s:'守经而不务宜',m:'变通'},
+  {w:'遗',s:'秦无亡矢遗镞之费',m:'遗失'},{w:'遗',s:'是以先帝简拔以遗陛下',m:'给予'},{w:'遗',s:'数遗魏王及公子书',m:'送'},
+  {w:'贻',s:'尝贻余核舟一',m:'赠送'},{w:'贻',s:'贻笑大方',m:'遗留，留下'},
+  {w:'易',s:'天下事有难易乎',m:'容易'},{w:'易',s:'缙绅而能不易其志者',m:'改变'},{w:'易',s:'若止印三二本，未为简易',m:'简便'},
+  {w:'阴',s:'其阴，济水东流',m:'山的北面'},{w:'阴',s:'阴风怒号',m:'阴冷'},{w:'阴',s:'阴知奸党名姓',m:'暗地里'},
+  {w:'右',s:'位在廉颇之右',m:'上（秦汉以右为尊）'},{w:'右',s:'为右臂',m:'右边'},
+  {w:'再',s:'一鼓作气，再而衰',m:'第二次'},{w:'再',s:'再拜献大王足下',m:'两次'},
+  {w:'造',s:'径造庐访成',m:'到'},{w:'造',s:'是造物者之无尽藏也',m:'制造'},{w:'造',s:'造恶的享富贵又寿延',m:'做'},
+  {w:'知',s:'人非生而知之者',m:'知道'},{w:'知',s:'则知明而行无过矣',m:'通"智"，智慧'},{w:'知',s:'绝宾客之知',m:'交情'},
+  {w:'致',s:'假舆马者，非利足也，而致千里',m:'到达'},{w:'致',s:'以致天下之士',m:'招纳'},{w:'致',s:'家贫，无从致书以观',m:'得到'},
+  {w:'质',s:'余立侍左右，援疑质理',m:'询问'},{w:'质',s:'黑质而白章',m:'质地，底子'},{w:'质',s:'燕太子丹质于秦',m:'做人质'},
+  {w:'治',s:'文武并用，垂拱而治',m:'治理得好'},{w:'治',s:'治国无法则乱',m:'治理'},{w:'治',s:'以故其后名之曰"褒禅"',m:'旧'},
+  {w:'诸',s:'王尝语庄子以好乐，有诸',m:'之乎'},{w:'诸',s:'投诸渤海之尾',m:'之于'},{w:'诸',s:'诸郡县苦秦吏者',m:'各，众'},
+  {w:'走',s:'仲尼闻之，出于颜渊',m:'奔向'},{w:'走',s:'兔走触株',m:'跑'},{w:'走',s:'兵走者斩',m:'逃跑'},
+  {w:'卒',s:'卒相与欢',m:'终于'},{w:'卒',s:'信臣精卒陈利兵而谁何',m:'士兵'},{w:'卒',s:'卒然边境有急',m:'通"猝"，突然'},
+  {w:'坐',s:'停车坐爱枫林晚',m:'因为'},{w:'坐',s:'满坐寂然',m:'通"座"，座位'},{w:'坐',s:'何坐？坐盗',m:'犯罪'},
+  {w:'左',s:'从左右，皆肘之',m:'左边'},{w:'左',s:'从左右，乃肘之',m:'近侍'},
+];
+const ALL_MEAN = [...new Set(CI.map(c=>c.m))];
+
+const LV = [
+  {l:'爱·安·被·倍',desc:'实词①',data:[0,1,2,3,4,5,6,7,8,9,10,11],qs:8,sec:14},
+  {l:'本·比·兵·病·察',desc:'实词②',data:[12,13,14,15,16,17,18,19,20,21,22,23,24,25,26],qs:8,sec:14},
+  {l:'朝·曾·乘·诚·除',desc:'实词③',data:[27,28,29,30,31,32,33,34,35,36,37,38,39,40,41],qs:8,sec:14},
+  {l:'辞·从·殆·当',desc:'实词④',data:[42,43,44,45,46,47,48,49,50,51,52,53],qs:8,sec:14},
+  {l:'道·得·度·故',desc:'实词⑤',data:[54,55,56,57,58,59,60,61,62,63,64,65],qs:8,sec:14},
+  {l:'固·顾·归·过',desc:'实词⑥',data:[66,67,68,69,70,71,72,73,74,75,76,77],qs:8,sec:14},
+  {l:'何·恨·胡·患·或',desc:'实词⑦',data:[78,79,80,81,82,83,84,85,86,87,88,89,90],qs:8,sec:14},
+  {l:'疾·及·即·既·假',desc:'实词⑧',data:[91,92,93,94,95,96,97,98,99,100,101,102,103,104,105],qs:8,sec:14},
+  {l:'间·见·解·就·举',desc:'实词⑨',data:[106,107,108,109,110,111,112,113,114,115,116,117,118,119,120],qs:8,sec:14},
+  {l:'绝·堪·克·类·怜',desc:'实词⑩',data:[121,122,123,124,125,126,127,128,129,130,131,132,133,134,135],qs:8,sec:14},
+  {l:'弥·莫·内·期·奇·迁',desc:'实词⑪',data:[136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153],qs:8,sec:14},
+  {l:'请·穷·去·劝·却·如·若',desc:'实词⑫',data:[154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174],qs:8,sec:14},
+  {l:'善·少·涉·胜·识·使·是',desc:'实词⑬',data:[175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195],qs:8,sec:14},
+  {l:'适·书·孰·属·数',desc:'实词⑭',data:[196,197,198,199,200,201,202,203,204,205,206,207,208],qs:8,sec:14},
+  {l:'率·说·素·汤·涕·徒',desc:'实词⑮',data:[209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225],qs:8,sec:14},
+  {l:'亡·王·望·恶·微',desc:'实词⑯',data:[226,227,228,229,230,231,232,233,234,235,236,237,238,239,240],qs:8,sec:14},
+  {l:'悉·相·谢·信·兴',desc:'实词⑰',data:[241,242,243,244,245,246,247,248,249,250,251,252,253,254,255],qs:8,sec:14},
+  {l:'行·幸·修·徐·许',desc:'实词⑱',data:[256,257,258,259,260,261,262,263,264,265,266,267,268,269,270],qs:8,sec:14},
+  {l:'阳·要·宜·遗·贻',desc:'实词⑲',data:[271,272,273,274,275,276,277,278,279,280,281,282,283,284,285],qs:8,sec:14},
+  {l:'易·阴·右·再·造·知',desc:'实词⑳',data:[286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,303],qs:8,sec:14},
+  {l:'致·质·治·诸·走·卒·坐·左',desc:'实词㉑',data:[304,305,306,307,308,309,310,311,312,313,314,315,316,317,318,319,320,321,322,323,324,325,326,327,328,329,330],qs:8,sec:14},
+];
+
+// ========== GAME ==========
+let G={lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+function save(){localStorage.setItem('wenyan_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('wenyan_lv')||'[]')}
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+function buildMap(){
+  load();let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}"><div class="num">${i+1}</div><div class="name">${l.l}</div><div class="desc">${l.desc}</div><div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div></div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+
+function startLv(i){
+  initAudio();G.lv=i;G.qi=0;G.ok=0;
+  let l=LV[i];
+  let pool=shuffle([...l.data]),qs=[];
+  for(let j=0;j<Math.min(l.qs,l.data.length);j++)qs.push(CI[pool[j]]);
+  G.questions=qs;G.total=qs.length;G.tmMax=(l.sec||14)*1000;
+  showScr('gameScr');showQ();
+}
+
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  initAudio();
+  let c=G.questions[G.qi];
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+  $('qArea').innerHTML=`<div class="q-prompt"><div class="q-tag">${c.w}</div><div class="q-word">${c.w}</div><div class="q-sent">${c.s.replace(c.w,'<span class="hl">'+c.w+'</span>')}</div></div>`;
+  let wrongs=shuffle(ALL_MEAN.filter(m=>m!==c.m)).slice(0,3);
+  let all=shuffle([c.m,...wrongs]);
+  let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,c.m)});
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars;save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>

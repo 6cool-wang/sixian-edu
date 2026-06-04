@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>化学方程式闯关 · 思贤学习站</title>
+<style>
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}
+.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr:not(.active){display:none}
+#mapScr.active{display:flex;flex-direction:column;align-items:center}
+#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#b8860b33}
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:12px 0 20px;width:100%}
+.q-prompt .q-tag{font-size:11px;color:var(--accent);background:#b8860b15;padding:2px 10px;border-radius:10px;display:inline-block;margin-bottom:8px}
+.q-prompt .q-rxt{font-size:20px;font-weight:700;color:var(--text);line-height:1.6;padding:14px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);font-family:"Times New Roman","STIX",serif}
+.q-prompt .q-rxt .arrow{color:var(--accent);margin:0 6px}
+.q-prompt .q-desc{font-size:13px;color:var(--text2);margin-top:6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:15px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);font-family:"Times New Roman","STIX",serif}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+@media(max-width:420px){.q-rxt{font-size:17px!important;padding:10px!important}.opt{font-size:13px;padding:10px 4px}}
+</style>
+</head>
+<body>
+<div id="mapScr" class="active">
+  <h1>化学方程式闯关</h1>
+  <p class="sub">反应物→生成物 · 反应类型配对</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+<script>
+const RX = [
+  {rxt:'H₂ + O₂ → ?',ans:'H₂O',tag:'化合反应'},
+  {rxt:'C + O₂ → ?',ans:'CO₂',tag:'化合反应'},
+  {rxt:'S + O₂ → ?',ans:'SO₂',tag:'化合反应'},
+  {rxt:'Fe + O₂ → ?',ans:'Fe₃O₄',tag:'化合反应'},
+  {rxt:'P + O₂ → ?',ans:'P₂O₅',tag:'化合反应'},
+  {rxt:'Mg + O₂ → ?',ans:'MgO',tag:'化合反应'},
+  {rxt:'Al + O₂ → ?',ans:'Al₂O₃',tag:'化合反应'},
+  {rxt:'Na + Cl₂ → ?',ans:'NaCl',tag:'化合反应'},
+  {rxt:'CaO + H₂O → ?',ans:'Ca(OH)₂',tag:'化合反应'},
+  {rxt:'CO₂ + H₂O → ?',ans:'H₂CO₃',tag:'化合反应'},
+  {rxt:'H₂O → ? + ?',ans:'H₂↑ + O₂↑',tag:'分解反应'},
+  {rxt:'KMnO₄ → ? + ? + ?',ans:'K₂MnO₄ + MnO₂ + O₂↑',tag:'分解反应'},
+  {rxt:'KClO₃ → ? + ?',ans:'KCl + O₂↑',tag:'分解反应'},
+  {rxt:'HgO → ? + ?',ans:'Hg + O₂↑',tag:'分解反应'},
+  {rxt:'H₂O₂ → ? + ?',ans:'H₂O + O₂↑',tag:'分解反应'},
+  {rxt:'CaCO₃ → ? + ?',ans:'CaO + CO₂↑',tag:'分解反应'},
+  {rxt:'Fe + CuSO₄ → ? + ?',ans:'FeSO₄ + Cu',tag:'置换反应'},
+  {rxt:'Zn + H₂SO₄ → ? + ?',ans:'ZnSO₄ + H₂↑',tag:'置换反应'},
+  {rxt:'Fe + HCl → ? + ?',ans:'FeCl₂ + H₂↑',tag:'置换反应'},
+  {rxt:'Mg + H₂SO₄ → ? + ?',ans:'MgSO₄ + H₂↑',tag:'置换反应'},
+  {rxt:'Al + H₂SO₄ → ? + ?',ans:'Al₂(SO₄)₃ + H₂↑',tag:'置换反应'},
+  {rxt:'Cu + AgNO₃ → ? + ?',ans:'Cu(NO₃)₂ + Ag',tag:'置换反应'},
+  {rxt:'Fe₂O₃ + CO → ? + ?',ans:'Fe + CO₂',tag:'还原反应'},
+  {rxt:'CuO + H₂ → ? + ?',ans:'Cu + H₂O',tag:'还原反应'},
+  {rxt:'C + CuO → ? + ?',ans:'Cu + CO₂↑',tag:'还原反应'},
+  {rxt:'HCl + NaOH → ? + ?',ans:'NaCl + H₂O',tag:'中和反应'},
+  {rxt:'H₂SO₄ + NaOH → ? + ?',ans:'Na₂SO₄ + H₂O',tag:'中和反应'},
+  {rxt:'HCl + Ca(OH)₂ → ? + ?',ans:'CaCl₂ + H₂O',tag:'中和反应'},
+  {rxt:'HCl + Na₂CO₃ → ? + ? + ?',ans:'NaCl + H₂O + CO₂↑',tag:'复分解反应'},
+  {rxt:'H₂SO₄ + BaCl₂ → ? + ?',ans:'BaSO₄↓ + HCl',tag:'复分解反应'},
+  {rxt:'NaCl + AgNO₃ → ? + ?',ans:'AgCl↓ + NaNO₃',tag:'复分解反应'},
+  {rxt:'NH₄Cl + NaOH → ? + ? + ?',ans:'NaCl + H₂O + NH₃↑',tag:'复分解反应'},
+  {rxt:'CuSO₄ + NaOH → ? + ?',ans:'Cu(OH)₂↓ + Na₂SO₄',tag:'复分解反应'},
+  {rxt:'CO₂ + Ca(OH)₂ → ? + ?',ans:'CaCO₃↓ + H₂O',tag:'复分解反应'},
+  {rxt:'CH₄ + O₂ → ? + ?',ans:'CO₂ + H₂O',tag:'氧化反应'},
+  {rxt:'C₂H₅OH + O₂ → ? + ?',ans:'CO₂ + H₂O',tag:'氧化反应'},
+  {rxt:'Fe₂O₃ + HCl → ? + ?',ans:'FeCl₃ + H₂O',tag:'复分解反应'},
+  {rxt:'MgO + HCl → ? + ?',ans:'MgCl₂ + H₂O',tag:'复分解反应'},
+  {rxt:'Na₂O + H₂O → ?',ans:'NaOH',tag:'化合反应'},
+  {rxt:'Fe + S → ?',ans:'FeS',tag:'化合反应'},
+  {rxt:'N₂ + H₂ → ?',ans:'NH₃',tag:'化合反应'},
+  {rxt:'NO₂ + H₂O → ? + ?',ans:'HNO₃ + NO',tag:'氧化还原'},
+  {rxt:'Cl₂ + H₂O → ? + ?',ans:'HCl + HClO',tag:'氧化还原'},
+  {rxt:'MnCl₂ + ? → MnO₂',donext:true,tag:'综合·配平'},
+  {rxt:'NaHCO₃ → ? + ? + ?',ans:'Na₂CO₃ + H₂O + CO₂↑',tag:'分解反应'},
+  {rxt:'C₂H₄ + O₂ → ? + ?',ans:'CO₂ + H₂O',tag:'氧化反应'},
+  {rxt:'AgNO₃ + HCl → ? + ?',ans:'AgCl↓ + HNO₃',tag:'复分解反应'},
+  {rxt:'KOH + H₂SO₄ → ? + ?',ans:'K₂SO₄ + H₂O',tag:'中和反应'},
+  {rxt:'Ba(OH)₂ + H₂SO₄ → ? + ?',ans:'BaSO₄↓ + H₂O',tag:'中和反应'},
+  {rxt:'Fe(OH)₃ → ? + ?',ans:'Fe₂O₃ + H₂O',tag:'分解反应'},
+  {rxt:'Cu₂(OH)₂CO₃ → ? + ? + ?',ans:'CuO + CO₂↑ + H₂O',tag:'分解反应'},
+];
+const ALL_ANS = [...new Set(RX.map(r=>r.ans))].filter(Boolean);
+
+const LV = [
+  {l:'氧气中的燃烧',desc:'化合反应⑴',data:[0,1,2,3,4,5,6],qs:7,sec:16},
+  {l:'化合反应',desc:'化合反应⑵',data:[7,8,9,38,39,40],qs:6,sec:16},
+  {l:'分解反应',desc:'分解反应',data:[10,11,12,13,14,15,43,49],qs:8,sec:16},
+  {l:'置换反应',desc:'置换反应',data:[16,17,18,19,20,21],qs:6,sec:16},
+  {l:'复分解·中和',desc:'复分解·中和反应',data:[25,26,27,28,29,30,31,32,33,36,37,46,47],qs:8,sec:16},
+  {l:'还原·氧化',desc:'还原·氧化反应',data:[22,23,24,34,35,45],qs:6,sec:16},
+  {l:'氧化还原综合',desc:'氧化·离子反应',data:[41,42,44,48],qs:4,sec:16},
+  {l:'综合大挑战',desc:'混合出题',data:RX.map((_,i)=>i),qs:10,sec:18}
+];
+
+// ========== GAME ==========
+let G={lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+function save(){localStorage.setItem('rx_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('rx_lv')||'[]')}
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+function buildMap(){
+  load();let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}"><div class="num">${i+1}</div><div class="name">${l.l}</div><div class="desc">${l.desc}</div><div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div></div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+
+function startLv(i){
+  initAudio();G.lv=i;G.qi=0;G.ok=0;
+  let l=LV[i];
+  let pool=shuffle([...l.data]),qs=[];
+  for(let j=0;j<Math.min(l.qs,l.data.length);j++)qs.push(RX[pool[j]]);
+  G.questions=qs;G.total=qs.length;G.tmMax=(l.sec||16)*1000;
+  showScr('gameScr');showQ();
+}
+
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  initAudio();
+  let c=G.questions[G.qi];
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+  $('qArea').innerHTML=`<div class="q-prompt"><div class="q-tag">${c.tag||'综合'}</div><div class="q-rxt">${c.rxt.replace('→','<span class="arrow">→</span>')}</div></div>`;
+  let correct=c.ans;
+  let wrongs=shuffle(ALL_ANS.filter(a=>a!==correct)).slice(0,3);
+  let all=shuffle([correct,...wrongs]);
+  let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,correct)});
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars;save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>

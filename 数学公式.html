@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>数学公式闯关 · 思贤学习站</title>
+<style>
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}
+.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr:not(.active){display:none}
+#mapScr.active{display:flex;flex-direction:column;align-items:center}
+#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#b8860b33}
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:12px 0 20px;width:100%}
+.q-prompt .q-tag{font-size:11px;color:var(--accent);background:#b8860b15;padding:2px 10px;border-radius:10px;display:inline-block;margin-bottom:8px}
+.q-prompt .q-rxt{font-size:19px;font-weight:700;color:var(--text);line-height:1.7;padding:16px;background:var(--bg2);border-radius:10px;border:1px solid var(--border);font-family:"Times New Roman","STIX",serif;overflow-x:auto}
+.q-prompt .q-rxt .blk{display:inline-block;min-width:40px;border-bottom:2px dashed var(--accent);color:var(--accent);font-weight:700;margin:0 2px}
+.q-prompt .q-rxt .hl{color:var(--accent)}
+.q-prompt .q-desc{font-size:13px;color:var(--text2);margin-top:6px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:16px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);font-family:"Times New Roman","STIX",serif}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+@media(max-width:420px){.q-rxt{font-size:16px!important;padding:12px!important}.opt{font-size:14px;padding:10px 4px}}
+</style>
+</head>
+<body>
+<div id="mapScr" class="active">
+  <h1>数学公式闯关</h1>
+  <p class="sub">高中数学公式 · 函数·三角·数列·向量·几何·导数·概率</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+<script>
+const RX = [
+  // ═══ 函数与方程 ═══
+  {rxt:'一次函数 y = kx + b，k 表示<span class="blk">?</span>',ans:'斜率',tag:'函数'},
+  {rxt:'二次函数 y = ax² + bx + c 顶点横坐标 = <span class="blk">?</span>',ans:'-b/(2a)',tag:'函数'},
+  {rxt:'二次函数判别式 &Delta; = <span class="blk">?</span>',ans:'b²-4ac',tag:'函数'},
+  {rxt:'韦达定理：x₁ + x₂ = <span class="blk">?</span>',ans:'-b/a',tag:'函数'},
+  {rxt:'韦达定理：x₁ · x₂ = <span class="blk">?</span>',ans:'c/a',tag:'函数'},
+  {rxt:'幂函数求导：f(x) = xⁿ → f&prime;(x) = <span class="blk">?</span>',ans:'nxⁿ⁻¹',tag:'函数'},
+  {rxt:'指数运算：aᵐ · aⁿ = <span class="blk">?</span>',ans:'aᵐ⁺ⁿ',tag:'函数'},
+  {rxt:'对数运算：logₐ(MN) = <span class="blk">?</span>',ans:'logₐM+logₐN',tag:'函数'},
+  {rxt:'对数运算：logₐ(M/N) = <span class="blk">?</span>',ans:'logₐM−logₐN',tag:'函数'},
+  {rxt:'指数式 a⁰ = <span class="blk">?</span>（a≠0）',ans:'1',tag:'函数'},
+  {rxt:'f(x) = √x 的导数 f&prime;(x) = <span class="blk">?</span>',ans:'1/(2√x)',tag:'函数'},
+
+  // ═══ 三角函数 ═══
+  {rxt:'sin²&theta; + cos²&theta; = <span class="blk">?</span>',ans:'1',tag:'三角函数'},
+  {rxt:'sin(&alpha;+&beta;) = sin&alpha;cos&beta; + <span class="blk">?</span>',ans:'cos&alpha;sin&beta;',tag:'三角函数'},
+  {rxt:'cos(&alpha;+&beta;) = <span class="blk">?</span>',ans:'cos&alpha;cos&beta;−sin&alpha;sin&beta;',tag:'三角函数'},
+  {rxt:'倍角公式：sin2&alpha; = <span class="blk">?</span>',ans:'2sin&alpha;cos&alpha;',tag:'三角函数'},
+  {rxt:'倍角公式：cos2&alpha; = <span class="blk">?</span>',ans:'cos²&alpha;−sin²&alpha;',tag:'三角函数'},
+  {rxt:'tan&theta; = <span class="blk">?</span>',ans:'sin&theta;/cos&theta;',tag:'三角函数'},
+  {rxt:'正弦定理 a/sinA = <span class="blk">?</span>',ans:'2R',tag:'三角函数'},
+  {rxt:'余弦定理 a² = <span class="blk">?</span>',ans:'b²+c²−2bc·cosA',tag:'三角函数'},
+  {rxt:'三角形面积 S = <span class="blk">?</span>',ans:'½bc·sinA',tag:'三角函数'},
+  {rxt:'y = sin x 的最小正周期 = <span class="blk">?</span>',ans:'2&pi;',tag:'三角函数'},
+
+  // ═══ 数列 ═══
+  {rxt:'等差数列通项 aₙ = <span class="blk">?</span>',ans:'a₁+(n−1)d',tag:'数列'},
+  {rxt:'等差数列前 n 项和 Sₙ = <span class="blk">?</span>',ans:'n(a₁+aₙ)/2',tag:'数列'},
+  {rxt:'等比数列通项 aₙ = <span class="blk">?</span>',ans:'a₁·qⁿ⁻¹',tag:'数列'},
+  {rxt:'等比数列前 n 项和 Sₙ = a₁(<span class="blk">?</span>)/(1−q)  (q≠1)',ans:'1−qⁿ',tag:'数列'},
+  {rxt:'等差中项：若 a,b,c 成等差，则 b = <span class="blk">?</span>',ans:'(a+c)/2',tag:'数列'},
+  {rxt:'等比中项：若 a,b,c 成等比，则 b² = <span class="blk">?</span>',ans:'ac',tag:'数列'},
+
+  // ═══ 向量与立体几何 ═══
+  {rxt:'向量 a·b = |a||b|·<span class="blk">?</span>',ans:'cos&theta;',tag:'向量'},
+  {rxt:'向量 a,b 垂直 → a·b = <span class="blk">?</span>',ans:'0',tag:'向量'},
+  {rxt:'若 a=(x₁,y₁), b=(x₂,y₂)，则 a·b = <span class="blk">?</span>',ans:'x₁x₂+y₁y₂',tag:'向量'},
+  {rxt:'球体体积 V = <span class="blk">?</span>',ans:'4/3·&pi;R³',tag:'立体几何'},
+  {rxt:'球体表面积 S = <span class="blk">?</span>',ans:'4&pi;R²',tag:'立体几何'},
+  {rxt:'圆柱体积 V = <span class="blk">?</span>',ans:'&pi;R²h',tag:'立体几何'},
+  {rxt:'圆锥体积 V = <span class="blk">?</span>',ans:'⅓&pi;R²h',tag:'立体几何'},
+
+  // ═══ 解析几何 ═══
+  {rxt:'点到直线距离 d = |Ax₀+By₀+C| / <span class="blk">?</span>',ans:'√(A²+B²)',tag:'解析几何'},
+  {rxt:'圆心 (a,b)、半径 r 的圆方程 = <span class="blk">?</span>',ans:'(x−a)²+(y−b)²=r²',tag:'解析几何'},
+  {rxt:'椭圆标准方程：x²/a² + y²/b² = <span class="blk">?</span>',ans:'1',tag:'解析几何'},
+  {rxt:'双曲线标准方程：x²/a² − y²/b² = <span class="blk">?</span>',ans:'1',tag:'解析几何'},
+  {rxt:'抛物线 y² = 2px 的焦点坐标 = <span class="blk">?</span>',ans:'(p/2,0)',tag:'解析几何'},
+  {rxt:'两点间距离 d = √[<span class="blk">?</span>]',ans:'(x₂−x₁)²+(y₂−y₁)²',tag:'解析几何'},
+  {rxt:'两直线平行 → k₁ <span class="blk">?</span> k₂',ans:'=',tag:'解析几何'},
+  {rxt:'两直线垂直 → k₁·k₂ = <span class="blk">?</span>',ans:'−1',tag:'解析几何'},
+
+  // ═══ 导数与积分 ═══
+  {rxt:'f(x) = eˣ 的导数 f&prime;(x) = <span class="blk">?</span>',ans:'eˣ',tag:'导数'},
+  {rxt:'f(x) = ln x 的导数 f&prime;(x) = <span class="blk">?</span>',ans:'1/x',tag:'导数'},
+  {rxt:'f(x) = sin x 的导数 f&prime;(x) = <span class="blk">?</span>',ans:'cos x',tag:'导数'},
+  {rxt:'f(x) = cos x 的导数 f&prime;(x) = <span class="blk">?</span>',ans:'−sin x',tag:'导数'},
+  {rxt:'乘积求导：(uv)&prime; = <span class="blk">?</span>',ans:"u&prime;v+uv&prime;",tag:'导数'},
+  {rxt:'商求导：(u/v)&prime; = (u&prime;v−uv&prime;)/<span class="blk">?</span>',ans:'v²',tag:'导数'},
+  {rxt:'复合函数求导：f(g(x))&prime; = <span class="blk">?</span>',ans:"f&prime;(g(x))·g&prime;(x)",tag:'导数'},
+
+  // ═══ 概率统计 ═══
+  {rxt:'排列数 P(n,m) = n! / <span class="blk">?</span>',ans:'(n−m)!',tag:'概率统计'},
+  {rxt:'组合数 C(n,m) = n! / <span class="blk">?</span>',ans:'m!(n−m)!',tag:'概率统计'},
+  {rxt:'均值（期望）E(X) = <span class="blk">?</span>',ans:'&sum;xᵢpᵢ',tag:'概率统计'},
+  {rxt:'方差 D(X) = E(X²) − <span class="blk">?</span>',ans:'[E(X)]²',tag:'概率统计'},
+  {rxt:'古典概型 P(A) = <span class="blk">?</span>',ans:'k/n',tag:'概率统计'},
+  {rxt:'对立事件 P(Ā) = <span class="blk">?</span>',ans:'1−P(A)',tag:'概率统计'},
+
+  // ═══ 不等式 ═══
+  {rxt:'均值不等式：(a+b)/2 <span class="blk">?</span> √(ab)  (a,b&gt;0)',ans:'≥',tag:'不等式'},
+  {rxt:'|x| &lt; a 的解集（a&gt;0）= <span class="blk">?</span>',ans:'−a&lt;x&lt;a',tag:'不等式'},
+  {rxt:'|x| &gt; a 的解集（a&gt;0）= <span class="blk">?</span>',ans:'x&lt;−a 或 x&gt;a',tag:'不等式'},
+
+  // ═══ 补充 ═══
+  {rxt:'弧度制：180° = <span class="blk">?</span> rad',ans:'&pi;',tag:'三角函数'},
+  {rxt:'诱导公式：sin(&pi;−&alpha;) = <span class="blk">?</span>',ans:'sin&alpha;',tag:'三角函数'},
+  {rxt:'辅助线：平行四边形面积 S = <span class="blk">?</span>',ans:'底×高',tag:'立体几何'},
+  {rxt:'直线斜率 k = (y₂−y₁)/<span class="blk">?</span>',ans:'x₂−x₁',tag:'解析几何'},
+  {rxt:'ab ≤ [(a+b)/<span class="blk">?</span>]²',ans:'2',tag:'不等式'},
+  {rxt:'f(x)=x 的导数 f&prime;(x) = <span class="blk">?</span>',ans:'1',tag:'导数'},
+  {rxt:'C(n,0) = <span class="blk">?</span>',ans:'1',tag:'概率统计'},
+  {rxt:'logₐa = <span class="blk">?</span>',ans:'1',tag:'函数'},
+  {rxt:'logₐ1 = <span class="blk">?</span>',ans:'0',tag:'函数'},
+  {rxt:'直线截距式：x/a + y/b = <span class="blk">?</span>',ans:'1',tag:'解析几何'},
+  {rxt:'等差数列公差 d = aₙ − <span class="blk">?</span>',ans:'aₙ₋₁',tag:'数列'},
+  {rxt:'等比数列公比 q = aₙ / <span class="blk">?</span>',ans:'aₙ₋₁',tag:'数列'},
+];
+const ALL_ANS = [...new Set(RX.map(r=>r.ans))].filter(Boolean);
+
+const LV = [
+  {l:'函数与方程',desc:'函数·指数·对数',data:[0,1,2,3,4,5,6,7,8,9,10],qs:8,sec:16},
+  {l:'三角函数',desc:'三角恒等·正余弦定理',data:[11,12,13,14,15,16,17,18,19,20,59,60],qs:8,sec:16},
+  {l:'数列',desc:'等差·等比·通项·求和',data:[21,22,23,24,25,26,70,71],qs:6,sec:16},
+  {l:'向量·立体几何',desc:'向量运算·体积·表面积',data:[27,28,29,30,31,32,33,62],qs:6,sec:16},
+  {l:'解析几何',desc:'直线·圆·圆锥曲线',data:[34,35,36,37,38,39,40,41,63,69],qs:8,sec:16},
+  {l:'导数',desc:'求导公式·运算法则',data:[42,43,44,45,46,47,48,66],qs:6,sec:16},
+  {l:'概率统计·不等式',desc:'排列组合·方差·不等式',data:[49,50,51,52,53,54,55,56,57,65,67,68],qs:8,sec:16},
+  {l:'综合大挑战',desc:'混合出题',data:RX.map((_,i)=>i),qs:10,sec:18}
+];
+
+// ========== GAME ==========
+let G={lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+function save(){localStorage.setItem('math_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('math_lv')||'[]')}
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+function buildMap(){
+  load();let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}"><div class="num">${i+1}</div><div class="name">${l.l}</div><div class="desc">${l.desc}</div><div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div></div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+
+function startLv(i){
+  initAudio();G.lv=i;G.qi=0;G.ok=0;
+  let l=LV[i];
+  let pool=shuffle([...l.data]),qs=[];
+  for(let j=0;j<Math.min(l.qs,l.data.length);j++)qs.push(RX[pool[j]]);
+  G.questions=qs;G.total=qs.length;G.tmMax=(l.sec||16)*1000;
+  showScr('gameScr');showQ();
+}
+
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  initAudio();
+  let c=G.questions[G.qi];
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+  $('qArea').innerHTML=`<div class="q-prompt"><div class="q-tag">${c.tag||'综合'}</div><div class="q-rxt">${c.rxt}</div></div>`;
+  let correct=c.ans;
+  let wrongs=shuffle(ALL_ANS.filter(a=>a!==correct)).slice(0,3);
+  let all=shuffle([correct,...wrongs]);
+  let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,correct)});
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,ok=G.ok,pct=Math.round(ok/total*100);
+  let stars=pct>=88?3:pct>=63?2:pct>=38?1:0;
+  let oldStars=G.stars[G.lv]||0;
+  if(stars>oldStars){G.stars[G.lv]=stars;save()}
+  let titles=['继续加油','还不错','很好！','太棒了！'];
+  let msgs=['多复习公式，下次一定行','掌握了一些，继续巩固','公式记得很牢！','满分通关！'];
+  $('resTitle').textContent=titles[stars]||titles[0];
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=msgs[stars]||msgs[0];
+  $('resDetail').textContent=`答对 ${ok}/${total} · ${pct}%`;
+  if(stars>=1)sfxPass();else sfxBad();
+  $('resOverlay').classList.add('active');
+}
+
+$('resNext').onclick=function(){
+  $('resOverlay').classList.remove('active');
+  let next=G.lv+1;
+  if(next<LV.length)startLv(next);else showScr('mapScr');
+};
+$('resMap').onclick=function(){$('resOverlay').classList.remove('active');showScr('mapScr');buildMap()};
+
+// init
+buildMap();
+</script>
+</body>
+</html>
