@@ -37,7 +37,6 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 .q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
 .q-prompt .q-name{font-size:22px;font-weight:700;color:var(--text);margin:6px 0}
 .q-prompt .q-feat{font-size:14px;color:var(--text2)}
-#outlineCanvas{display:block;margin:0 auto;background:#e8f4f8;border-radius:12px;max-width:260px;width:100%;aspect-ratio:1}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
 .opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:17px;cursor:pointer;transition:.1s;box-shadow:var(--shadow)}
 .opt:active{transform:scale(.95)}
@@ -79,8 +78,7 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
     <span class="qi" id="qIdx"></span>
     <span class="timer" id="timer">0s</span>
   </div>
-  <canvas id="outlineCanvas" width="300" height="300"></canvas>
-  <div id="qArea"></div>
+    <div id="qArea"></div>
   <div class="opts" id="opts"></div>
 </div>
 
@@ -96,80 +94,105 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 </div>
 
 <script>
-// ========== PROVINCE DATA ==========
-// Simplified outlines [x,y] normalized 0-100
-const PROV = [
-  {name:'山东',cap:'济南',abbr:'鲁',outline:[[38,35],[50,30],[62,25],[72,22],[80,20],[85,28],[82,38],[74,40],[70,45],[62,48],[55,52],[48,50],[42,48],[36,42],[38,35]]},
-  {name:'广东',cap:'广州',abbr:'粤',outline:[[30,65],[40,62],[50,60],[62,58],[72,55],[80,58],[85,65],[82,72],[75,78],[65,80],[55,82],[45,80],[35,76],[30,65]]},
-  {name:'台湾',cap:'台北',abbr:'台',outline:[[75,22],[80,28],[82,38],[80,48],[76,55],[72,58],[68,55],[66,48],[68,38],[70,30],[75,22]]},
-  {name:'海南',cap:'海口',abbr:'琼',outline:[[40,82],[50,80],[58,82],[60,88],[56,92],[46,94],[40,90],[38,86],[40,82]]},
-  {name:'黑龙江',cap:'哈尔滨',abbr:'黑',outline:[[70,5],[80,8],[88,12],[92,18],[90,26],[85,30],[78,28],[72,24],[68,18],[65,12],[68,8],[70,5]]},
-  {name:'新疆',cap:'乌鲁木齐',abbr:'新',outline:[[10,5],[20,3],[32,4],[38,8],[40,18],[42,28],[40,38],[36,44],[28,46],[20,44],[14,40],[10,34],[8,26],[8,16],[10,5]]},
-  {name:'西藏',cap:'拉萨',abbr:'藏',outline:[[8,38],[20,36],[30,34],[40,36],[46,40],[48,48],[44,54],[36,56],[28,54],[20,52],[14,48],[10,44],[8,38]]},
-  {name:'内蒙古',cap:'呼和浩特',abbr:'蒙',outline:[[15,10],[25,8],[35,6],[48,5],[60,6],[72,8],[78,12],[76,18],[68,20],[56,18],[44,16],[32,15],[22,16],[15,10]]},
-  {name:'四川',cap:'成都',abbr:'川',outline:[[28,38],[38,36],[48,34],[56,36],[60,42],[58,50],[50,54],[42,52],[34,48],[30,44],[28,38]]},
-  {name:'云南',cap:'昆明',abbr:'云',outline:[[20,52],[30,50],[40,48],[48,50],[52,56],[50,64],[44,70],[36,72],[28,70],[22,66],[18,60],[20,52]]},
-  {name:'湖南',cap:'长沙',abbr:'湘',outline:[[42,48],[50,46],[58,48],[62,54],[60,60],[54,64],[46,62],[40,58],[38,52],[42,48]]},
-  {name:'江苏',cap:'南京',abbr:'苏',outline:[[50,30],[58,28],[66,30],[72,34],[74,40],[70,46],[62,48],[56,46],[50,42],[48,36],[50,30]]},
-  {name:'陕西',cap:'西安',abbr:'陕',outline:[[34,22],[42,20],[48,22],[52,28],[54,36],[52,44],[46,48],[40,46],[36,40],[34,32],[34,22]]},
-  {name:'河南',cap:'郑州',abbr:'豫',outline:[[42,34],[50,32],[56,34],[60,38],[62,44],[58,48],[52,50],[46,48],[42,44],[40,38],[42,34]]},
-  {name:'浙江',cap:'杭州',abbr:'浙',outline:[[60,26],[66,24],[72,26],[76,30],[78,36],[74,42],[68,44],[62,42],[58,36],[58,30],[60,26]]},
+// ========== GEOGRAPHY DATA ==========
+// 省会配对
+const CAPS = [
+  {q:'山东',a:'济南'},{q:'广东',a:'广州'},{q:'福建',a:'福州'},{q:'浙江',a:'杭州'},{q:'江苏',a:'南京'},
+  {q:'湖南',a:'长沙'},{q:'湖北',a:'武汉'},{q:'河南',a:'郑州'},{q:'河北',a:'石家庄'},{q:'四川',a:'成都'},
+  {q:'云南',a:'昆明'},{q:'贵州',a:'贵阳'},{q:'陕西',a:'西安'},{q:'甘肃',a:'兰州'},{q:'黑龙江',a:'哈尔滨'},
+  {q:'吉林',a:'长春'},{q:'辽宁',a:'沈阳'},{q:'安徽',a:'合肥'},{q:'江西',a:'南昌'},{q:'山西',a:'太原'},
+  {q:'海南',a:'海口'},{q:'台湾',a:'台北'},{q:'青海',a:'西宁'},{q:'西藏',a:'拉萨'},{q:'新疆',a:'乌鲁木齐'},
+  {q:'内蒙古',a:'呼和浩特'},{q:'广西',a:'南宁'},{q:'宁夏',a:'银川'},
 ];
+const ALL_CAPS = CAPS.map(c=>c.a);
 
-// Country outlines (simplified)
-const COUNTRY = [
-  {name:'中国',outline:[[5,5],[25,3],[48,4],[70,5],[88,10],[92,20],[90,32],[82,42],[70,48],[55,52],[40,54],[25,52],[12,48],[5,40],[3,28],[3,16],[5,5]]},
-  {name:'美国',outline:[[10,18],[30,16],[50,14],[68,16],[82,20],[90,28],[88,38],[80,44],[65,48],[50,46],[35,44],[22,40],[12,36],[6,30],[8,22],[10,18]]},
-  {name:'俄罗斯',outline:[[30,5],[50,3],[70,2],[88,4],[94,10],[90,18],[82,22],[70,24],[58,22],[45,20],[35,18],[28,14],[26,8],[30,5]]},
-  {name:'澳大利亚',outline:[[40,50],[55,48],[70,50],[80,56],[82,64],[78,72],[66,76],[50,75],[36,72],[28,66],[30,58],[40,50]]},
-  {name:'印度',outline:[[40,55],[52,52],[60,54],[64,60],[62,68],[56,74],[48,76],[42,72],[38,66],[36,60],[40,55]]},
-  {name:'巴西',outline:[[38,48],[52,46],[64,48],[72,54],[74,62],[68,70],[56,74],[44,72],[34,66],[32,58],[38,48]]},
-  {name:'日本',outline:[[86,18],[90,24],[92,32],[90,42],[86,50],[82,52],[78,48],[76,40],[78,32],[80,24],[86,18]]},
-  {name:'法国',outline:[[28,28],[38,26],[46,28],[50,34],[48,42],[42,46],[34,45],[28,40],[26,34],[28,28]]},
+// 简称配对
+const ABBRS = [
+  {q:'山东',a:'鲁'},{q:'广东',a:'粤'},{q:'福建',a:'闽'},{q:'浙江',a:'浙'},{q:'江苏',a:'苏'},
+  {q:'湖南',a:'湘'},{q:'湖北',a:'鄂'},{q:'河南',a:'豫'},{q:'河北',a:'冀'},{q:'四川',a:'川'},
+  {q:'云南',a:'云'},{q:'贵州',a:'贵'},{q:'陕西',a:'陕'},{q:'甘肃',a:'甘'},{q:'黑龙江',a:'黑'},
+  {q:'吉林',a:'吉'},{q:'辽宁',a:'辽'},{q:'安徽',a:'皖'},{q:'江西',a:'赣'},{q:'山西',a:'晋'},
+  {q:'海南',a:'琼'},{q:'台湾',a:'台'},{q:'青海',a:'青'},{q:'西藏',a:'藏'},{q:'新疆',a:'新'},
+  {q:'内蒙古',a:'蒙'},{q:'广西',a:'桂'},{q:'宁夏',a:'宁'},{q:'重庆',a:'渝'},{q:'上海',a:'沪'},
+  {q:'北京',a:'京'},{q:'天津',a:'津'},
 ];
+const ALL_ABBRS = ABBRS.map(a=>a.a);
 
-// Province geography Q&A
-const GEO = PROV.map(p=>({name:p.name,cap:p.cap,abbr:p.abbr}));
-
-// Province features
+// 地理特征
 const FEAT = [
-  {name:'山东',feat:'泰山·黄河入海口·半岛'},
-  {name:'广东',feat:'珠江三角洲·经济特区'},
-  {name:'四川',feat:'天府之国·都江堰'},
-  {name:'西藏',feat:'珠穆朗玛峰·青藏高原'},
-  {name:'新疆',feat:'塔克拉玛干沙漠·天山'},
-  {name:'云南',feat:'西双版纳·大理古城'},
-  {name:'湖南',feat:'张家界·洞庭湖'},
-  {name:'陕西',feat:'兵马俑·华山·黄土高原'},
-  {name:'江苏',feat:'苏州园林·长江三角洲'},
-  {name:'浙江',feat:'西湖·钱塘江'},
-  {name:'黑龙江',feat:'大兴安岭·东北平原'},
-  {name:'内蒙古',feat:'大草原·蒙古包'},
-  {name:'海南',feat:'天涯海角·热带海岛'},
-  {name:'河南',feat:'少林寺·中原大地'},
-  {name:'台湾',feat:'日月潭·阿里山'},
+  {q:'有泰山、黄河入海口和山东半岛，孔子的故乡',a:'山东'},
+  {q:'珠江三角洲所在地，与港澳相邻，改革开放的前沿',a:'广东'},
+  {q:'被称为"天府之国"，有都江堰水利工程和国宝大熊猫',a:'四川'},
+  {q:'有珠穆朗玛峰和青藏高原，平均海拔4000米以上',a:'西藏'},
+  {q:'面积最大的省级行政区，有塔克拉玛干沙漠和天山',a:'新疆'},
+  {q:'有西双版纳热带雨林和洱海大理古城，少数民族最多',a:'云南'},
+  {q:'有张家界国家森林公园和洞庭湖，"芙蓉国"',a:'湖南'},
+  {q:'有兵马俑、华山和黄土高原，千年古都所在地',a:'陕西'},
+  {q:'有西湖、钱塘江大潮，江南水乡的代表',a:'浙江'},
+  {q:'有大兴安岭和东北平原，"北大仓"所在地',a:'黑龙江'},
+  {q:'有一望无际的大草原和蒙古包，"风吹草低见牛羊"',a:'内蒙古'},
+  {q:'有天涯海角和热带海岛风情，中国最南端的省级行政区',a:'海南'},
+  {q:'有少林寺和龙门石窟，中原文化的发源地',a:'河南'},
+  {q:'有日月潭和阿里山，位于西太平洋的宝岛',a:'台湾'},
+  {q:'有苏州园林和长江三角洲，自古就是鱼米之乡',a:'江苏'},
+  {q:'有桂林山水甲天下，典型的喀斯特地貌景观',a:'广西'},
+  {q:'有鼓浪屿和武夷山，东南沿海的重要港口省份',a:'福建'},
 ];
+
+// 世界国家 + 首都
+const WORLD = [
+  {q:'俄罗斯的首都',a:'莫斯科'},{q:'美国的首都',a:'华盛顿'},{q:'英国的首都',a:'伦敦'},{q:'法国的首都',a:'巴黎'},
+  {q:'德国的首都',a:'柏林'},{q:'日本的首都',a:'东京'},{q:'韩国的首都',a:'首尔'},{q:'印度的首都',a:'新德里'},
+  {q:'澳大利亚的首都',a:'堪培拉'},{q:'巴西的首都',a:'巴西利亚'},{q:'加拿大的首都',a:'渥太华'},{q:'埃及的首都',a:'开罗'},
+  {q:'意大利的首都',a:'罗马'},{q:'西班牙的首都',a:'马德里'},{q:'泰国的首都',a:'曼谷'},{q:'越南的首都',a:'河内'},
+  {q:'新加坡的首都',a:'新加坡'},{q:'马来西亚的首都',a:'吉隆坡'},{q:'印度尼西亚的首都',a:'雅加达'},{q:'巴基斯坦的首都',a:'伊斯兰堡'},
+  {q:'阿根廷的首都',a:'布宜诺斯艾利斯'},{q:'南非的首都',a:'比勒陀利亚'},{q:'沙特阿拉伯的首都',a:'利雅得'},
+];
+const ALL_WCAP = WORLD.map(w=>w.a);
+
+// 地理之最
+const RECORDS = [
+  {q:'世界上面积最大的国家',a:'俄罗斯'},{q:'世界上人口最多的国家',a:'中国'},{q:'世界上面积最小的国家',a:'梵蒂冈'},
+  {q:'世界上最长的河流',a:'尼罗河'},{q:'世界上水量最大的河流',a:'亚马逊河'},{q:'世界上最高的山峰',a:'珠穆朗玛峰'},
+  {q:'世界上最大的沙漠',a:'撒哈拉沙漠'},{q:'世界上最深的湖泊',a:'贝加尔湖'},{q:'世界上最大的淡水湖',a:'苏必利尔湖'},
+  {q:'世界上最大的咸水湖',a:'里海'},{q:'中国最长的河流',a:'长江'},{q:'中国第二长河流',a:'黄河'},
+  {q:'中国最大的岛屿',a:'台湾岛'},{q:'中国最大的内海',a:'渤海'},{q:'中国海拔最高的盆地',a:'柴达木盆地'},
+  {q:'中国面积最大的平原',a:'东北平原'},{q:'中国最大的咸水湖',a:'青海湖'},{q:'中国最大的瀑布',a:'黄果树瀑布'},
+];
+const ALL_RECORDS = [...new Set(RECORDS.map(r=>r.a))];
+
+// 山河地形
+const TERRAIN = [
+  {q:'位于中印边界，海拔8848.86米的世界最高峰',a:'珠穆朗玛峰'},
+  {q:'发源于青藏高原，全长约6300公里，流经11省',a:'长江'},
+  {q:'被称为"母亲河"，全长约5464公里，呈"几"字形',a:'黄河'},
+  {q:'中国最大的咸水湖，位于青海省',a:'青海湖'},
+  {q:'中国第一大淡水湖，位于江西省',a:'鄱阳湖'},
+  {q:'东西走向的山脉，中国南北方的分界线，长约1600公里',a:'秦岭'},
+  {q:'世界上海拔最高的高原，被称为"世界屋脊"',a:'青藏高原'},
+  {q:'世界最大的高原，位于南美洲巴西境内',a:'巴西高原'},
+  {q:'世界上最长的山脉，位于南美洲西部',a:'安第斯山脉'},
+  {q:'世界最大的热带雨林，被称为"地球之肺"',a:'亚马逊雨林'},
+  {q:'亚洲最大的河流，发源于中国青海，流经六国',a:'湄公河'},
+  {q:'中国最长的内流河，位于新疆塔里木盆地',a:'塔里木河'},
+  {q:'位于中国与尼泊尔之间的世界最高峰',a:'珠穆朗玛峰'},
+  {q:'世界第二长河，位于非洲，全长约6670公里',a:'尼罗河'},
+  {q:'位于北非的世界最大沙漠，面积约906万平方公里',a:'撒哈拉沙漠'},
+  {q:'位于俄罗斯西伯利亚的世界最深湖泊',a:'贝加尔湖'},
+];
+const ALL_TERRAIN = [...new Set(TERRAIN.map(t=>t.a))];
 
 // ========== LEVELS ==========
-const PROV_NAMES = PROV.map(p=>p.name);
-const COUNTRY_NAMES = COUNTRY.map(c=>c.name);
-
 const LV = [
-  {l:'省份轮廓·上',desc:'看轮廓辨省份',data:[0,1,2,3,4,5,6,7],mode:'outline',qs:8,sec:14,pool:'prov'},
-  {l:'省份轮廓·下',desc:'看轮廓辨省份',data:[8,9,10,11,12,13,14],mode:'outline',qs:7,sec:14,pool:'prov'},
-  {l:'省会配对',desc:'省份→省会',data:PROV_NAMES,mode:'cap',qs:8,sec:12},
-  {l:'省份简称',desc:'省份→简称',data:PROV_NAMES,mode:'abbr',qs:8,sec:12},
-  {l:'地理特征',desc:'特征→省份',data:FEAT.map((_,i)=>i),mode:'feat',qs:8,sec:14},
-  {l:'世界轮廓',desc:'看轮廓辨国家',data:[0,1,2,3,4,5,6,7],mode:'country',qs:8,sec:14},
-  {l:'国家机关',desc:'首都配对',data:COUNTRY_NAMES,mode:'capital',qs:8,sec:12},
-  {l:'综合大挑战',desc:'轮廓·省会·简称混合',data:[],mode:'mix',qs:10,sec:14}
+  {l:'省会配对·上',desc:'省份→省会',data:[0,1,2,3,4,5,6,7,8,9,10,11,12,13],mode:'cap',qs:8,sec:12},
+  {l:'省会配对·下',desc:'省份→省会',data:[14,15,16,17,18,19,20,21,22,23,24,25,26,27],mode:'cap',qs:8,sec:12},
+  {l:'省份简称',desc:'省份→简称',data:ABBRS.map((_,i)=>i),mode:'abbr',qs:8,sec:12},
+  {l:'地理特征识省份',desc:'特征描述→猜省份',data:FEAT.map((_,i)=>i),mode:'feat',qs:8,sec:14},
+  {l:'世界首都',desc:'国家→首都',data:WORLD.map((_,i)=>i),mode:'world',qs:8,sec:14},
+  {l:'地理之最',desc:'世界&中国地理之最',data:RECORDS.map((_,i)=>i),mode:'record',qs:8,sec:14},
+  {l:'山河地形',desc:'山脉·河流·湖泊识别',data:TERRAIN.map((_,i)=>i),mode:'terrain',qs:8,sec:14},
+  {l:'综合大挑战',desc:'省会·简称·特征·世界地理混合',data:[],mode:'mix',qs:10,sec:15}
 ];
-
-// Capitals for countries
-const CAPITALS = {
-  '中国':'北京','美国':'华盛顿','俄罗斯':'莫斯科','澳大利亚':'堪培拉',
-  '印度':'新德里','巴西':'巴西利亚','日本':'东京','法国':'巴黎'
-};
 
 // ========== GAME STATE ==========
 let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
@@ -190,29 +213,6 @@ function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
 function sfxBad(){tone(300,.2,.2,'sawtooth')}
 function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
 function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
-
-function drawOutline(points,canvas){
-  let ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
-  ctx.clearRect(0,0,w,h);
-  // find bounds
-  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-  for(let p of points){minX=Math.min(minX,p[0]);maxX=Math.max(maxX,p[0]);minY=Math.min(minY,p[1]);maxY=Math.max(maxY,p[1])}
-  let pw=maxX-minX,ph=maxY-minY,scale=Math.min((w-40)/pw,(h-40)/ph),cx=(minX+maxX)/2,cy=(minY+maxY)/2;
-  ctx.beginPath();
-  for(let i=0;i<points.length;i++){
-    let x=(points[i][0]-cx)*scale+w/2,y=(points[i][1]-cy)*scale+h/2;
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  }
-  ctx.closePath();
-  ctx.fillStyle='#b8860b22';ctx.fill();
-  ctx.strokeStyle='#b8860b';ctx.lineWidth=2;ctx.stroke();
-  // blue sea dots
-  ctx.fillStyle='#b8860b44';
-  for(let i=0;i<points.length;i++){
-    let x=(points[i][0]-cx)*scale+w/2,y=(points[i][1]-cy)*scale+h/2;
-    ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
-  }
-}
 
 function buildMap(){
   load();
@@ -236,34 +236,30 @@ function startLv(i){
   initAudio();
   G.lv=i;G.qi=0;G.ok=0;
   let l=LV[i],mode=l.mode;
-  let pool,questions=[];
+  let questions=[];
 
-  if(mode==='outline'){
-    pool=l.data.map(j=>PROV[j]);
-    questions=shuffle(pool).slice(0,l.qs);
-  } else if(mode==='country'){
-    pool=l.data.map(j=>COUNTRY[j]);
-    questions=shuffle(pool).slice(0,l.qs);
-  } else if(mode==='cap'){
-    pool=shuffle([...l.data]);
-    questions=pool.slice(0,l.qs).map(n=>GEO.find(g=>g.name===n));
+  if(mode==='cap'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>CAPS[j]);
   } else if(mode==='abbr'){
-    pool=shuffle([...l.data]);
-    questions=pool.slice(0,l.qs).map(n=>GEO.find(g=>g.name===n));
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>ABBRS[j]);
   } else if(mode==='feat'){
-    pool=shuffle([...l.data]);
-    questions=pool.slice(0,l.qs).map(j=>FEAT[j]);
-  } else if(mode==='capital'){
-    pool=shuffle([...l.data]);
-    questions=pool.slice(0,l.qs).map(n=>{let c=COUNTRY.find(c=>c.name===n);return{name:c.name,cap:CAPITALS[c.name]}});
-  } else { // mix
-    let types=['outline','cap','abbr','feat'];
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>FEAT[j]);
+  } else if(mode==='world'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>WORLD[j]);
+  } else if(mode==='record'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>RECORDS[j]);
+  } else if(mode==='terrain'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>TERRAIN[j]);
+  } else if(mode==='mix'){
+    let types=['cap','abbr','feat','world','record','terrain'];
     for(let j=0;j<l.qs;j++){
       let t=types[rand(0,types.length-1)];
-      if(t==='outline'){let p=PROV[rand(0,PROV.length-1)];questions.push({mode:'outline',data:p})}
-      else if(t==='cap'){let p=GEO[rand(0,GEO.length-1)];questions.push({mode:'cap',data:p})}
-      else if(t==='abbr'){let p=GEO[rand(0,GEO.length-1)];questions.push({mode:'abbr',data:p})}
-      else if(t==='feat'){let p=FEAT[rand(0,FEAT.length-1)];questions.push({mode:'feat',data:p})}
+      if(t==='cap'){let p=CAPS[rand(0,CAPS.length-1)];questions.push({mode:'cap',q:p.q,a:p.a})}
+      else if(t==='abbr'){let p=ABBRS[rand(0,ABBRS.length-1)];questions.push({mode:'abbr',q:p.q,a:p.a})}
+      else if(t==='feat'){let p=FEAT[rand(0,FEAT.length-1)];questions.push({mode:'feat',q:p.q,a:p.a})}
+      else if(t==='world'){let p=WORLD[rand(0,WORLD.length-1)];questions.push({mode:'world',q:p.q,a:p.a})}
+      else if(t==='record'){let p=RECORDS[rand(0,RECORDS.length-1)];questions.push({mode:'record',q:p.q,a:p.a})}
+      else if(t==='terrain'){let p=TERRAIN[rand(0,TERRAIN.length-1)];questions.push({mode:'terrain',q:p.q,a:p.a})}
     }
   }
 
@@ -282,43 +278,41 @@ function showQ(){
   $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
   $('progFill').style.width=((G.qi)/G.total*100)+'%';
 
-  let canvas=$('outlineCanvas'),correct='',pool=[];
+  let correct='',prompt='',label='',pool=[];
 
-  if(mode==='outline'){
-    let p=q.data||q;
-    drawOutline(p.outline,canvas);
-    canvas.style.display='block';
-    $('qArea').innerHTML='<div class="q-prompt"><div class="q-name">这是哪个省份/地区？</div></div>';
-    correct=p.name;
-    pool=PROV_NAMES.filter(n=>n!==correct);
-  } else if(mode==='country'){
-    let c=q.data||q;
-    drawOutline(c.outline,canvas);
-    canvas.style.display='block';
-    $('qArea').innerHTML='<div class="q-prompt"><div class="q-name">这是哪个国家？</div></div>';
-    correct=c.name;
-    pool=COUNTRY_NAMES.filter(n=>n!==correct);
-  } else if(mode==='cap'){
-    canvas.style.display='none';
-    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.name}的省会是？</div></div>`;
-    correct=q.cap;
-    pool=GEO.map(g=>g.cap).filter(c=>c!==correct);
+  if(mode==='cap'){
+    prompt=`<div class="q-name">${q.q}</div>`;
+    label='的省会是哪个？';
+    correct=q.a;
+    pool=ALL_CAPS.filter(c=>c!==correct);
   } else if(mode==='abbr'){
-    canvas.style.display='none';
-    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.name}的简称是？</div></div>`;
-    correct=q.abbr;
-    pool=GEO.map(g=>g.abbr).filter(c=>c!==correct);
+    prompt=`<div class="q-name">${q.q}</div>`;
+    label='的简称是哪个？';
+    correct=q.a;
+    pool=ALL_ABBRS.filter(c=>c!==correct);
   } else if(mode==='feat'){
-    canvas.style.display='none';
-    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.feat}</div><div class="q-label">以上特征描述的是哪个省份？</div></div>`;
-    correct=q.name;
-    pool=PROV_NAMES.filter(n=>n!==correct);
-  } else if(mode==='capital'){
-    canvas.style.display='none';
-    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.name}的首都是？</div></div>`;
-    correct=q.cap;
-    pool=Object.values(CAPITALS).filter(c=>c!==correct);
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='以上描述的是哪个省份？';
+    correct=q.a;
+    pool=ABBRS.map(a=>a.q).filter(n=>n!==correct);
+  } else if(mode==='world'){
+    prompt=`<div class="q-name">${q.q}</div>`;
+    label='是哪个城市？';
+    correct=q.a;
+    pool=ALL_WCAP.filter(c=>c!==correct);
+  } else if(mode==='record'){
+    prompt=`<div class="q-name">${q.q}</div>`;
+    label='';
+    correct=q.a;
+    pool=ALL_RECORDS.filter(c=>c!==correct);
+  } else if(mode==='terrain'){
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='';
+    correct=q.a;
+    pool=ALL_TERRAIN.filter(c=>c!==correct);
   }
+
+  $('qArea').innerHTML=`<div class="q-prompt">${prompt}<div class="q-label">${label}</div></div>`;
 
   pool=shuffle(pool).slice(0,3);
   let all=shuffle([correct,...pool]);
