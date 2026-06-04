@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>英语语法闯关 · 思贤学习站</title>
+<style>
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}
+.h.active{display:flex;flex-direction:column;align-items:center}
+
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#b8860b33}
+
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:8px 0 16px}
+.q-prompt .q-tag{font-size:11px;color:var(--accent);background:#b8860b15;padding:2px 10px;border-radius:10px;display:inline-block;margin-bottom:6px}
+.q-prompt .q-sent{font-size:18px;font-weight:600;color:var(--text);line-height:1.5;margin:8px 0;padding:12px;background:var(--bg2);border-radius:10px;border:1px solid var(--border)}
+.q-prompt .q-sent .blank{display:inline-block;min-width:60px;border-bottom:2px dashed var(--accent);margin:0 4px}
+.q-prompt .q-desc{font-size:14px;color:var(--text2)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:15px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);font-family:"Times New Roman","STIX",serif}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+
+@media(max-width:420px){
+  .q-sent{font-size:16px!important;padding:8px!important}
+  .opt{font-size:14px;padding:10px 6px}
+}
+</style>
+</head>
+<body>
+
+<div id="mapScr" class="active">
+  <h1>英语语法闯关</h1>
+  <p class="sub">时态 · 语态 · 从句 · 句型 · 初中语法全覆盖</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+
+<script>
+// ========== GRAMMAR DATA ==========
+// {sent: sentence with ___ placeholder, correct: answer, opts: [wrong options...], tag: category}
+const QS = [
+  // --- 一般现在时 ---
+  {sent:'She ___ to school every day.',correct:'goes',opts:['go','going','gone'],tag:'一般现在时'},
+  {sent:'They ___ football every weekend.',correct:'play',opts:['plays','playing','played'],tag:'一般现在时'},
+  {sent:'He ___ a teacher.',correct:'is',opts:['am','are','be'],tag:'一般现在时'},
+  {sent:'I ___ like coffee.',correct:'don\'t',opts:['doesn\'t','isn\'t','aren\'t'],tag:'一般现在时'},
+  {sent:'The sun ___ in the east.',correct:'rises',opts:['rise','rising','rose'],tag:'一般现在时'},
+
+  // --- 现在进行时 ---
+  {sent:'Listen! She ___ a song.',correct:'is singing',opts:['sings','sang','sing'],tag:'现在进行时'},
+  {sent:'The children ___ games now.',correct:'are playing',opts:['play','played','were playing'],tag:'现在进行时'},
+  {sent:'What ___ you ___ right now?',correct:'are doing',opts:['do do','have done','did do'],tag:'现在进行时'},
+  {sent:'He ___ a book at the moment.',correct:'is reading',opts:['reads','read','was reading'],tag:'现在进行时'},
+
+  // --- 一般过去时 ---
+  {sent:'I ___ a movie yesterday.',correct:'watched',opts:['watch','will watch','am watching'],tag:'一般过去时'},
+  {sent:'She ___ to Beijing last week.',correct:'went',opts:['goes','gone','will go'],tag:'一般过去时'},
+  {sent:'They ___ breakfast at 7 am.',correct:'had',opts:['have','having','will have'],tag:'一般过去时'},
+  {sent:'He ___ born in 2010.',correct:'was',opts:['were','is','has been'],tag:'一般过去时'},
+
+  // --- 一般将来时 ---
+  {sent:'We ___ a picnic tomorrow.',correct:'will have',opts:['have','had','are having'],tag:'一般将来时'},
+  {sent:'She ___ a doctor when she grows up.',correct:'will be',opts:['is','was','has been'],tag:'一般将来时'},
+  {sent:'There ___ a meeting next Monday.',correct:'will be',opts:['is','was','will have'],tag:'一般将来时'},
+  {sent:'I ___ you with your homework.',correct:'will help',opts:['help','helped','am helping'],tag:'一般将来时'},
+
+  // --- 现在完成时 ---
+  {sent:'I ___ already ___ my homework.',correct:'have finished',opts:['will finish','finished','am finishing'],tag:'现在完成时'},
+  {sent:'She ___ never ___ to Shanghai.',correct:'has been',opts:['have been','went','will go'],tag:'现在完成时'},
+  {sent:'They ___ lived here for ten years.',correct:'have',opts:['has','had','will have'],tag:'现在完成时'},
+  {sent:'___ you ever ___ a horse?',correct:'Have ridden',opts:['Did ride','Do ride','Will ride'],tag:'现在完成时'},
+
+  // --- 被动语态 ---
+  {sent:'The cake ___ by my mother.',correct:'was made',opts:['made','is making','has made'],tag:'被动语态'},
+  {sent:'English ___ all over the world.',correct:'is spoken',opts:['speaks','spoke','is speaking'],tag:'被动语态'},
+  {sent:'The letter ___ yesterday.',correct:'was sent',opts:['sent','is sent','will send'],tag:'被动语态'},
+  {sent:'Rice ___ in many countries.',correct:'is grown',opts:['grows','grew','is growing'],tag:'被动语态'},
+
+  // --- 宾语从句 ---
+  {sent:'I think ___ he is right.',correct:'that',opts:['what','if','which'],tag:'宾语从句'},
+  {sent:'She asked ___ I liked music.',correct:'if',opts:['that','what','which'],tag:'宾语从句'},
+  {sent:'Do you know ___ she is?',correct:'who',opts:['which','what','that'],tag:'宾语从句'},
+  {sent:'He told me ___ he would come.',correct:'that',opts:['what','if','when'],tag:'宾语从句'},
+
+  // --- 定语从句 ---
+  {sent:'The man ___ is standing there is my uncle.',correct:'who',opts:['which','whom','what'],tag:'定语从句'},
+  {sent:'This is the book ___ I bought.',correct:'that',opts:['who','whom','what'],tag:'定语从句'},
+  {sent:'I like the house ___ has a garden.',correct:'which',opts:['who','whom','where'],tag:'定语从句'},
+  {sent:'That is the school ___ I studied.',correct:'where',opts:['which','that','who'],tag:'定语从句'},
+
+  // --- 比较级/最高级 ---
+  {sent:'She is ___ than her sister.',correct:'taller',opts:['tall','tallest','more tall'],tag:'比较级/最高级'},
+  {sent:'This is the ___ day of my life.',correct:'happiest',opts:['happier','happy','most happy'],tag:'比较级/最高级'},
+  {sent:'He runs ___ than me.',correct:'faster',opts:['fast','fastest','more fast'],tag:'比较级/最高级'},
+  {sent:'Shanghai is one of the ___ cities in China.',correct:'largest',opts:['larger','large','most large'],tag:'比较级/最高级'},
+
+  // --- 非谓语动词 ---
+  {sent:'I enjoy ___ basketball.',correct:'playing',opts:['play','to play','played'],tag:'非谓语动词'},
+  {sent:'He wants ___ a doctor.',correct:'to be',opts:['being','be','was'],tag:'非谓语动词'},
+  {sent:'She stopped ___ hello to me.',correct:'to say',opts:['saying','say','said'],tag:'非谓语动词'},
+  {sent:'I saw him ___ the room.',correct:'enter',opts:['entered','entering','to enter'],tag:'非谓语动词'},
+
+  // --- 情态动词 ---
+  {sent:'You ___ cross the street when the light is red.',correct:'mustn\'t',opts:['don\'t have to','needn\'t','won\'t'],tag:'情态动词'},
+  {sent:'She ___ speak three languages.',correct:'can',opts:['may','must','need'],tag:'情态动词'},
+  {sent:'___ I use your pen, please?',correct:'May',opts:['Must','Need','Shall'],tag:'情态动词'},
+  {sent:'You ___ finish your homework first.',correct:'should',opts:['can','may','need'],tag:'情态动词'},
+
+  // --- 虚拟/条件 ---
+  {sent:'If it rains, I ___ at home.',correct:'will stay',opts:['stay','stayed','would stay'],tag:'条件状语从句'},
+  {sent:'If I ___ you, I would study harder.',correct:'were',opts:['am','was','be'],tag:'条件状语从句'},
+  {sent:'He won\'t pass the exam ___ he studies hard.',correct:'unless',opts:['if','because','when'],tag:'条件状语从句'},
+  {sent:'She would come ___ she had time.',correct:'if',opts:['unless','because','though'],tag:'条件状语从句'},
+
+  // --- 疑问/反义 ---
+  {sent:'You\'re a student, ___?',correct:'aren\'t you',opts:['are you','don\'t you','isn\'t he'],tag:'反意疑问句'},
+  {sent:'She likes music, ___?',correct:'doesn\'t she',opts:['does she','isn\'t she','likes she'],tag:'反意疑问句'},
+  {sent:'Let\'s go, ___?',correct:'shall we',opts:['will you','don\'t we','isn\'t it'],tag:'反意疑问句'},
+  {sent:'He has never been there, ___?',correct:'has he',opts:['hasn\'t he','is he','does he'],tag:'反意疑问句'},
+];
+
+const TAG_ORDER = ['一般现在时','现在进行时','一般过去时','一般将来时','现在完成时','被动语态','宾语从句','定语从句','比较级/最高级','非谓语动词','情态动词','条件状语从句','反意疑问句'];
+
+const LV = [
+  {l:'一般现在·进行时',desc:'时态基础',tags:['一般现在时','现在进行时'],qs:8,sec:14},
+  {l:'一般过去·将来时',desc:'时态进阶',tags:['一般过去时','一般将来时'],qs:8,sec:14},
+  {l:'现在完成时',desc:'完成时态',tags:['现在完成时'],qs:7,sec:14},
+  {l:'被动语态',desc:'语态辨析',tags:['被动语态'],qs:7,sec:14},
+  {l:'三大从句',desc:'宾语·定语·状语',tags:['宾语从句','定语从句','条件状语从句'],qs:8,sec:14},
+  {l:'比较级·非谓语·情态',desc:'语法综合',tags:['比较级/最高级','非谓语动词','情态动词'],qs:8,sec:14},
+  {l:'反意疑问句·混合',desc:'疑问句型',tags:['反意疑问句'],qs:7,sec:14},
+  {l:'综合大挑战',desc:'语法全面检测',tags:[],qs:10,sec:16}
+];
+
+// ========== GAME STATE ==========
+let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+
+function save(){localStorage.setItem('gram_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('gram_lv')||'[]')}
+
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+function buildMap(){
+  load();
+  let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}">
+      <div class="num">${i+1}</div>
+      <div class="name">${l.l}</div>
+      <div class="desc">${l.desc}</div>
+      <div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div>
+    </div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+
+function startLv(i){
+  initAudio();
+  G.lv=i;G.qi=0;G.ok=0;
+  let l=LV[i];
+  let pool;
+  if(l.tags.length){
+    pool=QS.filter(q=>l.tags.includes(q.tag));
+  } else {
+    pool=[...QS];
+  }
+  pool=shuffle(pool);
+  G.qs=Math.min(l.qs,pool.length);
+  let qs=[];
+  for(let j=0;j<G.qs;j++)qs.push(pool[j]);
+  G.questions=qs;G.total=qs.length;
+  G.tmMax=(l.sec||14)*1000;
+  showScr('gameScr');
+  showQ();
+}
+
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  initAudio();
+  let q=G.questions[G.qi],correct=q.correct;
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+
+  // split sentence at ___ and highlight blank
+  let parts=q.sent.split('___');
+  let sentHtml='';
+  for(let p=0;p<parts.length;p++){
+    sentHtml+=parts[p];
+    if(p<parts.length-1)sentHtml+='<span class="blank"> </span>';
+  }
+
+  $('qArea').innerHTML=`<div class="q-prompt">
+    <div class="q-tag">${q.tag}</div>
+    <div class="q-sent">${sentHtml}</div>
+  </div>`;
+
+  // options: correct + shuffled opts (pick 3)
+  let wrongs=shuffle(q.opts).slice(0,3);
+  let all=shuffle([correct,...wrongs]);
+  let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;
+  G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,correct)});
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];
+  let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars;
+  save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>

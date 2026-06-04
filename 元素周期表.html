@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>元素周期表闯关 · 思贤学习站</title>
+<style>
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}
+.h.active{display:flex;flex-direction:column;align-items:center}
+
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#b8860b33}
+
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-meta{font-size:13px;color:var(--text2);margin-bottom:4px;text-align:center}
+.q-prompt{margin:8px 0 20px;text-align:center}
+.q-prompt .elem-sym{font-size:64px;font-weight:700;color:var(--accent);letter-spacing:2px;line-height:1.2}
+.q-prompt .elem-hint{font-size:13px;color:var(--text2);margin-top:4px}
+.q-prompt .elem-num{font-size:48px;font-weight:700;color:var(--accent);line-height:1.2}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:18px;cursor:pointer;transition:.1s;box-shadow:var(--shadow)}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.opt .sub{font-size:12px;color:var(--text2);display:block;margin-top:2px}
+
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+
+@media(max-width:420px){
+  .elem-sym{font-size:52px!important}
+  .opt{font-size:16px;padding:14px 6px}
+}
+</style>
+</head>
+<body>
+
+<div id="mapScr" class="active">
+  <h1>元素周期表闯关</h1>
+  <p class="sub">看元素符号选名称 / 原子序数推理</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+
+<script>
+// ========== DATA ==========
+const EL = [
+  {n:1,sym:'H',name:'氢',cat:'非金属'},
+  {n:2,sym:'He',name:'氦',cat:'稀有气体'},
+  {n:3,sym:'Li',name:'锂',cat:'金属'},
+  {n:4,sym:'Be',name:'铍',cat:'金属'},
+  {n:5,sym:'B',name:'硼',cat:'非金属'},
+  {n:6,sym:'C',name:'碳',cat:'非金属'},
+  {n:7,sym:'N',name:'氮',cat:'非金属'},
+  {n:8,sym:'O',name:'氧',cat:'非金属'},
+  {n:9,sym:'F',name:'氟',cat:'非金属'},
+  {n:10,sym:'Ne',name:'氖',cat:'稀有气体'},
+  {n:11,sym:'Na',name:'钠',cat:'金属'},
+  {n:12,sym:'Mg',name:'镁',cat:'金属'},
+  {n:13,sym:'Al',name:'铝',cat:'金属'},
+  {n:14,sym:'Si',name:'硅',cat:'非金属'},
+  {n:15,sym:'P',name:'磷',cat:'非金属'},
+  {n:16,sym:'S',name:'硫',cat:'非金属'},
+  {n:17,sym:'Cl',name:'氯',cat:'非金属'},
+  {n:18,sym:'Ar',name:'氩',cat:'稀有气体'},
+  {n:19,sym:'K',name:'钾',cat:'金属'},
+  {n:20,sym:'Ca',name:'钙',cat:'金属'},
+  {n:24,sym:'Cr',name:'铬',cat:'金属'},
+  {n:25,sym:'Mn',name:'锰',cat:'金属'},
+  {n:26,sym:'Fe',name:'铁',cat:'金属'},
+  {n:27,sym:'Co',name:'钴',cat:'金属'},
+  {n:28,sym:'Ni',name:'镍',cat:'金属'},
+  {n:29,sym:'Cu',name:'铜',cat:'金属'},
+  {n:30,sym:'Zn',name:'锌',cat:'金属'},
+  {n:35,sym:'Br',name:'溴',cat:'非金属'},
+  {n:36,sym:'Kr',name:'氪',cat:'稀有气体'},
+  {n:47,sym:'Ag',name:'银',cat:'金属'},
+  {n:56,sym:'Ba',name:'钡',cat:'金属'},
+  {n:79,sym:'Au',name:'金',cat:'金属'},
+  {n:80,sym:'Hg',name:'汞',cat:'金属'},
+  {n:82,sym:'Pb',name:'铅',cat:'金属'},
+];
+const CATMAP = {金属:'金属元素',非金属:'非金属元素',稀有气体:'稀有气体'};
+
+const LV = [
+  {l:'前10号元素',desc:'H→Ne',data:[0,1,2,3,4,5,6,7,8,9],mode:'sn',qs:8,sec:10},
+  {l:'11-20号元素',desc:'Na→Ca',data:[10,11,12,13,14,15,16,17,18,19],mode:'sn',qs:8,sec:10},
+  {l:'常见金属',desc:'Fe Cu Zn Ag Au Mn Ba Hg',data:[20,21,22,23,24,25,26,27,28,29,30,37,38],mode:'sn',qs:8,sec:10},
+  {l:'非金属·稀有气体',desc:'补充非金属',data:[4,5,6,7,8,9,14,15,16,17,31,32,33],mode:'sn',qs:8,sec:12},
+  {l:'符号→原子序数',desc:'看符号选序数',data:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,22,25,26,29,30],mode:'s2n',qs:8,sec:10},
+  {l:'原子序数→符号',desc:'看序数选符号',data:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,22,25,26,29,30],mode:'n2s',qs:8,sec:10},
+  {l:'元素分类',desc:'金属/非金属/稀有气体',data:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,22,25,26,29,30,31,32,33,34,35,36,37,38],mode:'cat',qs:8,sec:12},
+  {l:'综合大挑战',desc:'混合出题',data:EL.map((_,i)=>i),mode:'mix',qs:10,sec:12}
+];
+
+// ========== GAME STATE ==========
+let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],ans:[],timer:null,locked:false};
+
+// ========== SAVE ==========
+function save(){localStorage.setItem('elem_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('elem_lv')||'[]')}
+
+// ========== UTIL ==========
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+// ========== AUDIO ==========
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(freq,vol,dur,type){
+  try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=type||'sine';o.frequency.value=freq;g.gain.setValueAtTime(vol,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+dur);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+dur)}catch(e){}
+}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+// ========== MAP ==========
+function buildMap(){
+  load();
+  let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}">
+      <div class="num">${i+1}</div>
+      <div class="name">${l.l}</div>
+      <div class="desc">${l.desc}</div>
+      <div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div>
+    </div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+function startLv(i){
+  initAudio();
+  G.lv=i;G.qi=0;G.ok=0;G.total=0;
+  let l=LV[i];
+  G.qs=Math.min(l.qs,l.data.length);
+  G.tmMax=l.sec*1000;
+  // generate questions
+  let pool=shuffle([...l.data]),qs=[];
+  for(let j=0;j<G.qs;j++)qs.push(pool[j]);
+  G.questions=qs;G.ans=[];G.total=qs.length;
+  showScr('gameScr');
+  showQ();
+}
+
+// ========== QUESTION ==========
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  initAudio();
+  let l=LV[G.lv],elIdx=G.questions[G.qi],el=EL[elIdx];
+  let mode=l.mode;
+  if(mode==='mix')mode=['sn','s2n','n2s','cat'][rand(0,3)];
+
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+
+  let qa=$('qArea'),opts=$('opts');
+
+  // build prompt
+  let prompt='',correct='',qtype='';
+  if(mode==='sn'||mode==='s2n'){
+    // show symbol, pick name or number
+    if(mode==='sn'){
+      prompt=`<div class="elem-sym">${el.sym}</div><div class="elem-hint">原子序数 ${el.n}</div>`;
+      correct=el.name;qtype='name';
+    } else {
+      prompt=`<div class="elem-sym">${el.sym}</div><div class="elem-hint">选择对应的原子序数</div>`;
+      correct=el.n+'';qtype='num';
+    }
+  } else if(mode==='n2s'){
+    prompt=`<div class="elem-num">${el.n}</div><div class="elem-hint">选择对应的元素符号</div>`;
+    correct=el.sym;qtype='sym';
+  } else if(mode==='cat'){
+    prompt=`<div class="elem-sym">${el.sym} ${el.name}</div><div class="elem-hint">属于哪一类元素？</div>`;
+    correct=CATMAP[el.cat];qtype='cat';
+  }
+  qa.innerHTML=`<div class="q-prompt">${prompt}</div>`;
+
+  // build options
+  let wrongs=[];
+  if(qtype==='name'){
+    wrongs=EL.filter(e=>e.name!==el.name).map(e=>e.name);
+  } else if(qtype==='num'){
+    wrongs=EL.filter(e=>e.n!==el.n).map(e=>e.n+'');
+  } else if(qtype==='sym'){
+    wrongs=EL.filter(e=>e.sym!==el.sym).map(e=>e.sym);
+  } else if(qtype==='cat'){
+    wrongs=Object.values(CATMAP).filter(c=>c!==correct);
+  }
+  wrongs=shuffle(wrongs).slice(0,4);
+  let all=shuffle([correct,...wrongs.slice(0,3)]);
+  let h='';
+  for(let o of all){
+    let extra='';
+    if(qtype==='num')extra=`<span class="sub">${EL.find(e=>e.n==+o)?.sym||''}</span>`;
+    if(qtype==='sym')extra=`<span class="sub">${EL.find(e=>e.sym===o)?.name||''}</span>`;
+    h+=`<div class="opt" data-v="${o}">${o}${extra}</div>`;
+  }
+  opts.innerHTML=h;
+
+  G.ans=[];
+  opts.querySelectorAll('.opt').forEach(b=>{
+    b.onclick=()=>chk(b,correct);
+  });
+
+  G.locked=false;
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();
+  G.locked=true;
+  clearTimeout(G.timer);
+  let val=btn.dataset.v;
+  let isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  opts.querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);
+  let tEl=$('timer');
+  G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';
+    tEl.classList.toggle('warn',left<=3);
+    if(left<=0){
+      G.locked=true;
+      sfxDrop();
+      opts.querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled')});
+      // auto-reveal correct
+      opts.querySelectorAll('.opt').forEach(b=>{if(b.dataset.v===G.ans[0])b.classList.add('correct')});
+      setTimeout(()=>{G.qi++;showQ()},500);
+      return;
+    }
+    G.tm-=100;
+    G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total;
+  let stars;
+  if(pct>=.88)stars=3;
+  else if(pct>=.63)stars=2;
+  else if(pct>=.38)stars=1;
+  else stars=0;
+
+  if(!G.stars)G.stars=[];
+  let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars;
+  save();
+
+  showScr('mapScr');
+
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  $('resDetail').textContent=stars>=3?'全部答对，太厉害了！':stars>=2?'大部分正确，继续进步！':stars>=1?'还需要多加练习！':'别灰心，再来一次！';
+
+  if(stars>=3)sfxPass();
+
+  let lv=G.lv;
+  $('resNext').onclick=()=>{
+    if(lv<LV.length-1&&(G.stars[lv]||0)>=1){startLv(lv+1)}
+    else{buildMap();$('resOverlay').classList.remove('active')}
+  };
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+
+  // delay overlay to let map render first
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+
+// ========== INIT ==========
+buildMap();
+
+// Prevent zoom on double tap
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>地形图识 · 思贤学习站</title>
+<style>
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}
+.h.active{display:flex;flex-direction:column;align-items:center}
+
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#b8860b33}
+
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:8px 0 12px}
+.q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
+.q-prompt .q-name{font-size:22px;font-weight:700;color:var(--text);margin:6px 0}
+.q-prompt .q-feat{font-size:14px;color:var(--text2)}
+#outlineCanvas{display:block;margin:0 auto;background:#e8f4f8;border-radius:12px;max-width:260px;width:100%;aspect-ratio:1}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:17px;cursor:pointer;transition:.1s;box-shadow:var(--shadow)}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.q-prop{display:inline-block;font-size:11px;color:var(--accent);background:#b8860b15;padding:2px 10px;border-radius:10px;margin:4px 0}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+
+@media(max-width:420px){
+  .q-name{font-size:19px!important}
+  .opt{font-size:15px;padding:12px 6px}
+}
+</style>
+</head>
+<body>
+
+<div id="mapScr" class="active">
+  <h1>地形图识</h1>
+  <p class="sub">看轮廓选省份 · 省会配对 · 地理知识闯关</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <canvas id="outlineCanvas" width="300" height="300"></canvas>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+
+<script>
+// ========== PROVINCE DATA ==========
+// Simplified outlines [x,y] normalized 0-100
+const PROV = [
+  {name:'山东',cap:'济南',abbr:'鲁',outline:[[38,35],[50,30],[62,25],[72,22],[80,20],[85,28],[82,38],[74,40],[70,45],[62,48],[55,52],[48,50],[42,48],[36,42],[38,35]]},
+  {name:'广东',cap:'广州',abbr:'粤',outline:[[30,65],[40,62],[50,60],[62,58],[72,55],[80,58],[85,65],[82,72],[75,78],[65,80],[55,82],[45,80],[35,76],[30,65]]},
+  {name:'台湾',cap:'台北',abbr:'台',outline:[[75,22],[80,28],[82,38],[80,48],[76,55],[72,58],[68,55],[66,48],[68,38],[70,30],[75,22]]},
+  {name:'海南',cap:'海口',abbr:'琼',outline:[[40,82],[50,80],[58,82],[60,88],[56,92],[46,94],[40,90],[38,86],[40,82]]},
+  {name:'黑龙江',cap:'哈尔滨',abbr:'黑',outline:[[70,5],[80,8],[88,12],[92,18],[90,26],[85,30],[78,28],[72,24],[68,18],[65,12],[68,8],[70,5]]},
+  {name:'新疆',cap:'乌鲁木齐',abbr:'新',outline:[[10,5],[20,3],[32,4],[38,8],[40,18],[42,28],[40,38],[36,44],[28,46],[20,44],[14,40],[10,34],[8,26],[8,16],[10,5]]},
+  {name:'西藏',cap:'拉萨',abbr:'藏',outline:[[8,38],[20,36],[30,34],[40,36],[46,40],[48,48],[44,54],[36,56],[28,54],[20,52],[14,48],[10,44],[8,38]]},
+  {name:'内蒙古',cap:'呼和浩特',abbr:'蒙',outline:[[15,10],[25,8],[35,6],[48,5],[60,6],[72,8],[78,12],[76,18],[68,20],[56,18],[44,16],[32,15],[22,16],[15,10]]},
+  {name:'四川',cap:'成都',abbr:'川',outline:[[28,38],[38,36],[48,34],[56,36],[60,42],[58,50],[50,54],[42,52],[34,48],[30,44],[28,38]]},
+  {name:'云南',cap:'昆明',abbr:'云',outline:[[20,52],[30,50],[40,48],[48,50],[52,56],[50,64],[44,70],[36,72],[28,70],[22,66],[18,60],[20,52]]},
+  {name:'湖南',cap:'长沙',abbr:'湘',outline:[[42,48],[50,46],[58,48],[62,54],[60,60],[54,64],[46,62],[40,58],[38,52],[42,48]]},
+  {name:'江苏',cap:'南京',abbr:'苏',outline:[[50,30],[58,28],[66,30],[72,34],[74,40],[70,46],[62,48],[56,46],[50,42],[48,36],[50,30]]},
+  {name:'陕西',cap:'西安',abbr:'陕',outline:[[34,22],[42,20],[48,22],[52,28],[54,36],[52,44],[46,48],[40,46],[36,40],[34,32],[34,22]]},
+  {name:'河南',cap:'郑州',abbr:'豫',outline:[[42,34],[50,32],[56,34],[60,38],[62,44],[58,48],[52,50],[46,48],[42,44],[40,38],[42,34]]},
+  {name:'浙江',cap:'杭州',abbr:'浙',outline:[[60,26],[66,24],[72,26],[76,30],[78,36],[74,42],[68,44],[62,42],[58,36],[58,30],[60,26]]},
+];
+
+// Country outlines (simplified)
+const COUNTRY = [
+  {name:'中国',outline:[[5,5],[25,3],[48,4],[70,5],[88,10],[92,20],[90,32],[82,42],[70,48],[55,52],[40,54],[25,52],[12,48],[5,40],[3,28],[3,16],[5,5]]},
+  {name:'美国',outline:[[10,18],[30,16],[50,14],[68,16],[82,20],[90,28],[88,38],[80,44],[65,48],[50,46],[35,44],[22,40],[12,36],[6,30],[8,22],[10,18]]},
+  {name:'俄罗斯',outline:[[30,5],[50,3],[70,2],[88,4],[94,10],[90,18],[82,22],[70,24],[58,22],[45,20],[35,18],[28,14],[26,8],[30,5]]},
+  {name:'澳大利亚',outline:[[40,50],[55,48],[70,50],[80,56],[82,64],[78,72],[66,76],[50,75],[36,72],[28,66],[30,58],[40,50]]},
+  {name:'印度',outline:[[40,55],[52,52],[60,54],[64,60],[62,68],[56,74],[48,76],[42,72],[38,66],[36,60],[40,55]]},
+  {name:'巴西',outline:[[38,48],[52,46],[64,48],[72,54],[74,62],[68,70],[56,74],[44,72],[34,66],[32,58],[38,48]]},
+  {name:'日本',outline:[[86,18],[90,24],[92,32],[90,42],[86,50],[82,52],[78,48],[76,40],[78,32],[80,24],[86,18]]},
+  {name:'法国',outline:[[28,28],[38,26],[46,28],[50,34],[48,42],[42,46],[34,45],[28,40],[26,34],[28,28]]},
+];
+
+// Province geography Q&A
+const GEO = PROV.map(p=>({name:p.name,cap:p.cap,abbr:p.abbr}));
+
+// Province features
+const FEAT = [
+  {name:'山东',feat:'泰山·黄河入海口·半岛'},
+  {name:'广东',feat:'珠江三角洲·经济特区'},
+  {name:'四川',feat:'天府之国·都江堰'},
+  {name:'西藏',feat:'珠穆朗玛峰·青藏高原'},
+  {name:'新疆',feat:'塔克拉玛干沙漠·天山'},
+  {name:'云南',feat:'西双版纳·大理古城'},
+  {name:'湖南',feat:'张家界·洞庭湖'},
+  {name:'陕西',feat:'兵马俑·华山·黄土高原'},
+  {name:'江苏',feat:'苏州园林·长江三角洲'},
+  {name:'浙江',feat:'西湖·钱塘江'},
+  {name:'黑龙江',feat:'大兴安岭·东北平原'},
+  {name:'内蒙古',feat:'大草原·蒙古包'},
+  {name:'海南',feat:'天涯海角·热带海岛'},
+  {name:'河南',feat:'少林寺·中原大地'},
+  {name:'台湾',feat:'日月潭·阿里山'},
+];
+
+// ========== LEVELS ==========
+const PROV_NAMES = PROV.map(p=>p.name);
+const COUNTRY_NAMES = COUNTRY.map(c=>c.name);
+
+const LV = [
+  {l:'省份轮廓·上',desc:'看轮廓辨省份',data:[0,1,2,3,4,5,6,7],mode:'outline',qs:8,sec:14,pool:'prov'},
+  {l:'省份轮廓·下',desc:'看轮廓辨省份',data:[8,9,10,11,12,13,14],mode:'outline',qs:7,sec:14,pool:'prov'},
+  {l:'省会配对',desc:'省份→省会',data:PROV_NAMES,mode:'cap',qs:8,sec:12},
+  {l:'省份简称',desc:'省份→简称',data:PROV_NAMES,mode:'abbr',qs:8,sec:12},
+  {l:'地理特征',desc:'特征→省份',data:FEAT.map((_,i)=>i),mode:'feat',qs:8,sec:14},
+  {l:'世界轮廓',desc:'看轮廓辨国家',data:[0,1,2,3,4,5,6,7],mode:'country',qs:8,sec:14},
+  {l:'国家机关',desc:'首都配对',data:COUNTRY_NAMES,mode:'capital',qs:8,sec:12},
+  {l:'综合大挑战',desc:'轮廓·省会·简称混合',data:[],mode:'mix',qs:10,sec:14}
+];
+
+// Capitals for countries
+const CAPITALS = {
+  '中国':'北京','美国':'华盛顿','俄罗斯':'莫斯科','澳大利亚':'堪培拉',
+  '印度':'新德里','巴西':'巴西利亚','日本':'东京','法国':'巴黎'
+};
+
+// ========== GAME STATE ==========
+let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+
+function save(){localStorage.setItem('geo_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('geo_lv')||'[]')}
+
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+function drawOutline(points,canvas){
+  let ctx=canvas.getContext('2d'),w=canvas.width,h=canvas.height;
+  ctx.clearRect(0,0,w,h);
+  // find bounds
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  for(let p of points){minX=Math.min(minX,p[0]);maxX=Math.max(maxX,p[0]);minY=Math.min(minY,p[1]);maxY=Math.max(maxY,p[1])}
+  let pw=maxX-minX,ph=maxY-minY,scale=Math.min((w-40)/pw,(h-40)/ph),cx=(minX+maxX)/2,cy=(minY+maxY)/2;
+  ctx.beginPath();
+  for(let i=0;i<points.length;i++){
+    let x=(points[i][0]-cx)*scale+w/2,y=(points[i][1]-cy)*scale+h/2;
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.fillStyle='#b8860b22';ctx.fill();
+  ctx.strokeStyle='#b8860b';ctx.lineWidth=2;ctx.stroke();
+  // blue sea dots
+  ctx.fillStyle='#b8860b44';
+  for(let i=0;i<points.length;i++){
+    let x=(points[i][0]-cx)*scale+w/2,y=(points[i][1]-cy)*scale+h/2;
+    ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.fill();
+  }
+}
+
+function buildMap(){
+  load();
+  let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}">
+      <div class="num">${i+1}</div>
+      <div class="name">${l.l}</div>
+      <div class="desc">${l.desc}</div>
+      <div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div>
+    </div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+
+function startLv(i){
+  initAudio();
+  G.lv=i;G.qi=0;G.ok=0;
+  let l=LV[i],mode=l.mode;
+  let pool,questions=[];
+
+  if(mode==='outline'){
+    pool=l.data.map(j=>PROV[j]);
+    questions=shuffle(pool).slice(0,l.qs);
+  } else if(mode==='country'){
+    pool=l.data.map(j=>COUNTRY[j]);
+    questions=shuffle(pool).slice(0,l.qs);
+  } else if(mode==='cap'){
+    pool=shuffle([...l.data]);
+    questions=pool.slice(0,l.qs).map(n=>GEO.find(g=>g.name===n));
+  } else if(mode==='abbr'){
+    pool=shuffle([...l.data]);
+    questions=pool.slice(0,l.qs).map(n=>GEO.find(g=>g.name===n));
+  } else if(mode==='feat'){
+    pool=shuffle([...l.data]);
+    questions=pool.slice(0,l.qs).map(j=>FEAT[j]);
+  } else if(mode==='capital'){
+    pool=shuffle([...l.data]);
+    questions=pool.slice(0,l.qs).map(n=>{let c=COUNTRY.find(c=>c.name===n);return{name:c.name,cap:CAPITALS[c.name]}});
+  } else { // mix
+    let types=['outline','cap','abbr','feat'];
+    for(let j=0;j<l.qs;j++){
+      let t=types[rand(0,types.length-1)];
+      if(t==='outline'){let p=PROV[rand(0,PROV.length-1)];questions.push({mode:'outline',data:p})}
+      else if(t==='cap'){let p=GEO[rand(0,GEO.length-1)];questions.push({mode:'cap',data:p})}
+      else if(t==='abbr'){let p=GEO[rand(0,GEO.length-1)];questions.push({mode:'abbr',data:p})}
+      else if(t==='feat'){let p=FEAT[rand(0,FEAT.length-1)];questions.push({mode:'feat',data:p})}
+    }
+  }
+
+  G.questions=questions;G.total=questions.length;
+  G.tmMax=(l.sec||12)*1000;
+  showScr('gameScr');
+  showQ();
+}
+
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  initAudio();
+  let l=LV[G.lv],q=G.questions[G.qi];
+  let mode=q.mode||l.mode;
+
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+
+  let canvas=$('outlineCanvas'),correct='',pool=[];
+
+  if(mode==='outline'){
+    let p=q.data||q;
+    drawOutline(p.outline,canvas);
+    canvas.style.display='block';
+    $('qArea').innerHTML='<div class="q-prompt"><div class="q-name">这是哪个省份/地区？</div></div>';
+    correct=p.name;
+    pool=PROV_NAMES.filter(n=>n!==correct);
+  } else if(mode==='country'){
+    let c=q.data||q;
+    drawOutline(c.outline,canvas);
+    canvas.style.display='block';
+    $('qArea').innerHTML='<div class="q-prompt"><div class="q-name">这是哪个国家？</div></div>';
+    correct=c.name;
+    pool=COUNTRY_NAMES.filter(n=>n!==correct);
+  } else if(mode==='cap'){
+    canvas.style.display='none';
+    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.name}的省会是？</div></div>`;
+    correct=q.cap;
+    pool=GEO.map(g=>g.cap).filter(c=>c!==correct);
+  } else if(mode==='abbr'){
+    canvas.style.display='none';
+    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.name}的简称是？</div></div>`;
+    correct=q.abbr;
+    pool=GEO.map(g=>g.abbr).filter(c=>c!==correct);
+  } else if(mode==='feat'){
+    canvas.style.display='none';
+    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.feat}</div><div class="q-label">以上特征描述的是哪个省份？</div></div>`;
+    correct=q.name;
+    pool=PROV_NAMES.filter(n=>n!==correct);
+  } else if(mode==='capital'){
+    canvas.style.display='none';
+    $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.name}的首都是？</div></div>`;
+    correct=q.cap;
+    pool=Object.values(CAPITALS).filter(c=>c!==correct);
+  }
+
+  pool=shuffle(pool).slice(0,3);
+  let all=shuffle([correct,...pool]);
+  let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;
+  G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,correct)});
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];
+  let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars;
+  save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>

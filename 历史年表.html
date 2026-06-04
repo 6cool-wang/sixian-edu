@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>历史年表闯关 · 思贤学习站</title>
+<style>
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}
+.h.active{display:flex;flex-direction:column;align-items:center}
+
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#b8860b33}
+
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:12px 0 20px}
+.q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
+.q-prompt .q-event{font-size:22px;font-weight:700;color:var(--text);line-height:1.4;margin:8px 0}
+.q-prompt .q-era{font-size:12px;color:var(--text2);display:inline-block;background:#b8860b15;padding:2px 10px;border-radius:10px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:17px;cursor:pointer;transition:.1s;box-shadow:var(--shadow)}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+
+@media(max-width:420px){
+  .q-event{font-size:19px!important}
+  .opt{font-size:15px;padding:12px 6px}
+}
+</style>
+</head>
+<body>
+
+<div id="mapScr" class="active">
+  <h1>历史年表闯关</h1>
+  <p class="sub">历史事件 · 朝代配对</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+
+<script>
+// ========== DATA ==========
+// event -> dynasty / period
+const HIS = [
+  {ev:'夏朝建立',ans:'夏朝',era:'古代'},
+  {ev:'商汤灭夏，商朝建立',ans:'商朝',era:'古代'},
+  {ev:'武王伐纣，西周建立',ans:'西周',era:'古代'},
+  {ev:'烽火戏诸侯，西周灭亡',ans:'西周',era:'古代'},
+  {ev:'平王东迁，东周开始',ans:'东周',era:'古代'},
+  {ev:'齐桓公称霸',ans:'春秋',era:'古代'},
+  {ev:'晋楚城濮之战',ans:'春秋',era:'古代'},
+  {ev:'秦灭六国，统一天下',ans:'秦朝',era:'古代'},
+  {ev:'焚书坑儒',ans:'秦朝',era:'古代'},
+  {ev:'陈胜吴广起义',ans:'秦末',era:'古代'},
+  {ev:'楚汉之争',ans:'秦末',era:'古代'},
+  {ev:'汉朝建立，定都长安',ans:'西汉',era:'古代'},
+  {ev:'文景之治',ans:'西汉',era:'古代'},
+  {ev:'张骞出使西域',ans:'西汉',era:'古代'},
+  {ev:'丝绸之路开通',ans:'西汉',era:'古代'},
+  {ev:'王莽篡汉',ans:'新朝',era:'古代'},
+  {ev:'刘秀建立东汉',ans:'东汉',era:'古代'},
+  {ev:'官渡之战',ans:'东汉末',era:'古代'},
+  {ev:'赤壁之战',ans:'东汉末',era:'古代'},
+  {ev:'三国鼎立',ans:'三国',era:'古代'},
+  {ev:'西晋统一全国',ans:'西晋',era:'古代'},
+  {ev:'八王之乱',ans:'西晋',era:'古代'},
+  {ev:'北魏孝文帝改革',ans:'南北朝',era:'古代'},
+  {ev:'隋朝统一全国',ans:'隋朝',era:'古代'},
+  {ev:'开凿大运河',ans:'隋朝',era:'古代'},
+  {ev:'唐朝建立',ans:'唐朝',era:'古代'},
+  {ev:'贞观之治',ans:'唐朝',era:'古代'},
+  {ev:'武则天称帝',ans:'唐朝',era:'古代'},
+  {ev:'开元盛世',ans:'唐朝',era:'古代'},
+  {ev:'安史之乱',ans:'唐朝',era:'古代'},
+  {ev:'陈桥兵变，宋朝建立',ans:'北宋',era:'古代'},
+  {ev:'澶渊之盟',ans:'北宋',era:'古代'},
+  {ev:'王安石变法',ans:'北宋',era:'古代'},
+  {ev:'靖康之变，北宋灭亡',ans:'南宋',era:'古代'},
+  {ev:'岳飞抗金',ans:'南宋',era:'古代'},
+  {ev:'元朝建立',ans:'元朝',era:'古代'},
+  {ev:'马可·波罗来华',ans:'元朝',era:'古代'},
+  {ev:'明朝建立',ans:'明朝',era:'古代'},
+  {ev:'郑和下西洋',ans:'明朝',era:'古代'},
+  {ev:'土木堡之变',ans:'明朝',era:'古代'},
+  {ev:'戚继光抗倭',ans:'明朝',era:'古代'},
+  {ev:'努尔哈赤建立后金',ans:'明末',era:'古代'},
+  {ev:'清军入关',ans:'清朝',era:'古代'},
+  {ev:'康乾盛世',ans:'清朝',era:'古代'},
+  {ev:'郑成功收复台湾',ans:'清朝',era:'古代'},
+  {ev:'虎门销烟',ans:'清朝',era:'近代'},
+  {ev:'鸦片战争爆发',ans:'清朝',era:'近代'},
+  {ev:'太平天国运动',ans:'清朝',era:'近代'},
+  {ev:'第二次鸦片战争',ans:'清朝',era:'近代'},
+  {ev:'洋务运动',ans:'清朝',era:'近代'},
+  {ev:'甲午中日战争',ans:'清朝',era:'近代'},
+  {ev:'戊戌变法',ans:'清朝',era:'近代'},
+  {ev:'义和团运动',ans:'清朝',era:'近代'},
+  {ev:'辛亥革命，清朝灭亡',ans:'近代',era:'近代'},
+  {ev:'中华民国建立',ans:'近代',era:'近代'},
+  {ev:'五四运动',ans:'近代',era:'近代'},
+  {ev:'中国共产党成立',ans:'近代',era:'近代'},
+  {ev:'南昌起义',ans:'近代',era:'近代'},
+  {ev:'红军长征',ans:'近代',era:'近代'},
+  {ev:'西安事变',ans:'近代',era:'近代'},
+  {ev:'七七事变，全面抗战',ans:'近代',era:'近代'},
+  {ev:'百团大战',ans:'近代',era:'近代'},
+  {ev:'抗日战争胜利',ans:'近代',era:'近代'},
+  {ev:'新中国成立',ans:'现代',era:'现代'},
+  {ev:'三大改造完成',ans:'现代',era:'现代'},
+  {ev:'改革开放',ans:'现代',era:'现代'},
+  {ev:'香港回归',ans:'现代',era:'现代'},
+  {ev:'澳门回归',ans:'现代',era:'现代'},
+  {ev:'中国加入WTO',ans:'现代',era:'现代'},
+];
+// unique dynasty labels
+const DYN = [...new Set(HIS.map(h=>h.ans))];
+
+const LV = [
+  {l:'先秦时期',desc:'夏·商·西周·春秋',era:'古代',filter:e=>['夏朝','商朝','西周'].includes(e.ans),qs:8,sec:12},
+  {l:'秦汉',desc:'秦·西汉·东汉',era:'古代',filter:e=>['秦朝','秦末','西汉','新朝','东汉','东汉末'].includes(e.ans),qs:8,sec:12},
+  {l:'三国两晋南北朝',desc:'三国·两晋·南北朝',era:'古代',filter:e=>['三国','西晋','南北朝'].includes(e.ans),qs:6,sec:12},
+  {l:'隋唐',desc:'隋·唐',era:'古代',filter:e=>['隋朝','唐朝'].includes(e.ans),qs:8,sec:12},
+  {l:'宋元',desc:'北宋·南宋·元',era:'古代',filter:e=>['北宋','南宋','元朝'].includes(e.ans),qs:8,sec:12},
+  {l:'明清',desc:'明·清',era:'古代',filter:e=>['明朝','明末','清朝'].includes(e.ans),qs:8,sec:12},
+  {l:'近代风云',desc:'晚清·民国·革命',era:'近代',filter:e=>e.era==='近代',qs:8,sec:12},
+  {l:'综合大挑战',desc:'上下五千年混合',era:'全部',filter:e=>true,qs:10,sec:14}
+];
+
+// ========== GAME STATE ==========
+let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+
+function save(){localStorage.setItem('his_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('his_lv')||'[]')}
+
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+function buildMap(){
+  load();
+  let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}">
+      <div class="num">${i+1}</div>
+      <div class="name">${l.l}</div>
+      <div class="desc">${l.desc}</div>
+      <div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div>
+    </div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+
+function startLv(i){
+  initAudio();
+  G.lv=i;G.qi=0;G.ok=0;
+  let l=LV[i];
+  let pool=HIS.filter(l.filter);
+  let idx=shuffle(pool.map((_,j)=>j));
+  G.qs=Math.min(l.qs,pool.length);
+  let qs=[];
+  for(let j=0;j<G.qs;j++)qs.push(pool[idx[j]]);
+  G.questions=qs;G.total=qs.length;
+  G.tmMax=(l.sec||12)*1000;
+  showScr('gameScr');
+  showQ();
+}
+
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  initAudio();
+  let ev=G.questions[G.qi],correct=ev.ans;
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+  $('qArea').innerHTML=`<div class="q-prompt">
+    <div class="q-label">${ev.era}</div>
+    <div class="q-event">${ev.ev}</div>
+  </div>`;
+  // distractors: same era or random dynasties
+  let pool=DYN.filter(d=>d!==correct);
+  if(pool.length>3)pool=shuffle(pool).slice(0,3);
+  let all=shuffle([correct,...pool]);
+  let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;
+  G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,correct)});
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);
+  let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];
+  let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars;
+  save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>
