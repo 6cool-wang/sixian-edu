@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>拼音大冒险 · 拼音闯关训练</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--card2:#f8f7f4;--accent:#b8860b;--accent2:#daa520;--red:#c0392b;--red2:#e74c3c;--pink:#fceae8;--text:#2d2d2d;--sub:#9a9a9a;--success:#27ae60;--error:var(--red2);--radius:16px;--shadow:0 4px 24px rgba(0,0,0,.05)}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:center}
+#app{width:100%;max-width:420px;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;background:var(--bg2)}
+.bg-deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-deco .orb{position:absolute;border-radius:50%;filter:blur(120px);opacity:.07}
+.bg-deco .orb:nth-child(1){width:260px;height:260px;background:var(--red);top:-100px;right:-60px}
+.bg-deco .orb:nth-child(2){width:200px;height:200px;background:var(--accent);bottom:-60px;left:-60px}
+.bg-deco .orb:nth-child(3){width:160px;height:160px;background:var(--red2);top:45%;left:30%}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 4px;z-index:10;position:relative}
+header .back-btn{background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer;padding:4px}
+header .back-btn:active{transform:scale(.85)}
+.header-title{font-size:16px;font-weight:700;color:var(--accent)}
+.header-right{font-size:12px;color:var(--sub)}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all .12s;text-align:center}
+.btn:active{transform:scale(.97)}
+.btn-red{background:linear-gradient(135deg,var(--red2),var(--red));color:#fff;box-shadow:0 4px 16px rgba(192,57,43,.25)}
+.btn-gold{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;box-shadow:0 4px 16px rgba(184,134,11,.22)}
+.btn-outline{background:transparent;border:2px solid #e0ddd5;color:var(--text)}
+.btn-group{display:flex;gap:8px;margin-top:10px}
+.btn-group .btn{flex:1}
+
+.home-screen{text-align:center;padding:30px 18px;flex:1;display:flex;flex-direction:column;justify-content:center;z-index:10}
+.home-screen .logo{font-size:52px;margin-bottom:2px}
+.home-screen h1{font-size:34px;font-weight:900;color:var(--red);margin-bottom:2px}
+.home-screen .subtitle{color:var(--sub);font-size:13px;margin-bottom:6px}
+.home-tagline{color:var(--accent2);font-size:13px;font-weight:600;margin-bottom:16px;letter-spacing:2px}
+.home-feats{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;text-align:left}
+.home-feats .feat{display:flex;align-items:center;gap:8px;font-size:13px;background:var(--card);padding:10px 14px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.02);border:1px solid #f0ede8}
+
+.map-screen{flex:1;display:flex;flex-direction:column;padding:10px 18px 20px;overflow-y:auto;z-index:10}
+.map-screen h2{text-align:center;font-size:20px;font-weight:800;color:var(--red);margin-bottom:12px}
+.map-path{flex:1;display:flex;flex-direction:column;gap:8px}
+.map-node{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid #f0ede8;border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .2s}
+.map-node:active{transform:scale(.98)}
+.map-node.locked{opacity:.3;pointer-events:none}
+.map-node.current{border-color:var(--red);box-shadow:0 0 16px rgba(192,57,43,.08)}
+.map-node.completed{border-color:rgba(39,174,96,.2)}
+.map-node .icon{font-size:26px;min-width:34px;text-align:center}
+.map-node .info{flex:1;min-width:0}
+.map-node .info .name{font-size:15px;font-weight:700}
+.map-node .info .desc{font-size:11px;color:var(--sub);margin-top:1px}
+.map-node .status{font-size:12px;color:var(--accent)}
+.map-connector{text-align:center;font-size:9px;color:#d0d0d0;margin:-3px 0}
+.map-progress{text-align:center;font-size:12px;color:var(--sub);margin-bottom:8px}
+.map-progress span{color:var(--red);font-weight:700}
+
+.game-screen{flex:1;display:flex;flex-direction:column;padding:6px 16px 16px;z-index:10}
+.game-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.game-hd .lvl-name{font-size:13px;color:var(--sub)}
+.game-hd .score{font-size:14px;font-weight:700;color:var(--red)}
+.q-area{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 0}
+.q-area .q-char{font-size:72px;font-weight:900;color:var(--text);margin-bottom:4px;letter-spacing:2px}
+.q-area .q-meta2{font-size:12px;color:var(--sub);margin-bottom:18px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.choice-btn{background:var(--card);border:2px solid #e8e5e0;border-radius:12px;padding:16px 8px;font-size:18px;font-weight:700;cursor:pointer;transition:all .12s;text-align:center;color:var(--text);font-family:serif}
+.choice-btn:active{transform:scale(.95);border-color:var(--accent)}
+.choice-btn.correct{background:#d4edda;border-color:var(--success);animation:fadeUp .25s}
+.choice-btn.wrong{background:var(--pink);border-color:var(--error);animation:shake .35s}
+.choice-btn.disabled{pointer-events:none;opacity:.6}
+.q-progress{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:0 2px}
+.q-progress .info{font-size:11px;color:var(--sub);display:flex;gap:12px}
+.q-progress .info em{font-style:normal;color:var(--red);font-weight:700}
+.q-progress .streak{font-size:13px;font-weight:700;color:#e67e22;opacity:0;transition:opacity .2s}
+.q-progress .streak.active{opacity:1}
+.progress-dots{display:flex;gap:4px;justify-content:center;margin:4px 0 2px}
+.progress-dots .dot{width:7px;height:7px;border-radius:50%;background:#e8e5e0;transition:all .2s}
+.progress-dots .dot.done{background:var(--success)}
+.progress-dots .dot.wrong{background:var(--error)}
+.progress-dots .dot.current{background:var(--accent);transform:scale(1.3)}
+
+.result-overlay{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.3);backdrop-filter:blur(6px);animation:fadeIn .3s ease}
+.result-overlay.hidden{display:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.result-card{background:var(--card);border-radius:var(--radius);padding:28px 24px;width:90%;max-width:340px;text-align:center;box-shadow:0 12px 48px rgba(0,0,0,.08);border:1px solid #f0ede8;animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.result-card .big-icon{font-size:52px;margin-bottom:4px}
+.result-card .title{font-size:22px;font-weight:800;margin-bottom:2px}
+.result-card .sub{font-size:13px;color:var(--sub);margin-bottom:10px}
+.result-card .stars{font-size:26px;margin-bottom:6px}
+.result-card .score-big{font-size:40px;font-weight:900;color:var(--red)}
+.result-card .score-lbl{font-size:11px;color:var(--sub);margin-bottom:10px}
+.result-card .stats{display:flex;justify-content:center;gap:20px;margin-bottom:12px}
+.result-card .stats .item{text-align:center}
+.result-card .stats .item .v{font-size:18px;font-weight:700}
+.result-card .stats .item .l{font-size:10px;color:var(--sub)}
+.result-combo{font-size:14px;font-weight:700;color:#e67e22;margin-bottom:8px;opacity:0;animation:comboPop .5s .3s forwards}
+@keyframes comboPop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{translate:0}20%{translate:-6px}40%{translate:6px}60%{translate:-4px}80%{translate:4px}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.correct-flash{position:fixed;inset:0;pointer-events:none;z-index:30;display:flex;align-items:center;justify-content:center}
+.correct-flash .lbl{font-size:46px;font-weight:900;color:var(--success);opacity:0;animation:cfx .5s ease forwards}
+@keyframes cfx{0%{transform:scale(.5);opacity:0}50%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:0}}
+.hidden{display:none!important}
+@media(max-width:380px){.q-area .q-char{font-size:56px}.choice-btn{font-size:15px;padding:12px 6px}}
+</style>
+</head>
+<body>
+<div class="bg-deco"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+<div id="app">
+
+<header id="gameHeader" class="hidden">
+  <button class="back-btn" id="headerBack">‹</button>
+  <span class="header-title" id="headerTitle">拼音大冒险</span>
+  <span class="header-right" id="headerRight"></span>
+</header>
+
+<div class="game-area" id="gameArea">
+
+  <div id="homeScreen" class="home-screen">
+    <span class="logo">🔤</span>
+    <h1>拼音大冒险</h1>
+    <div class="subtitle">拼音闯关训练</div>
+    <div class="home-tagline">─ 见字能拼 听音能写 ─</div>
+    <div class="home-feats">
+      <div class="feat"><span>🔊</span> 看汉字选拼音，训练拼读能力</div>
+      <div class="feat"><span>📈</span> 从单韵母到综合闯关</div>
+      <div class="feat"><span>⭐</span> 连击加分，挑战满分</div>
+      <div class="feat"><span>💾</span> 自动存档，随时继续</div>
+    </div>
+    <button class="btn btn-red" id="startBtn">🚀 开始冒险</button>
+    <div class="home-footer" style="font-size:10px;color:var(--sub);margin-top:14px;opacity:.5">思贤学习站 · 出品</div>
+  </div>
+
+  <div id="mapScreen" class="map-screen hidden">
+    <h2>🗺️ 拼音之路</h2>
+    <div class="map-progress">进度：<span id="mapProg">0</span> / <span id="mapTotal">9</span></div>
+    <div class="map-path" id="mapPath"></div>
+  </div>
+
+  <div id="gameScreen" class="game-screen hidden">
+    <div class="game-hd">
+      <span class="lvl-name" id="lvlName">单韵母 · 基础</span>
+      <span class="score">⭐ <span id="gameScore">0</span></span>
+    </div>
+    <div class="q-area">
+      <div class="q-char" id="qChar">妈</div>
+      <div class="q-meta2" id="qMeta">第 1 / 8 题</div>
+      <div class="choices" id="choicesContainer"></div>
+    </div>
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="q-progress">
+      <div class="info"><span>✅ <em id="correctCount">0</em></span><span id="timerDisplay">⏱️ <em id="timerValue">10</em></span></div>
+      <div class="streak" id="streakDisplay">🔥 <span id="streakCount">0</span></div>
+    </div>
+  </div>
+
+  <div id="resultOverlay" class="result-overlay hidden">
+    <div class="result-card">
+      <div class="big-icon" id="resultIcon">🎉</div>
+      <div class="title" id="resultTitle">闯关成功！</div>
+      <div class="sub" id="resultSub">太棒了</div>
+      <div class="stars" id="resultStars">⭐⭐⭐</div>
+      <div class="score-big" id="resultScore">0</div>
+      <div class="score-lbl">得分</div>
+      <div class="stats">
+        <div class="item"><div class="v" id="rC">0</div><div class="l">正确</div></div>
+        <div class="item"><div class="v" id="rW">0</div><div class="l">错误</div></div>
+        <div class="item"><div class="v" id="rS">0</div><div class="l">最大连击</div></div>
+      </div>
+      <div class="result-combo" id="resultCombo"></div>
+      <button class="btn btn-red" id="resultBtn">下一关</button>
+      <button class="btn btn-outline" id="resultHomeBtn" style="margin-top:6px;font-size:13px">返回</button>
+    </div>
+  </div>
+
+</div></div>
+
+<script>
+const SAVE_KEY='pinyin_save';const QS=8;const PASS=6;
+
+// 汉字-拼音题库 [汉字, pinyin, 关卡索引]
+const DATA=[
+  // ── 0:单韵母 ──
+  ['妈','mā',0],['爸','bà',0],['大','dà',0],['他','tā',0],['拉','lā',0],['哈','hā',0],
+  ['哥','gē',0],['乐','lè',0],['喝','hē',0],['鸡','jī',0],['七','qī',0],['西','xī',0],
+  ['一','yī',0],['里','lǐ',0],['几','jǐ',0],['不','bù',0],['路','lù',0],['书','shū',0],
+  ['绿','lǜ',0],['女','nǚ',0],['去','qù',0],['雨','yǔ',0],['湖','hú',0],['哭','kū',0],
+
+  // ── 1:声母(一) b p m f d t n l ──
+  ['爬','pá',1],['马','mǎ',1],['发','fā',1],['地','dì',1],['提','tí',1],['你','nǐ',1],
+  ['力','lì',1],['八','bā',1],['怕','pà',1],['米','mǐ',1],['法','fǎ',1],['弟','dì',1],
+  ['体','tǐ',1],['泥','ní',1],['丽','lì',1],['步','bù',1],['破','pò',1],['迷','mí',1],
+  ['飞','fēi',1],['读','dú',1],['头','tóu',1],['拿','ná',1],['狼','láng',1],['跑','pǎo',1],
+
+  // ── 2:声母(二) g k h j q x ──
+  ['高','gāo',2],['开','kāi',2],['花','huā',2],['家','jiā',2],['桥','qiáo',2],['下','xià',2],
+  ['狗','gǒu',2],['看','kàn',2],['河','hé',2],['九','jiǔ',2],['七','qī',2],['小','xiǎo',2],
+  ['果','guǒ',2],['口','kǒu',2],['火','huǒ',2],['金','jīn',2],['球','qiú',2],['星','xīng',2],
+  ['光','guāng',2],['快','kuài',2],['红','hóng',2],['机','jī',2],['前','qián',2],['学','xué',2],
+
+  // ── 3:声母(三) zh ch sh r z c s y w ──
+  ['中','zhōng',3],['吃','chī',3],['是','shì',3],['人','rén',3],['在','zài',3],['从','cóng',3],
+  ['四','sì',3],['有','yǒu',3],['我','wǒ',3],['这','zhè',3],['出','chū',3],['上','shàng',3],
+  ['日','rì',3],['走','zǒu',3],['草','cǎo',3],['三','sān',3],['也','yě',3],['为','wèi',3],
+  ['住','zhù',3],['车','chē',3],['山','shān',3],['子','zǐ',3],['才','cái',3],['做','zuò',3],
+  ['纸','zhǐ',3],['茶','chá',3],['少','shǎo',3],['热','rè',3],['足','zú',3],['词','cí',3],
+  ['色','sè',3],['月','yuè',3],['文','wén',3],
+
+  // ── 4:复韵母 ai ei ui ao ou iu ie üe er ──
+  ['白','bái',4],['北','běi',4],['回','huí',4],['好','hǎo',4],['走','zǒu',4],['六','liù',4],
+  ['写','xiě',4],['雪','xuě',4],['儿','ér',4],['百','bǎi',4],['美','měi',4],['会','huì',4],
+  ['高','gāo',4],['豆','dòu',4],['秋','qiū',4],['叶','yè',4],['月','yuè',4],['二','èr',4],
+  ['海','hǎi',4],['给','gěi',4],['水','shuǐ',4],['猫','māo',4],['狗','gǒu',4],['牛','niú',4],
+  ['姐','jiě',4],['雀','què',4],
+
+  // ── 5:前后鼻音 an en in un ün / ang eng ing ong ──
+  ['天','tiān',5],['看','kàn',5],['门','mén',5],['心','xīn',5],['春','chūn',5],['云','yún',5],
+  ['方','fāng',5],['风','fēng',5],['星','xīng',5],['东','dōng',5],['见','jiàn',5],['半','bàn',5],
+  ['全','quán',5],['真','zhēn',5],['近','jìn',5],['军','jūn',5],['长','cháng',5],['正','zhèng',5],
+  ['明','míng',5],['红','hóng',5],['山','shān',5],['本','běn',5],['林','lín',5],['羊','yáng',5],
+  ['虫','chóng',5],['弯','wān',5],
+
+  // ── 6:整体认读 ──
+  ['知','zhī',6],['吃','chī',6],['师','shī',6],['日','rì',6],['字','zì',6],['词','cí',6],
+  ['思','sī',6],['衣','yī',6],['五','wǔ',6],['鱼','yú',6],['夜','yè',6],['月','yuè',6],
+  ['圆','yuán',6],['阴','yīn',6],['云','yún',6],['影','yǐng',6],['十','shí',6],['紫','zǐ',6],
+  ['四','sì',6],['雨','yǔ',6],['远','yuǎn',6],['因','yīn',6],['英','yīng',6],
+
+  // ── 7:综合 ──
+  ['我','wǒ',7],['你','nǐ',7],['他','tā',7],['她','tā',7],['们','men',7],['是','shì',7],
+  ['的','de',7],['了','le',7],['人','rén',7],['大','dà',7],['小','xiǎo',7],['上','shàng',7],
+  ['下','xià',7],['来','lái',7],['去','qù',7],['子','zǐ',7],['有','yǒu',7],['不','bù',7],
+  ['在','zài',7],['好','hǎo',7],['学','xué',7],['生','shēng',7],['老','lǎo',7],['师','shī',7],
+  ['花','huā',7],['鸟','niǎo',7],['鱼','yú',7],['虫','chóng',7],['山','shān',7],['水','shuǐ',7],
+  ['月','yuè',7],['日','rì',7],['天','tiān',7],['地','dì',7],
+];
+
+const LEVELS=[
+  {n:'单韵母',d:'a o e i u ü'},
+  {n:'声母(一)',d:'b p m f d t n l'},
+  {n:'声母(二)',d:'g k h j q x'},
+  {n:'声母(三)',d:'zh ch sh r z c s y w'},
+  {n:'复韵母',d:'ai ei ui ao ou iu ie üe er'},
+  {n:'前后鼻音',d:'an en in un ün ang eng ing ong'},
+  {n:'整体认读',d:'zhi chi shi ri zi ci si yi wu yu ye yue yuan yin yun ying'},
+  {n:'综合挑战',d:'随机出题'},
+];
+
+const TONE_MARKS={a:'āáǎà',o:'ōóǒò',e:'ēéěè',i:'īíǐì',u:'ūúǔù',v:'ǖǘǚǜ'};
+// v = ü
+const TONE_CHAR={'ā':'a1','á':'a2','ǎ':'a3','à':'a4','ō':'o1','ó':'o2','ǒ':'o3','ò':'o4',
+  'ē':'e1','é':'e2','ě':'e3','è':'e4','ī':'i1','í':'i2','ǐ':'i3','ì':'i4',
+  'ū':'u1','ú':'u2','ǔ':'u3','ù':'u4','ǖ':'v1','ǘ':'v2','ǚ':'v3','ǜ':'v4'};
+
+function pyInfo(py){
+  // return {initial, final, tone}
+  const last=py[py.length-1];
+  const tone=TONE_CHAR[last]?parseInt(TONE_CHAR[last][1]):0;
+  const base=tone?py.slice(0,-1):py;
+  // simple initial extraction
+  const inits=['zh','ch','sh','b','p','m','f','d','t','n','l','g','k','h','j','q','x','r','z','c','s','y','w'];
+  let initial='',final=base;
+  for(const i of inits){if(base.startsWith(i)){initial=i;final=base.slice(i.length);break}}
+  // ü -> v for internal processing
+  final=final.replace(/ü/g,'v');
+  return {initial,final,tone,base};
+}
+
+function rand(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function genWrongs(py,n=3){
+  const info=pyInfo(py);
+  const res=[];
+  // strategy: vary tone, vary initial, vary final
+  const attempts=[
+    ()=>{
+      // same base, different tone
+      const nt=info.tone===0?rand(1,4):((info.tone%4)+1);
+      return applyTone(info.base,nt);
+    },
+    ()=>{
+      // keep final, change initial
+      const allInits=['b','p','m','f','d','t','n','l','g','k','h','j','q','x','zh','ch','sh','r','z','c','s','y','w'];
+      const others=allInits.filter(i=>i!==info.initial);
+      if(others.length===0||!info.initial)return null;
+      const ni=others[rand(0,others.length-1)];
+      const nb=ni+info.final;
+      const nt=info.tone||rand(1,4);
+      return applyTone(nb,nt);
+    },
+    ()=>{
+      // same initial, change final vowel
+      const vowels=['a','o','e','i','u','v','ai','ei','ui','ao','ou','iu','ie','üe','er','an','en','in','un','ün','ang','eng','ing','ong'];
+      const nf=vowels[rand(0,vowels.length-1)];
+      let nb=info.initial+nf;
+      const nt=info.tone||rand(1,4);
+      return applyTone(nb,nt);
+    }
+  ];
+  for(const fn of attempts){
+    if(res.length>=n)break;
+    const w=fn();
+    if(w&&w!==py&&!res.includes(w))res.push(w);
+  }
+  // fill with random
+  while(res.length<n){
+    const r=DATA[rand(0,DATA.length-1)];
+    const rpy=r[1];
+    if(rpy!==py&&!res.includes(rpy))res.push(rpy);
+  }
+  return res.slice(0,n);
+}
+
+function applyTone(base,tone){
+  // find the vowel to apply tone to
+  const vowels='aoeiuv';
+  const baseV=base.replace(/ü/g,'v');
+  // find the main vowel (a/e/o first, then others)
+  let idx=-1;
+  for(const v of ['a','e','o']){idx=baseV.indexOf(v);if(idx>=0)break}
+  if(idx<0){for(const v of 'iuv'){idx=baseV.indexOf(v);if(idx>=0)break}}
+  if(idx<0)return base;
+  const target=baseV[idx];
+  const marks=TONE_MARKS[target]||(target==='v'?TONE_MARKS.v:null);
+  if(!marks)return base;
+  const arr=[...base];
+  const mt=marks[Math.min(tone-1,3)];
+  const norm=[...'aoeiu'].includes(target)?target:'ü';
+  const idx2=base.indexOf(norm);
+  if(idx2>=0){arr[idx2]=mt}
+  else{arr[idx]=mt}
+  return arr.join('');
+}
+
+function getPool(lvl){
+  return DATA.filter(d=>d[2]===lvl);
+}
+
+function genLevelQs(lvl){
+  const pool=getPool(lvl);
+  const shuffled=shuffle([...pool]);
+  const qs=[];
+  for(let i=0;i<QS&&i<shuffled.length;i++){
+    const [ch,py]=shuffled[i];
+    const wrongs=genWrongs(py,3);
+    const opts=shuffle([py,...wrongs]);
+    qs.push({ch,py,opts,idx:opts.indexOf(py)});
+  }
+  while(qs.length<QS){
+    const [ch,py]=pool[rand(0,pool.length-1)];
+    const wrongs=genWrongs(py,3);
+    const opts=shuffle([py,...wrongs]);
+    if(!qs.find(q=>q.ch===ch))qs.push({ch,py,opts,idx:opts.indexOf(py)});
+  }
+  return qs;
+}
+
+let S=load()||{completed:{},stars:{},scores:{},points:0};
+let G={},timer=null;
+const $=id=>document.getElementById(id);
+
+function startLevel(i){
+  stopTimer();
+  const lv=LEVELS[i];
+  G={idx:i,qi:0,cor:0,wro:0,str:0,mxStr:0,pts:0,res:[],qs:[],as:false};
+  G.qs=genLevelQs(i);
+  showGame();showQ();
+}
+function showQ(){
+  const q=G.qs[G.qi];G.as=false;stopTimer();
+  const lv=LEVELS[G.idx];
+  $('lvlName').textContent=`${lv.n} · ${lv.d}`;
+  $('gameScore').textContent=G.pts;
+  $('qChar').textContent=q.ch;
+  $('qMeta').textContent=`第 ${G.qi+1} / ${QS} 题`;
+  $('correctCount').textContent=G.cor;
+  $('streakCount').textContent=G.str;
+  $('streakDisplay').className='streak'+(G.str>=2?' active':'');
+  dots();
+  const c=$('choicesContainer');c.innerHTML='';
+  const lbs=['A','B','C','D'];
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='choice-btn';b.textContent=o+'  '+lbs[i];
+    b.addEventListener('click',()=>chk(i));c.appendChild(b);
+  });
+  startTimer(10);
+}
+function chk(idx){
+  if(G.as)return;G.as=true;stopTimer();
+  const q=G.qs[G.qi];const btns=$('choicesContainer').querySelectorAll('.choice-btn');
+  const ok=idx===q.idx;
+  btns.forEach((b,i)=>{
+    b.classList.add('disabled');
+    if(i===q.idx)b.classList.add('correct');
+    if(i===idx&&!ok)b.classList.add('wrong');
+  });
+  if(ok){
+    const bonus=Math.max(0,Math.floor(G.tm/10*15));const sb=Math.min(G.str,8)*3;
+    G.pts+=10+bonus+sb;G.cor++;G.str++;G.mxStr=Math.max(G.mxStr,G.str);G.res.push(true);
+    sfxOk();
+    const el=document.createElement('div');el.className='correct-flash';
+    el.innerHTML=`<div class="lbl">+${10+bonus+sb}</div>`;
+    document.body.appendChild(el);setTimeout(()=>el.remove(),600);
+  }else{
+    G.wro++;G.str=0;G.res.push(false);sfxBad();
+  }
+  dots();$('correctCount').textContent=G.cor;
+  $('streakCount').textContent=G.str;
+  $('streakDisplay').className='streak'+(G.str>=2?' active':'');
+  $('gameScore').textContent=G.pts;
+  setTimeout(()=>{
+    G.qi++;if(G.qi>=QS)return endLv();
+    showQ();
+  },ok?500:1000);
+}
+function endLv(){
+  stopTimer();const passed=G.cor>=PASS;
+  let st=0;if(passed){st=G.cor===QS?3:G.cor>=QS-1?2:1}
+  const lid=LEVELS[G.idx].n;
+  if(st>(S.stars[lid]||0))S.stars[lid]=st;
+  if(G.pts>(S.scores[lid]||0))S.scores[lid]=G.pts;
+  if(passed)S.completed[lid]=true;S.points+=G.pts;save();
+  $('resultIcon').textContent=passed?'🎉':'💪';
+  $('resultTitle').textContent=passed?'闯关成功！':'继续加油！';
+  $('resultSub').textContent=passed?['勉强过关','不错哦！','完美通关！'][st-1]:`答对 ${G.cor}/${QS}`;
+  $('resultStars').textContent='⭐'.repeat(st)+'☆'.repeat(3-st);
+  $('resultScore').textContent=G.pts;
+  $('rC').textContent=G.cor;$('rW').textContent=G.wro;$('rS').textContent=G.mxStr;
+  $('resultCombo').textContent=G.mxStr>=3?`🔥 最高连击 ${G.mxStr}x`:'';
+
+  if(G.idx+1>=LEVELS.length){
+    $('resultBtn').textContent='🏆 全部通关！';
+    $('resultBtn').onclick=()=>{hideR();showMap();};
+  }else if(passed){
+    $('resultBtn').textContent='下一关 →';
+    $('resultBtn').onclick=()=>{hideR();startLevel(G.idx+1);};
+  }else{
+    $('resultBtn').textContent='🔄 重新挑战';
+    $('resultBtn').onclick=()=>{hideR();startLevel(G.idx);};
+  }
+  $('resultHomeBtn').onclick=()=>{hideR();showMap();};
+  $('resultOverlay').classList.remove('hidden');
+  if(passed)sfxPass();else sfxDrop();
+}
+function hideR(){$('resultOverlay').classList.add('hidden')}
+
+function startTimer(s){G.tm=s;stopTimer();updateTm(s);timer=setInterval(()=>{G.tm--;updateTm(G.tm);if(G.tm<=0&&!G.as){stopTimer();G.as=true;chk(-1);}},1000)}
+function stopTimer(){if(timer){clearInterval(timer);timer=null}}
+function updateTm(v){$('timerValue').textContent=String(Math.max(0,v))}
+function dots(){
+  const e=$('progressDots');e.innerHTML='';
+  for(let i=0;i<QS;i++){const d=document.createElement('div');d.className='dot';if(i<G.res.length)d.classList.add(G.res[i]?'done':'wrong');if(i===G.qi)d.classList.add('current');e.appendChild(d)}
+}
+
+function showMap(){
+  hideAll();$('gameHeader').classList.remove('hidden');$('mapScreen').classList.remove('hidden');
+  const p=$('mapPath');p.innerHTML='';
+  let done=0;Object.keys(S.completed).forEach(k=>done++);
+  $('mapProg').textContent=done;$('mapTotal').textContent=LEVELS.length;
+  LEVELS.forEach((lv,i)=>{
+    if(i>0){const c=document.createElement('div');c.className='map-connector';c.textContent='▼';p.appendChild(c)}
+    const n=document.createElement('div');
+    const comp=S.completed[lv.n];const cur=i===0||S.completed[LEVELS[i-1].n];
+    n.className='map-node'+(cur?' current':'')+(comp?' completed':'')+(!cur&&!comp?' locked':'');
+    n.innerHTML=`<div class="icon">${!cur&&!comp?'🔒':comp?'✅':'🔤'}</div><div class="info"><div class="name">${lv.n}</div><div class="desc">${lv.d}</div></div><div class="status">${'⭐'.repeat(S.stars[lv.n]||0)}</div>`;
+    if((!comp&&cur)||comp)n.addEventListener('click',()=>startLevel(i));
+    p.appendChild(n);
+  });
+  $('headerTitle').textContent='拼音大冒险';
+  $('headerRight').textContent=`⭐ ${S.points}`;
+  $('headerBack').onclick=showHome;
+}
+function showGame(){hideAll();$('gameHeader').classList.remove('hidden');$('gameScreen').classList.remove('hidden');$('headerBack').onclick=()=>{stopTimer();showMap()};}
+function showHome(){hideAll();$('homeScreen').classList.remove('hidden')}
+function hideAll(){['homeScreen','mapScreen','gameScreen'].forEach(id=>$(id).classList.add('hidden'));$('gameHeader').classList.add('hidden')}
+
+function save(){try{localStorage.setItem(SAVE_KEY,JSON.stringify(S))}catch(e){}}
+function load(){try{const r=localStorage.getItem(SAVE_KEY);if(!r)return null;const s=JSON.parse(r);if(typeof s.stars!=='object')s.stars={};if(typeof s.scores!=='object')s.scores={};if(typeof s.completed!=='object')s.completed={};return s}catch(e){return null}}
+
+let ac=null;
+function tone(f,d,t='sine'){try{if(!ac)ac=new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.value=f;g.gain.value=0.05;g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function sfxOk(){tone(880,.1);setTimeout(()=>tone(1100,.12),70)}
+function sfxBad(){tone(300,.15,'sawtooth')}
+function sfxPass(){tone(660,.08);setTimeout(()=>tone(880,.08),80);setTimeout(()=>tone(1100,.15),160)}
+function sfxDrop(){tone(400,.1);setTimeout(()=>tone(300,.2),100)}
+
+$('startBtn').addEventListener('click',showMap);
+$('resultHomeBtn').addEventListener('click',()=>{hideR();showMap()});
+showHome();
+</script>
+</body>
+</html>
