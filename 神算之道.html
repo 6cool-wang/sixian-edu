@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>神算之道 · 珠心算闯关</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0b0b1a;--bg2:#12122a;--card:#1a1a38;--card2:#222248;
+  --gold:#c8a84e;--gold2:#e8d5a3;--gold3:#f0d080;
+  --text:#f0ece4;--sub:#7a7a92;--accent:#c8a84e;
+  --bead-upper:#c8a84e;--bead-lower:#c0392b;
+  --frame:#3e2723;--beam:#5d4037;--rod:#8a7a6a;
+  --success:#27ae60;--error:#e74c3c;--radius:14px;
+  --shadow:0 8px 40px rgba(0,0,0,.5);
+  --wood:linear-gradient(180deg,#4a3228,#3e2723,#2c1a12);
+}
+body{font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden}
+#app{width:100%;max-width:420px;min-height:100vh;position:relative;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg,var(--bg),var(--bg2))}
+
+/* ── 背景装饰 ── */
+.bg-deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-deco .orb{position:absolute;border-radius:50%;filter:blur(100px);opacity:.06}
+.bg-deco .orb:nth-child(1){width:300px;height:300px;background:var(--gold);top:-120px;right:-100px}
+.bg-deco .orb:nth-child(2){width:250px;height:250px;background:#8e44ad;bottom:-80px;left:-80px}
+.bg-deco .orb:nth-child(3){width:200px;height:200px;background:var(--gold);top:50%;left:30%}
+
+/* ── Header ── */
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px 6px;z-index:10;position:relative}
+header .back-btn{background:none;border:none;color:var(--sub);font-size:20px;cursor:pointer;padding:4px;transition:all .15s}
+header .back-btn:active{transform:scale(.85)}
+.header-title{font-size:16px;font-weight:700;color:var(--gold2)}
+.header-right{font-size:12px;color:var(--sub)}
+.btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;transition:all .15s;text-align:center;position:relative;overflow:hidden}
+.btn:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#a8892e);color:#1a1a1a;box-shadow:0 4px 20px rgba(200,168,78,.3)}
+.btn-gold2{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#1a1a1a;box-shadow:0 4px 20px rgba(200,168,78,.3)}
+.btn-outline{background:transparent;border:2px solid rgba(255,255,255,.12);color:var(--text)}
+.btn-success{background:linear-gradient(135deg,var(--success),#2ecc71);color:#fff}
+.btn-group{display:flex;gap:8px;margin-top:10px}
+.btn-group .btn{flex:1}
+.btn:disabled{opacity:.4;pointer-events:none}
+
+/* ── 首页 ── */
+.home-screen{text-align:center;padding:30px 18px;flex:1;display:flex;flex-direction:column;justify-content:center;z-index:10;position:relative}
+.home-screen .logo{font-size:48px;margin-bottom:6px;display:block}
+.home-screen h1{font-size:34px;font-weight:900;margin-bottom:2px;background:linear-gradient(135deg,var(--gold3),var(--gold),#a8892e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-screen .subtitle{color:var(--sub);font-size:13px;margin-bottom:8px}
+.home-tagline{color:var(--gold2);font-size:13px;font-weight:600;margin-bottom:20px;letter-spacing:1px}
+.home-features{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;text-align:left}
+.home-features .feat{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub);background:rgba(255,255,255,.02);padding:8px 12px;border-radius:8px}
+.home-footer{font-size:10px;color:var(--sub);margin-top:16px;opacity:.5}
+
+/* ── 关卡地图 ── */
+.map-screen{flex:1;display:flex;flex-direction:column;padding:10px 18px 20px;overflow-y:auto;z-index:10}
+.map-screen h2{text-align:center;font-size:20px;font-weight:800;color:var(--gold2);margin-bottom:14px}
+.map-path{flex:1;display:flex;flex-direction:column;gap:10px;padding:4px 0}
+.map-node{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid rgba(255,255,255,.05);border-radius:12px;padding:12px 14px;cursor:pointer;transition:all .2s;position:relative}
+.map-node:active{transform:scale(.98)}
+.map-node.locked{opacity:.35;cursor:not-allowed;pointer-events:none}
+.map-node.current{border-color:var(--gold);box-shadow:0 0 20px rgba(200,168,78,.12)}
+.map-node.completed{border-color:rgba(39,174,96,.3)}
+.map-node .icon{font-size:28px;min-width:36px;text-align:center}
+.map-node .info{flex:1;min-width:0}
+.map-node .info .name{font-size:15px;font-weight:700}
+.map-node .info .desc{font-size:11px;color:var(--sub);margin-top:1px}
+.map-node .status{font-size:13px}
+.map-node .status .star{color:var(--gold);font-size:14px}
+.map-connector{text-align:center;font-size:10px;color:var(--sub);opacity:.35;margin:-4px 0}
+.map-progress{text-align:center;font-size:12px;color:var(--sub);margin-bottom:10px}
+.map-progress span{color:var(--gold);font-weight:700}
+
+/* ── 游戏界面 ── */
+.game-screen{flex:1;display:flex;flex-direction:column;padding:6px 16px 16px;z-index:10}
+.game-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.game-header .level-name{font-size:13px;color:var(--sub)}
+.game-header .score-display{font-size:13px;font-weight:700;color:var(--gold)}
+.game-instruction{text-align:center;font-size:15px;font-weight:700;color:var(--gold2);margin-bottom:10px;line-height:1.4}
+.game-target{text-align:center;margin-bottom:12px}
+.game-target .num{font-size:56px;font-weight:900;color:var(--gold3);text-shadow:0 0 40px rgba(200,168,78,.2);letter-spacing:4px}
+.game-target .label{font-size:11px;color:var(--sub);margin-top:-2px}
+
+/* ── 算盘 ── */
+.abacus-wrap{background:var(--wood);border-radius:var(--radius);padding:18px 10px 10px;box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.06);margin-bottom:10px;position:relative;overflow-x:auto;}
+.abacus{display:flex;justify-content:center;gap:4px;min-width:280px;padding:0 4px}
+.col{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;width:44px;flex-shrink:0}
+.col .digit-label{font-size:13px;font-weight:700;color:var(--gold2);margin-bottom:3px;height:18px}
+.col .upper-area{height:40px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;cursor:pointer;position:relative;width:100%;border-radius:4px;transition:background .15s}
+.col .upper-area:active{background:rgba(255,255,255,.04)}
+.col .upper-bead{width:32px;height:24px;border-radius:50%;transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:pointer;position:relative}
+.col .upper-bead.up{transform:translateY(-8px);background:radial-gradient(circle at 35% 30%,#8a7a6a,#5d4a3a);box-shadow:0 1px 3px rgba(0,0,0,.3),inset 0 -1px 2px rgba(0,0,0,.2)}
+.col .upper-bead.down{transform:translateY(0);background:radial-gradient(circle at 35% 30%,var(--gold3),var(--bead-upper),#8a6e20);box-shadow:0 2px 8px rgba(0,0,0,.3),inset 0 -2px 4px rgba(0,0,0,.15),inset 0 2px 6px rgba(255,255,255,.15)}
+.col .upper-bead.animating{transition:all .25s cubic-bezier(.34,1.56,.64,1)}
+.col .beam{width:100%;height:3px;background:linear-gradient(90deg,var(--beam),#7a5a4a,var(--beam));border-radius:1px;flex-shrink:0;z-index:2;position:relative}
+.col .lower-area{height:70px;display:flex;flex-direction:column-reverse;align-items:center;gap:2px;padding-top:4px;cursor:pointer;position:relative;width:100%;border-radius:4px;transition:background .15s}
+.col .lower-area:active{background:rgba(255,255,255,.04)}
+.col .lower-bead{width:32px;height:18px;border-radius:50%;transition:all .25s cubic-bezier(.34,1.56,.64,1);cursor:pointer;flex-shrink:0}
+.col .lower-bead.up{background:radial-gradient(circle at 35% 30%,#e8744a,var(--bead-lower),#8a1a0a);box-shadow:0 2px 6px rgba(0,0,0,.3),inset 0 -2px 3px rgba(0,0,0,.15),inset 0 2px 6px rgba(255,200,200,.15);transform:translateY(0)}
+.col .lower-bead.down{background:radial-gradient(circle at 35% 30%,#8a7a6a,#5d4a3a);box-shadow:0 1px 3px rgba(0,0,0,.3),inset 0 -1px 2px rgba(0,0,0,.2);transform:translateY(6px)}
+.col .lower-bead.dn2{background:radial-gradient(circle at 35% 30%,#8a7a6a,#5d4a3a);box-shadow:0 1px 3px rgba(0,0,0,.3),inset 0 -1px 2px rgba(0,0,0,.2);transform:translateY(10px);opacity:.6}
+.col .col-controls{display:flex;gap:6px;margin-top:2px}
+.col .col-btn{width:28px;height:24px;border:none;border-radius:4px;font-size:14px;font-weight:700;cursor:pointer;transition:all .1s;display:flex;align-items:center;justify-content:center}
+.col .col-btn:active{transform:scale(.9)}
+.col .col-btn.plus{background:rgba(200,168,78,.2);color:var(--gold)}
+.col .col-btn.minus{background:rgba(231,76,60,.15);color:var(--error)}
+.col .col-btn:disabled{opacity:.2;pointer-events:none}
+
+/* ── 答案区 ── */
+.answer-area{display:flex;gap:10px;align-items:center;justify-content:center;margin-bottom:10px}
+.answer-area input{background:var(--card);border:2px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 16px;font-size:24px;font-weight:700;color:var(--gold3);text-align:center;width:140px;outline:none;transition:border-color .2s;font-family:inherit}
+.answer-area input:focus{border-color:var(--gold)}
+.answer-area input.correct{border-color:var(--success);background:rgba(39,174,96,.08)}
+.answer-area input.wrong{border-color:var(--error);background:rgba(231,76,60,.08);animation:shake .35s}
+.game-progress{display:flex;justify-content:space-between;align-items:center;padding:0 2px;margin-top:auto}
+.game-progress .info{font-size:11px;color:var(--sub);display:flex;gap:12px}
+.game-progress .info span em{font-style:normal;color:var(--gold);font-weight:700}
+.game-progress .streak{font-size:13px;font-weight:700;color:var(--gold);opacity:0;transition:opacity .2s}
+.game-progress .streak.active{opacity:1}
+.progress-dots{display:flex;gap:5px;justify-content:center;margin-bottom:6px}
+.progress-dots .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.08);transition:all .2s}
+.progress-dots .dot.done{background:var(--success)}
+.progress-dots .dot.wrong{background:var(--error)}
+.progress-dots .dot.current{background:var(--gold);transform:scale(1.3)}
+
+/* ── 结果 ── */
+.result-overlay{position:absolute;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);animation:fadeIn .3s ease}
+.result-overlay.hidden{display:none}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.result-card{background:var(--card);border-radius:var(--radius);padding:28px 24px;width:90%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.6);animation:popIn .35s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{transform:scale(.8);opacity:0}to{transform:scale(1);opacity:1}}
+.result-card .big-icon{font-size:56px;margin-bottom:4px}
+.result-card .title{font-size:22px;font-weight:800;margin-bottom:2px}
+.result-card .sub{font-size:13px;color:var(--sub);margin-bottom:12px}
+.result-card .stars{font-size:28px;margin-bottom:8px}
+.result-card .score-big{font-size:40px;font-weight:900;color:var(--gold)}
+.result-card .score-label{font-size:11px;color:var(--sub);margin-bottom:10px}
+.result-card .stats{display:flex;justify-content:center;gap:20px;margin-bottom:14px}
+.result-card .stats .item{text-align:center}
+.result-card .stats .item .v{font-size:18px;font-weight:700}
+.result-card .stats .item .l{font-size:10px;color:var(--sub)}
+.result-combo{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px;opacity:0;animation:comboPop .5s .3s forwards}
+
+/* ── 动画 ── */
+@keyframes shake{0%,100%{translate:0}20%{translate:-6px}40%{translate:6px}60%{translate:-4px}80%{translate:4px}}
+@keyframes comboPop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes pulse{0%,100%{box-shadow:0 0 10px rgba(200,168,78,.1)}50%{box-shadow:0 0 25px rgba(200,168,78,.25)}}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.flash-overlay{position:absolute;inset:0;background:var(--bg);z-index:20;display:flex;align-items:center;justify-content:center;font-size:48px;font-weight:900;color:var(--gold3);animation:fadeIn .2s ease}
+.flash-overlay.hidden{display:none}
+.flash-overlay .countdown{font-size:72px;color:var(--gold3);font-weight:900}
+.correct-flash{position:fixed;inset:0;pointer-events:none;z-index:30;display:flex;align-items:center;justify-content:center}
+.correct-flash .label{font-size:48px;font-weight:900;color:var(--success);opacity:0;animation:correctPop .5s ease forwards}
+@keyframes correctPop{0%{transform:scale(.5);opacity:0}50%{transform:scale(1.2);opacity:1}100%{transform:scale(1);opacity:0}}
+.hidden{display:none!important}
+@keyframes beadClick{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+
+/* ── 提示 ── */
+.tip-area{text-align:center;font-size:11px;color:var(--sub);padding:4px;min-height:20px}
+.tip-area .hint{color:var(--gold)}
+@media(max-width:420px){.col{width:38px}.col .upper-bead{width:28px;height:20px}.col .lower-bead{width:28px;height:16px}.game-target .num{font-size:44px}.abacus-wrap{padding:14px 6px 8px}}
+</style>
+</head>
+<body>
+<div class="bg-deco"><div class="orb"></div><div class="orb"></div><div class="orb"></div></div>
+
+<div id="app">
+
+<header id="gameHeader" class="hidden">
+  <button class="back-btn" id="headerBack">‹</button>
+  <span class="header-title" id="headerTitle">神算之道</span>
+  <span class="header-right" id="headerRight"></span>
+</header>
+
+<div class="game-area" id="gameArea">
+
+  <!-- ═══ 首页 ═══ -->
+  <div id="homeScreen" class="home-screen">
+    <span class="logo">🧮</span>
+    <h1>神算之道</h1>
+    <div class="subtitle">珠心算闯关训练</div>
+    <div class="home-tagline">─ 练就最强大脑 ─</div>
+    <div class="home-features">
+      <div class="feat"><span>🧮</span> 交互式算盘，动手又动脑</div>
+      <div class="feat"><span>🎯</span> 分级闯关，循序渐进</div>
+      <div class="feat"><span>⚡</span> 闪电挑战，训练反应速度</div>
+      <div class="feat"><span>🧠</span> 心算训练，远超同龄人</div>
+    </div>
+    <button class="btn btn-gold" id="startBtn">🚀 开始修炼</button>
+    <div class="home-footer">思贤学习站 · 出品</div>
+  </div>
+
+  <!-- ═══ 关卡地图 ═══ -->
+  <div id="mapScreen" class="map-screen hidden">
+    <h2>🗺️ 修炼之路</h2>
+    <div class="map-progress">进度：<span id="mapProgress">0</span> / <span id="mapTotal">0</span></div>
+    <div class="map-path" id="mapPath"></div>
+  </div>
+
+  <!-- ═══ 游戏 ═══ -->
+  <div id="gameScreen" class="game-screen hidden">
+
+    <div class="game-header">
+      <span class="level-name" id="levelName">第 1 关 · 读数入门</span>
+      <span class="score-display">⭐ <span id="gameScore">0</span></span>
+    </div>
+
+    <div class="game-instruction" id="gameInstruction">读出算盘上的数字</div>
+
+    <!-- 目标数字（拨珠模式显示） -->
+    <div id="targetArea" class="game-target hidden">
+      <div class="num" id="targetNumber">0</div>
+      <div class="label">请在算盘上拨出这个数</div>
+    </div>
+
+    <!-- 算盘 -->
+    <div class="abacus-wrap" id="abacusWrap">
+      <div class="abacus" id="abacus"></div>
+    </div>
+
+    <!-- 提示区 -->
+    <div class="tip-area" id="tipArea">👆 点击算盘上的珠子调整</div>
+
+    <!-- 答案输入 -->
+    <div class="answer-area" id="answerArea">
+      <input type="number" id="answerInput" placeholder="?" inputmode="numeric">
+      <button class="btn btn-gold" id="submitBtn" style="width:auto;padding:12px 20px;font-size:15px">确认</button>
+    </div>
+
+    <!-- 进度 -->
+    <div class="progress-dots" id="progressDots"></div>
+    <div class="game-progress">
+      <div class="info">
+        <span id="qCounter">第 <em>1</em> / <em>8</em> 题</span>
+        <span>✅ <em id="correctCount">0</em></span>
+        <span id="timerDisplay">⏱️ <em id="timerValue">00</em></span>
+      </div>
+      <div class="streak" id="streakDisplay">🔥 <span id="streakCount">0</span></div>
+    </div>
+  </div>
+
+  <!-- ═══ 结果弹窗 ═══ -->
+  <div id="resultOverlay" class="result-overlay hidden">
+    <div class="result-card">
+      <div class="big-icon" id="resultIcon">🎉</div>
+      <div class="title" id="resultTitle">闯关成功！</div>
+      <div class="sub" id="resultSub">进入下一关</div>
+      <div class="stars" id="resultStars">⭐⭐⭐</div>
+      <div class="score-big" id="resultScore">0</div>
+      <div class="score-label">得分</div>
+      <div class="stats">
+        <div class="item"><div class="v" id="rCorrect">0</div><div class="l">正确</div></div>
+        <div class="item"><div class="v" id="rWrong">0</div><div class="l">错误</div></div>
+        <div class="item"><div class="v" id="rStreak">0</div><div class="l">最大连击</div></div>
+      </div>
+      <div class="result-combo" id="resultCombo"></div>
+      <button class="btn btn-gold" id="resultBtn">下一关</button>
+      <button class="btn btn-outline" id="resultHomeBtn" style="margin-top:6px;font-size:13px">返回地图</button>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  配置
+// ═══════════════════════════════════════
+const COLS = 6; // 个十百千万十万
+const COL_NAMES = ['十万','万','千','百','十','个'];
+const QS = 8; // 每题关题数
+const PASS_COUNT = 6; // 过关需要正确数
+
+const LEVELS = [
+  { id:'read1',  name:'读数入门',  desc:'读出算盘上的数字', digits:[1,2], type:'read',    icon:'👁️' },
+  { id:'read2',  name:'读数进阶',  desc:'三位数读数训练',   digits:[2,3], type:'read',    icon:'👁️' },
+  { id:'read3',  name:'读数高手',  desc:'四位数快速读取',   digits:[3,4], type:'read',    icon:'👁️' },
+  { id:'set1',   name:'拨珠入门',  desc:'在算盘上拨出数字', digits:[1,2], type:'set',     icon:'👆' },
+  { id:'set2',   name:'拨珠进阶',  desc:'三位数拨珠',       digits:[2,3], type:'set',     icon:'👆' },
+  { id:'flash1', name:'闪电读数',  desc:'一闪而过的数字',    digits:[2,3], type:'flash',   icon:'⚡' },
+  { id:'flash2', name:'闪电进阶',  desc:'快速记忆三位数',    digits:[3,4], type:'flash',   icon:'⚡' },
+  { id:'add1',   name:'加法入门',  desc:'个位数加法训练',    digits:[1],   type:'add',     icon:'➕' },
+  { id:'add2',   name:'加法进阶',  desc:'两位数加法训练',    digits:[2],   type:'add',     icon:'➕' },
+  { id:'master', name:'大师挑战',  desc:'综合心算终极挑战',  digits:[2],   type:'mixed',   icon:'👑' },
+];
+
+// ═══════════════════════════════════════
+//  状态
+// ═══════════════════════════════════════
+const SAVE_KEY = 'shensuan_save';
+let S = loadState() || {
+  levelIdx: 0, points: 0, stars: {}, // stars[levelId] = 0-3
+  scores: {}, // scores[levelId] = bestScore
+  completed: {},
+  streak: 0, maxStreak: 0
+};
+
+// 当前游戏状态
+let G = {
+  levelIdx: 0, questions: [], qIdx: 0,
+  correct: 0, wrong: 0, streak: 0, maxStreak: 0,
+  score: 0, answered: false, timer: null, timeLeft: 0,
+  colValues: [], results: [], // results per question
+  flashPhase: false,
+};
+
+const $ = id => document.getElementById(id);
+
+// ═══════════════════════════════════════
+//  算盘核心逻辑
+// ═══════════════════════════════════════
+function makeCols(vals){ // vals = array of digits (0-9), rightmost = ones
+  return vals.map(v => {
+    const upper = v >= 5 ? 1 : 0;
+    const lower = v - upper * 5;
+    return { upper, lower, value: v };
+  });
+}
+
+function makeEmptyCols(n){
+  return Array(n).fill(0).map(() => ({ upper: 0, lower: 0, value: 0 }));
+}
+
+function colsToNumber(cols){
+  let n = 0;
+  cols.forEach((c, i) => { n += c.value * Math.pow(10, cols.length - 1 - i); });
+  return n;
+}
+
+function renderAbacus(cols, interactive){
+  const el = $('abacus'); el.innerHTML = '';
+  const pad = COLS - cols.length;
+  cols.forEach((c, idx) => {
+    const col = document.createElement('div');
+    col.className = 'col';
+    col.dataset.idx = idx;
+    // digit label
+    const label = document.createElement('div');
+    label.className = 'digit-label';
+    label.textContent = COL_NAMES[idx + pad] || '';
+    col.appendChild(label);
+    // upper bead area
+    const upperArea = document.createElement('div');
+    upperArea.className = 'upper-area';
+    const ub = document.createElement('div');
+    ub.className = 'upper-bead ' + (c.upper ? 'down' : 'up');
+    if(interactive){
+      upperArea.style.cursor = 'pointer';
+      upperArea.addEventListener('click', () => toggleUpper(idx));
+    }
+    upperArea.appendChild(ub);
+    col.appendChild(upperArea);
+    // beam
+    const beam = document.createElement('div');
+    beam.className = 'beam';
+    col.appendChild(beam);
+    // lower beads area
+    const lowerArea = document.createElement('div');
+    lowerArea.className = 'lower-area';
+    for(let li = 0; li < 4; li++){
+      const lb = document.createElement('div');
+      const active = li < c.lower;
+      if(li < c.lower) lb.className = 'lower-bead up';
+      else if(li === c.lower) lb.className = 'lower-bead down';
+      else lb.className = 'lower-bead dn2';
+      if(interactive){
+        lb.style.cursor = 'pointer';
+        lb.addEventListener('click', (e) => { e.stopPropagation(); toggleLower(idx, li); });
+      }
+      lowerArea.appendChild(lb);
+    }
+    col.appendChild(lowerArea);
+    // +/- controls
+    if(interactive){
+      const ctrl = document.createElement('div');
+      ctrl.className = 'col-controls';
+      const mi = document.createElement('button');
+      mi.className = 'col-btn minus'; mi.textContent = '−';
+      mi.addEventListener('click', (e) => { e.stopPropagation(); adjCol(idx, -1); });
+      ctrl.appendChild(mi);
+      const pl = document.createElement('button');
+      pl.className = 'col-btn plus'; pl.textContent = '+';
+      pl.addEventListener('click', (e) => { e.stopPropagation(); adjCol(idx, 1); });
+      ctrl.appendChild(pl);
+      col.appendChild(ctrl);
+    }
+    el.appendChild(col);
+  });
+}
+
+// ── 算盘交互 ──
+function toggleUpper(idx){
+  if(G.answered) return;
+  const c = G.colValues[idx];
+  c.upper = c.upper ? 0 : 1;
+  c.value = c.upper * 5 + c.lower;
+  playBead();
+  updateAbacus();
+}
+
+function toggleLower(idx, li){
+  if(G.answered) return;
+  const c = G.colValues[idx];
+  if(c.lower > li){ // clicking ABOVE current → reduce to li
+    c.lower = li;
+  } else if(c.lower === li){ // toggle same level
+    c.lower = li > 0 ? li - 1 : 0;
+  } else { // clicking below current → set to li+1
+    c.lower = li + 1;
+  }
+  c.lower = Math.max(0, Math.min(4, c.lower));
+  c.value = c.upper * 5 + c.lower;
+  playBead();
+  updateAbacus();
+}
+
+function adjCol(idx, delta){
+  if(G.answered) return;
+  const c = G.colValues[idx];
+  let v = c.value + delta;
+  v = Math.max(0, Math.min(9, v));
+  c.upper = v >= 5 ? 1 : 0;
+  c.lower = v - c.upper * 5;
+  c.value = v;
+  playBead();
+  updateAbacus();
+}
+
+function updateAbacus(){
+  // Re-render but keep current values
+  const interactive = G.levelData && (G.levelData.type === 'set');
+  renderAbacus(G.colValues, interactive);
+}
+
+// ═══════════════════════════════════════
+//  音效
+// ═══════════════════════════════════════
+let ac = null;
+function tone(f,d,t='sine'){
+  try{
+    if(!ac) ac = new(window.AudioContext||window.webkitAudioContext)();
+    const o=ac.createOscillator(),g=ac.createGain();
+    o.type=t;o.frequency.value=f;g.gain.value=0.05;
+    g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);
+    o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d);
+  }catch(e){}
+}
+function playBead(){tone(800,.06)}
+function sfxOk(){tone(880,.1);setTimeout(()=>tone(1100,.12),70)}
+function sfxBad(){tone(300,.15,'sawtooth')}
+function sfxPass(){tone(660,.08);setTimeout(()=>tone(880,.08),80);setTimeout(()=>tone(1100,.15),160)}
+function sfxDrop(){tone(400,.1);setTimeout(()=>tone(300,.2),100)}
+
+// ═══════════════════════════════════════
+//  题目生成
+// ═══════════════════════════════════════
+function randInt(min,max){ return Math.floor(Math.random()*(max-min+1))+min; }
+
+function generateQuestion(level){
+  const lv = LEVELS[level];
+  const dMin = lv.digits[0], dMax = lv.digits.length > 1 ? lv.digits[1] : dMin;
+  const nd = randInt(dMin, dMax); // number of digits
+  const min = Math.pow(10, nd-1);
+  const max = Math.pow(10, nd) - 1;
+  const targetNum = randInt(min, max);
+  const digits = String(targetNum).padStart(nd,'0').split('').map(Number);
+
+  switch(lv.type){
+    case 'read': // Show abacus, user types number
+      return {
+        type: 'read',
+        target: targetNum,
+        abacusDigits: [...Array(COLS-nd).fill(0), ...digits],
+        answer: targetNum,
+        prompt: '读出算盘上的数字'
+      };
+
+    case 'set': // Show number, user sets abacus
+      return {
+        type: 'set',
+        target: targetNum,
+        abacusDigits: makeEmptyCols(COLS).map(c => c.value),
+        answer: targetNum,
+        prompt: '在算盘上拨出这个数'
+      };
+
+    case 'flash': // Flash abacus briefly, user recalls
+      return {
+        type: 'flash',
+        target: targetNum,
+        abacusDigits: [...Array(COLS-nd).fill(0), ...digits],
+        answer: targetNum,
+        prompt: '记住算盘上的数字！'
+      };
+
+    case 'add': {
+      const a = randInt(min, max);
+      const b = randInt(1, Math.min(9, max-a));
+      return {
+        type: 'add',
+        op: '+',
+        a, b,
+        target: a + b,
+        answer: a + b,
+        prompt: `${a} + ${b} = ?`
+      };
+    }
+
+    case 'mixed': {
+      if(Math.random() < 0.5){
+        const a = randInt(10, 99);
+        const b = randInt(1, 9);
+        const op = Math.random() < 0.7 ? '+' : '-';
+        const ans = op === '+' ? a + b : a - b;
+        if(ans < 0) return generateQuestion(level);
+        return { type:'mixed', op, a, b, target: ans, answer: ans, prompt: `${a} ${op} ${b} = ?` };
+      } else {
+        return generateQuestion(randInt(0,5)); // reuse read/set for variety
+      }
+    }
+
+    default: return generateQuestion(0);
+  }
+}
+
+function startLevel(lvIdx){
+  G = {
+    levelIdx: lvIdx, questions: [], qIdx: 0,
+    correct: 0, wrong: 0, streak: 0, maxStreak: 0,
+    score: 0, answered: false, results: [],
+    timer: null, timeLeft: 0, colValues: [], flashPhase: false,
+    levelData: LEVELS[lvIdx]
+  };
+  stopTimer();
+  // generate questions
+  const lv = LEVELS[lvIdx];
+  for(let i = 0; i < QS; i++){
+    G.questions.push(generateQuestion(lvIdx));
+  }
+  showGameScreen();
+  showQuestion();
+}
+
+function showQuestion(){
+  const q = G.questions[G.qIdx];
+  const lv = LEVELS[G.levelIdx];
+  G.answered = false;
+
+  $('levelName').textContent = `第 ${G.levelIdx+1} 关 · ${lv.name}`;
+  $('gameScore').textContent = G.score;
+  $('qCounter').innerHTML = `第 <em>${G.qIdx+1}</em> / <em>${QS}</em> 题`;
+  $('correctCount').textContent = G.correct;
+  $('streakCount').textContent = G.streak;
+  $('streakDisplay').className = 'streak' + (G.streak >= 2 ? ' active' : '');
+  updateDots();
+  updateTimerDisplay(0);
+
+  // Hide/show areas
+  $('targetArea').classList.add('hidden');
+  $('answerArea').classList.remove('hidden');
+  $('answerInput').value = '';
+  $('answerInput').className = '';
+  $('answerInput').disabled = false;
+  $('answerInput').focus();
+  $('submitBtn').disabled = false;
+  $('tipArea').textContent = '';
+
+  if(q.type === 'read'){
+    // Show abacus with beads
+    G.colValues = makeCols(q.abacusDigits);
+    renderAbacus(G.colValues, false);
+    $('gameInstruction').textContent = '👁️ 读出算盘上的数字';
+    $('answerInput').placeholder = '输入数字';
+    startTimer(10);
+  }
+  else if(q.type === 'set'){
+    // Show target number, user adjusts abacus
+    G.colValues = makeEmptyCols(COLS);
+    renderAbacus(G.colValues, true);
+    $('targetArea').classList.remove('hidden');
+    $('targetNumber').textContent = q.target;
+    $('gameInstruction').textContent = '🧮 在算盘上拨出这个数字';
+    $('answerInput').placeholder = '确认数字';
+    startTimer(20);
+  }
+  else if(q.type === 'flash'){
+    // Show abacus briefly, then hide
+    G.colValues = makeCols(q.abacusDigits);
+    renderAbacus(G.colValues, false);
+    G.flashPhase = true;
+    $('gameInstruction').textContent = '⏳ 仔细看！';
+    $('answerInput').placeholder = '等待...';
+    $('answerInput').disabled = true;
+    $('submitBtn').disabled = true;
+    // Flash effect
+    setTimeout(() => {
+      // Hide abacus
+      G.colValues = makeEmptyCols(COLS);
+      renderAbacus(G.colValues, false);
+      G.flashPhase = false;
+      $('gameInstruction').textContent = '💭 刚才的数字是？';
+      $('answerInput').placeholder = '输入数字';
+      $('answerInput').disabled = false;
+      $('submitBtn').disabled = false;
+      $('answerInput').focus();
+      startTimer(8);
+    }, 1500);
+  }
+  else {
+    // Arithmetic
+    G.colValues = makeEmptyCols(COLS);
+    renderAbacus(G.colValues, false);
+    $('gameInstruction').textContent = `🧮 ${q.prompt}`;
+    $('answerInput').placeholder = '输入答案';
+    startTimer(15);
+  }
+}
+
+function checkAnswer(){
+  if(G.answered) return;
+  const input = $('answerInput');
+  const val = parseInt(input.value);
+  if(isNaN(val)) { $('tipArea').textContent = '⚠️ 请输入数字'; input.focus(); return; }
+  G.answered = true;
+  stopTimer();
+  const q = G.questions[G.qIdx];
+  const isCorrect = val === q.answer;
+
+  if(isCorrect){
+    const bonus = Math.max(0, Math.floor(G.timeLeft / G.maxTime * 20));
+    const streakBonus = Math.min(G.streak, 8) * 3;
+    const pts = 10 + bonus + streakBonus;
+    G.score += pts;
+    G.correct++; G.streak++; G.maxStreak = Math.max(G.maxStreak, G.streak);
+    G.results.push(true);
+    input.className = 'correct';
+    showCorrectAnim('+' + pts);
+    sfxOk();
+  } else {
+    G.wrong++; G.streak = 0;
+    G.results.push(false);
+    input.className = 'wrong';
+    input.value = '';
+    sfxBad();
+    $('tipArea').textContent = `💡 正确答案是 ${q.answer}`;
+  }
+  updateDots();
+  $('correctCount').textContent = G.correct;
+  $('streakCount').textContent = G.streak;
+  $('streakDisplay').className = 'streak' + (G.streak >= 2 ? ' active' : '');
+  $('gameScore').textContent = G.score;
+
+  setTimeout(() => {
+    G.qIdx++;
+    if(G.qIdx >= QS) return endLevel();
+    showQuestion();
+  }, isCorrect ? 500 : 1200);
+}
+
+function showCorrectAnim(text){
+  const el = document.createElement('div');
+  el.className = 'correct-flash';
+  el.innerHTML = `<div class="label">${text}</div>`;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 600);
+}
+
+function endLevel(){
+  stopTimer();
+  const passed = G.correct >= PASS_COUNT;
+  // Stars
+  let stars = 0;
+  if(passed){
+    if(G.correct === QS) stars = 3;
+    else if(G.correct >= QS - 1) stars = 2;
+    else stars = 1;
+    S.completed[LEVELS[G.levelIdx].id] = true;
+  }
+  const prevStars = S.stars[LEVELS[G.levelIdx].id] || 0;
+  if(stars > prevStars) S.stars[LEVELS[G.levelIdx].id] = stars;
+  if(G.score > (S.scores[LEVELS[G.levelIdx].id] || 0)) S.scores[LEVELS[G.levelIdx].id] = G.score;
+  S.points += G.score;
+  if(passed && G.levelIdx + 1 < LEVELS.length){
+    // Unlock next level
+  }
+  saveState();
+
+  // Show result
+  $('resultIcon').textContent = passed ? '🎉' : '💪';
+  $('resultTitle').textContent = passed ? '闯关成功！' : '继续努力！';
+  $('resultSub').textContent = passed ?
+    (stars >= 3 ? '完美通关，太强了！' : stars >= 2 ? '表现不错！' : '勉强过关，再练练') :
+    `答对 ${G.correct}/${QS} 题，差 ${PASS_COUNT - G.correct} 题过关`;
+  $('resultStars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3-stars);
+  $('resultScore').textContent = G.score;
+  $('rCorrect').textContent = G.correct;
+  $('rWrong').textContent = G.wrong;
+  $('rStreak').textContent = G.maxStreak;
+  $('resultCombo').textContent = G.maxStreak >= 3 ? `🔥 最高连击 ${G.maxStreak}x！` : '';
+
+  if(passed && G.levelIdx + 1 >= LEVELS.length){
+    $('resultBtn').textContent = '🏆 全部通关！';
+    $('resultBtn').onclick = () => { hideResult(); showMap(); };
+  } else if(passed){
+    $('resultBtn').textContent = '下一关 →';
+    $('resultBtn').onclick = () => { hideResult(); startLevel(G.levelIdx + 1); };
+  } else {
+    $('resultBtn').textContent = '🔄 重新挑战';
+    $('resultBtn').onclick = () => { hideResult(); startLevel(G.levelIdx); };
+  }
+  $('resultHomeBtn').onclick = () => { hideResult(); showMap(); };
+  $('resultOverlay').classList.remove('hidden');
+  if(passed) sfxPass(); else sfxDrop();
+}
+
+function hideResult(){ $('resultOverlay').classList.add('hidden'); }
+
+function updateDots(){
+  const el = $('progressDots'); el.innerHTML = '';
+  for(let i = 0; i < QS; i++){
+    const d = document.createElement('div');
+    d.className = 'dot';
+    if(i < G.results.length) d.classList.add(G.results[i] ? 'done' : 'wrong');
+    if(i === G.qIdx) d.classList.add('current');
+    el.appendChild(d);
+  }
+}
+
+// ═══════════════════════════════════════
+//  计时器
+// ═══════════════════════════════════════
+function startTimer(secs){
+  stopTimer();
+  G.maxTime = secs;
+  G.timeLeft = secs;
+  updateTimerDisplay(secs);
+  G.timer = setInterval(() => {
+    G.timeLeft--;
+    updateTimerDisplay(G.timeLeft);
+    if(G.timeLeft <= 0){
+      if(!G.answered && !G.flashPhase){
+        stopTimer();
+        G.answered = true;
+        G.wrong++; G.streak = 0; G.results.push(false);
+        sfxBad();
+        $('tipArea').textContent = '⏰ 时间到！';
+        updateDots(); updateTimerDisplay(0);
+        setTimeout(() => {
+          G.qIdx++;
+          if(G.qIdx >= QS) return endLevel();
+          showQuestion();
+        }, 1200);
+      }
+    }
+  }, 1000);
+}
+
+function stopTimer(){
+  if(G.timer){ clearInterval(G.timer); G.timer = null; }
+}
+
+function updateTimerDisplay(val){
+  $('timerValue').textContent = String(Math.max(0,val)).padStart(2,'0');
+}
+
+// ═══════════════════════════════════════
+//  屏幕切换
+// ═══════════════════════════════════════
+function hideAll(){
+  ['homeScreen','mapScreen','gameScreen'].forEach(id => $(id).classList.add('hidden'));
+  $('gameHeader').classList.add('hidden');
+}
+
+function showHome(){ hideAll(); $('homeScreen').classList.remove('hidden'); }
+function showMap(){ hideAll(); $('gameHeader').classList.remove('hidden'); $('mapScreen').classList.remove('hidden'); renderMap(); }
+function showGameScreen(){
+  hideAll();
+  $('gameHeader').classList.remove('hidden');
+  $('gameScreen').classList.remove('hidden');
+  $('headerBack').onclick = () => { stopTimer(); showMap(); };
+}
+
+// ═══════════════════════════════════════
+//  地图
+// ═══════════════════════════════════════
+function renderMap(){
+  const path = $('mapPath'); path.innerHTML = '';
+  const completed = Object.keys(S.completed).length;
+  $('mapProgress').textContent = completed;
+  $('mapTotal').textContent = LEVELS.length;
+
+  LEVELS.forEach((lv, i) => {
+    if(i > 0){
+      const conn = document.createElement('div');
+      conn.className = 'map-connector';
+      conn.textContent = '▼';
+      path.appendChild(conn);
+    }
+    const node = document.createElement('div');
+    const isCompleted = S.completed[lv.id];
+    const isCurrent = i === 0 || S.completed[LEVELS[i-1].id] || i <= completed;
+    const isLocked = !isCurrent && !isCompleted;
+    const stars = S.stars[lv.id] || 0;
+
+    node.className = 'map-node';
+    if(isLocked) node.classList.add('locked');
+    else if(isCompleted) node.classList.add('completed');
+    else node.classList.add('current');
+
+    node.innerHTML = `
+      <div class="icon">${isLocked ? '🔒' : isCompleted ? '✅' : lv.icon}</div>
+      <div class="info">
+        <div class="name">${lv.name}</div>
+        <div class="desc">${lv.desc}</div>
+      </div>
+      <div class="status">${'<span class="star">⭐</span>'.repeat(stars)}</div>
+    `;
+
+    if(!isLocked){
+      node.addEventListener('click', () => { startLevel(i); });
+    }
+
+    path.appendChild(node);
+  });
+
+  $('headerTitle').textContent = '神算之道';
+  $('headerRight').textContent = `⭐ ${S.points}`;
+  $('headerBack').onclick = showHome;
+}
+
+// ═══════════════════════════════════════
+//  存档
+// ═══════════════════════════════════════
+function saveState(){
+  try{ localStorage.setItem(SAVE_KEY, JSON.stringify(S)); }catch(e){}
+}
+function loadState(){
+  try{
+    const r = localStorage.getItem(SAVE_KEY);
+    if(!r) return null;
+    const s = JSON.parse(r);
+    if(typeof s.stars !== 'object') s.stars = {};
+    if(typeof s.scores !== 'object') s.scores = {};
+    if(typeof s.completed !== 'object') s.completed = {};
+    return s;
+  }catch(e){ return null; }
+}
+function clearState(){
+  if(confirm('确定重置所有进度？')){
+    localStorage.removeItem(SAVE_KEY);
+    S = { levelIdx:0, points:0, stars:{}, scores:{}, completed:{}, streak:0, maxStreak:0 };
+    showHome();
+  }
+}
+
+// ═══════════════════════════════════════
+//  事件绑定
+// ═══════════════════════════════════════
+$('startBtn').addEventListener('click', showMap);
+$('submitBtn').addEventListener('click', checkAnswer);
+$('answerInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') checkAnswer(); });
+
+// Long press reset
+let resetTimer = 0;
+$('homeScreen').addEventListener('click', (e) => {
+  if(e.target.tagName === 'BUTTON') return;
+  resetTimer++;
+  if(resetTimer >= 8){ clearState(); resetTimer = 0; }
+  setTimeout(() => resetTimer = 0, 3000);
+});
+
+// ═══════════════════════════════════════
+//  启动
+// ═══════════════════════════════════════
+showHome();
+</script>
+</body>
+</html>
