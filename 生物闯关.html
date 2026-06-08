@@ -445,7 +445,7 @@ function endLv(){
   $('resMsg').textContent=`答对 ${G.ok}/${total}`;
   if(stars>=3)sfxPass();
   let lv=G.lv;
-  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1){startLv(lv+1);$('resOverlay').classList.remove('active')}else{buildMap();$('resOverlay').classList.remove('active')}};
   $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
   setTimeout(()=>{$('resOverlay').classList.add('active')},100);
 }
