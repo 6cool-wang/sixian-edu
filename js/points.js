@@ -61,7 +61,7 @@ window.PointsSystem={
     {id:'t15',name:'免费答疑 15分钟',cost:70,icon:'📚',desc:'线上一对一答疑辅导'},
     {id:'report',name:'学情报告 1份',cost:30,icon:'📊',desc:'学习情况分析打印'},
     {id:'stationery',name:'文具盲盒',cost:20,icon:'🎁',desc:'随机文具小礼包'},
-    {id:'sweetpotato',name:'烤地瓜 1个',cost:15,icon:'🍠',desc:'商河本地烤地瓜'},
+    {id:'sweetpotato',name:'助学地瓜 1个',cost:15,icon:'🍠',desc:'商河本地新鲜地瓜'},
     {id:'notebook',name:'定制笔记本',cost:40,icon:'📓',desc:'思贤定制笔记本'},
     {id:'homework',name:'免作业卡 1次',cost:50,icon:'🃏',desc:'免一次书面作业'},
   ]
