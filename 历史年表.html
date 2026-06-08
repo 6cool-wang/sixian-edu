@@ -3,20 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>历史年表闯关 · 思贤学习站</title>
+<title>历史闯关 · 初中历史知识挑战</title>
 <style>
-:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+:root{--bg:#f5f0ee;--bg2:#faf8f6;--card:#fff;--accent:#8e44ad;--accent2:#9b59b6;--red:#c0392b;--text:#333;--text2:#666;--border:#e8ddd5;--shadow:0 2px 12px rgba(0,0,0,0.06)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
-.h{display:none}
-.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
-
+.h{display:none}.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
 #mapScr{padding:20px;min-height:100dvh}
 #mapScr:not(.active){display:none}
 #mapScr.active{display:flex;flex-direction:column;align-items:center}
-#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr h1{font-size:24px;margin:12px 0 2px;color:var(--accent);display:flex;align-items:center;gap:6px}
 #mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
-.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:400px}
 .lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
 .lv-card:active{transform:scale(.96);border-color:var(--accent)}
 .lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
@@ -25,27 +23,24 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 .lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
 .lv-card.locked{opacity:.5;pointer-events:none}
 .lv-card.locked .num::after{content:' 🔒';font-size:14px}
-.lv-card.done{border-color:#b8860b33}
-
+.lv-card.done{border-color:#8e44ad33}
 #gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
 .q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
 .q-header .qi{font-weight:600;color:var(--accent)}
 .q-header .timer{font-weight:600}
 .q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
 @keyframes pulse{50%{opacity:.5}}
-.q-prompt{text-align:center;margin:12px 0 20px}
+.q-prompt{text-align:center;margin:8px 0 12px}
 .q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
-.q-prompt .q-event{font-size:22px;font-weight:700;color:var(--text);line-height:1.4;margin:8px 0}
-.q-prompt .q-era{font-size:12px;color:var(--text2);display:inline-block;background:#b8860b15;padding:2px 10px;border-radius:10px}
+.q-prompt .q-name{font-size:17px;font-weight:700;color:var(--text);margin:8px 0;line-height:1.5}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
-.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:17px;cursor:pointer;transition:.1s;box-shadow:var(--shadow)}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:14px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);line-height:1.3}
 .opt:active{transform:scale(.95)}
 .opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
 .opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
 .opt.disabled{pointer-events:none}
 .progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
 .progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
-
 #resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
 #resOverlay.active{display:flex}
 .res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
@@ -56,31 +51,21 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 .res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
 .res-btn:active{opacity:.8}
 .res-btn.sec{background:var(--border);color:var(--text)}
-
-@media(max-width:420px){
-  .q-event{font-size:19px!important}
-  .opt{font-size:15px;padding:12px 6px}
-}
+@media(max-width:420px){.q-name{font-size:15px!important}.opt{font-size:13px;padding:12px 6px}}
 </style>
 </head>
 <body>
-
 <div id="mapScr" class="active">
-  <h1>历史年表闯关</h1>
-  <p class="sub">历史事件 · 朝代配对</p>
+  <h1>📜 历史闯关</h1>
+  <p class="sub">初中历史知识全覆盖 · 中国古代·近代·现代·世界史</p>
   <div class="lv-grid" id="lvGrid"></div>
 </div>
-
 <div id="gameScr" class="h">
   <div class="progress-bar"><div class="fill" id="progFill"></div></div>
-  <div class="q-header">
-    <span class="qi" id="qIdx"></span>
-    <span class="timer" id="timer">0s</span>
-  </div>
+  <div class="q-header"><span class="qi" id="qIdx"></span><span class="timer" id="timer">0s</span></div>
   <div id="qArea"></div>
   <div class="opts" id="opts"></div>
 </div>
-
 <div id="resOverlay">
   <div class="res-card">
     <h2 id="resTitle">太棒了！</h2>
@@ -91,107 +76,268 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
     <button class="res-btn sec" id="resMap">返回关卡</button>
   </div>
 </div>
-
 <script>
-// ========== DATA ==========
-// event -> dynasty / period
-const HIS = [
-  {ev:'大禹的儿子启继承王位，"家天下"取代"公天下"',ans:'夏朝',era:'古代'},
-  {ev:'汤灭掉夏桀建立新王朝，定都于亳，传至纣王时被周所灭',ans:'商朝',era:'古代'},
-  {ev:'周武王在牧野击败商纣大军，定都镐京，实行分封制和宗法制',ans:'西周',era:'古代'},
-  {ev:'周幽王为博美人一笑烽火戏诸侯，最终被犬戎攻破都城',ans:'西周',era:'古代'},
-  {ev:'周平王将都城东迁至洛邑，王室衰微，诸侯争霸',ans:'东周',era:'古代'},
-  {ev:'打着"尊王攘夷"的旗号召集诸侯会盟，成为春秋首霸',ans:'春秋',era:'古代'},
-  {ev:'晋文公在城濮之战中"退避三舍"大败楚军，确立霸主地位',ans:'春秋',era:'古代'},
-  {ev:'结束了战国纷争，建立了中国历史上第一个统一的中央集权国家',ans:'秦朝',era:'古代'},
-  {ev:'为统一思想下令焚烧诸子百家著作、坑杀儒生',ans:'秦朝',era:'古代'},
-  {ev:'九百名戍卒在大泽乡揭竿而起，喊出"王侯将相宁有种乎"',ans:'秦末',era:'古代'},
-  {ev:'刘邦与项羽争夺天下，最终垓下之围项羽自刎乌江',ans:'秦末',era:'古代'},
-  {ev:'刘邦击败项羽后称帝，定都长安，实行休养生息政策',ans:'西汉',era:'古代'},
-  {ev:'文帝和景帝推行轻徭薄赋，出现了政治清明、经济发展的繁荣局面',ans:'西汉',era:'古代'},
-  {ev:'奉皇帝之命出使西域，开辟了沟通中外的重要通道',ans:'西汉',era:'古代'},
-  {ev:'从长安出发经河西走廊通往中亚、欧洲的贸易通道',ans:'西汉',era:'古代'},
-  {ev:'以外戚身份篡夺皇位，建立了一个仅存在十几年的短命王朝',ans:'新朝',era:'古代'},
-  {ev:'刘邦的第九世孙刘秀重新恢复汉室江山，定都洛阳',ans:'东汉',era:'古代'},
-  {ev:'曹操与袁绍在黄河边以少胜多，奠定了统一北方的基础',ans:'东汉末',era:'古代'},
-  {ev:'孙刘联军用火攻大败曹操，奠定了三分天下的格局',ans:'东汉末',era:'古代'},
-  {ev:'魏蜀吴三个政权并立，各自建国称帝，维持了数十年的对峙局面',ans:'三国',era:'古代'},
-  {ev:'司马炎取代曹魏政权，出兵灭吴，重新统一了全国',ans:'西晋',era:'古代'},
-  {ev:'司马氏诸王为争夺中央权力自相残杀，混战长达十六年',ans:'西晋',era:'古代'},
-  {ev:'鲜卑族皇帝推行全面汉化改革：迁都洛阳、改汉姓、说汉语、穿汉服',ans:'南北朝',era:'古代'},
-  {ev:'杨坚取代北周建立新王朝，随后南下灭陈，统一了分裂近三百年的中国',ans:'隋朝',era:'古代'},
-  {ev:'为了加强南北交通和巩固统治，征发数百万民工开凿了大型水利工程',ans:'隋朝',era:'古代'},
-  {ev:'李渊父子在隋末群雄中胜出，定都长安，开创了长达近三百年的盛世',ans:'唐朝',era:'古代'},
-  {ev:'李世民虚心纳谏、任人唯贤，开创了政治清明、国力强盛的黄金时代',ans:'唐朝',era:'古代'},
-  {ev:'中国历史上独一无二的女皇帝，改国号为“周”，发展科举制度',ans:'唐朝',era:'古代'},
-  {ev:'李隆基统治前期励精图治，使国力达到鼎盛，史称"开元盛世"',ans:'唐朝',era:'古代'},
-  {ev:'边将安禄山和部将史思明先后起兵反叛，成为国力由盛转衰的关键转折',ans:'唐朝',era:'古代'},
-  {ev:'赵匡胤在陈桥驿"黄袍加身"被部下拥立为帝，定都开封',ans:'北宋',era:'古代'},
-  {ev:'与北方辽国在澶州签订盟约，约为兄弟之国，以岁币换取和平',ans:'北宋',era:'古代'},
-  {ev:'宋神宗任用改革家推行一系列富国强兵措施，涉及财政、军事、教育',ans:'北宋',era:'古代'},
-  {ev:'金军攻破东京，徽钦二帝被掳北上，王室被迫南迁临安',ans:'南宋',era:'古代'},
-  {ev:'精忠报国的抗金名将，率领"岳家军"大破金兵，却被以"莫须有"罪名杀害',ans:'南宋',era:'古代'},
-  {ev:'忽必烈继承祖父成吉思汗的伟业，改国号为"大元"，定都大都',ans:'元朝',era:'古代'},
-  {ev:'来自意大利的旅行家，在元朝担任官职十七年，写下《马可·波罗游记》',ans:'元朝',era:'古代'},
-  {ev:'出身贫寒的朱元璋在应天称帝，推翻蒙古人的统治，恢复汉族政权',ans:'明朝',era:'古代'},
-  {ev:'1405年起先后七次率领当时世界上最庞大的船队远航，到达非洲东海岸',ans:'明朝',era:'古代'},
-  {ev:'明英宗在太监怂恿下御驾亲征瓦剌，在土木堡兵败被俘',ans:'明朝',era:'古代'},
-  {ev:'在东南沿海组织"戚家军"抗击倭寇，发明鸳鸯阵屡破敌军',ans:'明朝',era:'古代'},
-  {ev:'建州女真领袖努尔哈赤统一女真各部，建立"大金"（后金）政权',ans:'明末',era:'古代'},
-  {ev:'吴三桂引关外铁骑入关，击败李自成的农民军，定都北京',ans:'清朝',era:'古代'},
-  {ev:'康熙、雍正、乾隆祖孙三代励精图治，将国力推向了历史的巅峰',ans:'清朝',era:'古代'},
-  {ev:'1662年从荷兰殖民者手中收复了被占领三十八年的台湾',ans:'清朝',era:'古代'},
-  {ev:'林则徐在广东将缴获的二百多万斤鸦片在虎门海滩当众销毁',ans:'清朝',era:'近代'},
-  {ev:'英国以虎门销烟为由发动侵略战争，用坚船利炮打开了中国的大门',ans:'清朝',era:'近代'},
-  {ev:'洪秀全领导的农民起义，定都天京，颁布《天朝田亩制度》',ans:'清朝',era:'近代'},
-  {ev:'英法联军攻入北京，大肆抢掠并焚烧了圆明园',ans:'清朝',era:'近代'},
-  {ev:'以"自强""求富"为口号的近代化运动，创办江南制造总局等军事工业',ans:'清朝',era:'近代'},
-  {ev:'日本借朝鲜东学党起义之机发动战争，北洋水师在威海卫全军覆没',ans:'清朝',era:'近代'},
-  {ev:'康有为、梁启超上书光绪帝发起的维新变法，仅一百零三天即宣告失败',ans:'清朝',era:'近代'},
-  {ev:'以"扶清灭洋"为口号的民间组织，围攻外国使馆，最终被八国联军镇压',ans:'清朝',era:'近代'},
-  {ev:'孙中山领导的革命党人发动武昌起义，各省纷纷响应，统治中国二百六十余年的王朝覆灭',ans:'近代',era:'近代'},
-  {ev:'亚洲第一个民主共和国成立，孙中山在南京就任临时大总统',ans:'近代',era:'近代'},
-  {ev:'北京三千余名学生在天安门前集会游行，提出"外争主权，内除国贼"',ans:'近代',era:'近代'},
-  {ev:'1921年在上海法租界秘密开幕，后转移到浙江嘉兴南湖的一艘游船上继续举行',ans:'近代',era:'近代'},
-  {ev:'1927年8月1日，周恩来、贺龙等人发动武装起义，打响了反抗反动派的第一枪',ans:'近代',era:'近代'},
-  {ev:'从江西瑞金出发，血战湘江、四渡赤水、巧渡金沙江、飞夺泸定桥、翻越雪山草地',ans:'近代',era:'近代'},
-  {ev:'张学良和杨虎城在临潼对蒋介石实行"兵谏"，最终促成抗日民族统一战线',ans:'近代',era:'近代'},
-  {ev:'1937年7月7日夜间，日军在卢沟桥借口一名士兵失踪，向中国守军发动进攻',ans:'近代',era:'近代'},
-  {ev:'彭德怀指挥一百多个团在华北两千多公里的战线上对日军发动大规模进攻',ans:'近代',era:'近代'},
-  {ev:'1945年8月15日，日本宣布无条件投降，中国取得了近代以来第一次反侵略战争的完全胜利',ans:'近代',era:'近代'},
-  {ev:'1949年10月1日，天安门广场三十万群众集会，举行了隆重的开国大典',ans:'现代',era:'现代'},
-  {ev:'1956年，对农业、手工业和资本主义工商业的改造基本完成，社会主义制度基本确立',ans:'现代',era:'现代'},
-  {ev:'1978年十二届三中全会后，从农村推行家庭联产承包责任制到设立沿海经济特区',ans:'现代',era:'现代'},
-  {ev:'1997年7月1日零时，英国米字旗降下，五星红旗冉冉升起',ans:'现代',era:'现代'},
-  {ev:'1999年12月20日，中国在时隔四百多年后重新对这片土地恢复行使主权',ans:'现代',era:'现代'},
-  {ev:'2001年正式加入全球最大的经济贸易组织，标志着中国对外开放进入新阶段',ans:'现代',era:'现代'},
+// ========== HISTORY DATA ==========
+// 史前时期与夏商周
+const H01 = [
+  {q:'我国最早的人类是', a:'元谋人', w:['北京人','蓝田人','山顶洞人']},
+  {q:'北京人距今约', a:'70万-20万年', w:['170万年','3万年','1万年']},
+  {q:'河姆渡人的主要农作物是', a:'水稻', w:['小麦','粟','玉米']},
+  {q:'半坡居民的主要农作物是', a:'粟', w:['水稻','小麦','大豆']},
+  {q:'相传"建造宫室、制作衣裳、教人挖井"的传说人物是', a:'黄帝', w:['炎帝','蚩尤','大禹']},
+  {q:'禅让制是指将首领之位传给', a:'贤德之人', w:['儿子','兄弟','功臣']},
+  {q:'夏朝的建立者是', a:'禹', w:['启','汤','桀']},
+  {q:'世袭制取代禅让制的标志是', a:'启继承禹的王位', w:['禹建立夏朝','汤灭夏','盘庚迁殷']},
+  {q:'商朝的建立者是', a:'汤', w:['盘庚','纣','武丁']},
+  {q:'西周实行的政治制度是', a:'分封制', w:['郡县制','行省制','科举制']},
+  {q:'西周为稳定政治形势而确立的制度是', a:'宗法制', w:['分封制','礼乐制','察举制']},
+  {q:'春秋时期第一个称霸的是', a:'齐桓公', w:['晋文公','楚庄王','秦穆公']},
+  {q:'战国时期规模最大的战役是', a:'长平之战', w:['桂陵之战','马陵之战','围魏救赵']},
+  {q:'甲骨文主要发现于哪个遗址', a:'殷墟', w:['二里头','周原','三星堆']},
+  {q:'春秋时期铁制农具和什么的使用促进了农业发展', a:'牛耕', w:['马耕','水车','曲辕犁']},
 ];
-// unique dynasty labels
-const DYN = [...new Set(HIS.map(h=>h.ans))];
+// 秦汉
+const H02 = [
+  {q:'秦统一六国是在', a:'公元前221年', w:['公元前230年','公元前210年','公元前202年']},
+  {q:'秦始皇推行的地方行政制度是', a:'郡县制', w:['分封制','行省制','三公九卿制']},
+  {q:'秦朝统一的文字是', a:'小篆', w:['隶书','楷书','行书']},
+  {q:'秦始皇修筑长城的目的是', a:'抵御匈奴', w:['抵御鲜卑','防御诸侯','抵御越族']},
+  {q:'大泽乡起义的领导者是', a:'陈胜吴广', w:['刘邦项羽','张角','黄巢']},
+  {q:'秦朝灭亡后，刘邦被分封在', a:'汉中', w:['关中','巴蜀','中原']},
+  {q:'文景之治发生在哪个时期', a:'西汉', w:['东汉','秦朝','西周']},
+  {q:'汉武帝接受了谁的建议"罢黜百家，独尊儒术"', a:'董仲舒', w:['孔子','孟子','司马迁']},
+  {q:'汉武帝为加强中央集权颁布了', a:'推恩令', w:['削藩策','七国之乱','分封令']},
+  {q:'丝绸之路的开辟者是', a:'张骞', w:['班超','卫青','霍去病']},
+  {q:'丝绸之路的最早开辟是在', a:'西汉', w:['东汉','秦朝','唐朝']},
+  {q:'东汉的建立者是', a:'刘秀', w:['刘邦','刘备','刘裕']},
+  {q:'西域都护设立于', a:'西汉', w:['东汉','唐朝','秦朝']},
+  {q:'造纸术的改进者是', a:'蔡伦', w:['毕昇','张衡','华佗']},
+  {q:'《史记》的作者是', a:'司马迁', w:['班固','司马光','陈寿']},
+];
+// 三国两晋南北朝
+const H03 = [
+  {q:'奠定了三国鼎立局面的战役是', a:'赤壁之战', w:['官渡之战','淝水之战','长平之战']},
+  {q:'官渡之战的交战双方是', a:'曹操与袁绍', w:['曹操与刘备','孙权与曹操','刘备与孙权']},
+  {q:'三国中最后被灭的是', a:'吴', w:['蜀','魏','三个同时']},
+  {q:'西晋的建立者是', a:'司马炎', w:['司马懿','司马昭','司马睿']},
+  {q:'西晋灭亡的直接原因是', a:'八王之乱', w:['匈奴入侵','农民起义','七国之乱']},
+  {q:'北魏孝文帝改革的核心内容是', a:'汉化政策', w:['鲜卑化','军事改革','赋税改革']},
+  {q:'北魏孝文帝迁都到', a:'洛阳', w:['长安','平城','建康']},
+  {q:'江南地区得到开发的主要原因是', a:'北方人口南迁带来劳动力和技术', w:['南方自然条件优越','南方没有战争','政府强制开发']},
+  {q:'著名的云冈石窟开凿于', a:'北魏', w:['隋朝','唐朝','明朝']},
+  {q:'《齐民要术》的作者是', a:'贾思勰', w:['徐光启','宋应星','李时珍']},
+  {q:'祖冲之在数学方面的突出贡献是', a:'精确计算圆周率', w:['发明地动仪','推算日月运行','改进造纸术']},
+  {q:'淝水之战的交战双方是', a:'前秦与东晋', w:['北魏与南朝','西晋与匈奴','隋与陈']},
+];
+// 隋唐
+const H04 = [
+  {q:'隋朝的建立者是', a:'杨坚', w:['杨广','李渊','李世民']},
+  {q:'隋朝大运河的中心是', a:'洛阳', w:['长安','建康','开封']},
+  {q:'大运河的开凿者是', a:'隋炀帝', w:['隋文帝','唐太宗','唐玄宗']},
+  {q:'科举制正式创立于', a:'隋朝', w:['唐朝','宋朝','秦朝']},
+  {q:'唐朝的建立者是', a:'李渊', w:['李世民','李治','李隆基']},
+  {q:'贞观之治是哪个皇帝统治时期', a:'唐太宗', w:['唐高祖','唐玄宗','武则天']},
+  {q:'中国历史上唯一的女皇帝是', a:'武则天', w:['慈禧太后','吕雉','萧太后']},
+  {q:'开元盛世是哪个皇帝统治前期', a:'唐玄宗', w:['唐太宗','武则天','唐高宗']},
+  {q:'唐朝时日本派遣到中国学习的使团叫', a:'遣唐使', w:['遣隋使','留学生','僧侣']},
+  {q:'安史之乱的发动者是', a:'安禄山和史思明', w:['安禄山和史朝义','史思明和李光弼','安庆绪和史思明']},
+  {q:'唐朝由盛转衰的标志是', a:'安史之乱', w:['黄巢起义','藩镇割据','宦官专权']},
+  {q:'文成公主嫁给吐蕃赞普松赞干布是在', a:'唐朝', w:['隋朝','宋朝','汉朝']},
+  {q:'唐朝灭亡后出现了什么局面', a:'五代十国', w:['三国鼎立','南北朝','春秋战国']},
+  {q:'唐三彩的主要颜色不包括', a:'蓝色', w:['黄色','绿色','白色']},
+  {q:'唐代最著名的诗人中被尊为"诗仙"的是', a:'李白', w:['杜甫','白居易','王维']},
+];
+// 宋元
+const H05 = [
+  {q:'北宋的建立者是', a:'赵匡胤', w:['赵光义','赵构','赵普']},
+  {q:'北宋定都于', a:'开封', w:['洛阳','长安','杭州']},
+  {q:'北宋与辽订立的盟约是', a:'澶渊之盟', w:['绍兴和议','海上之盟','隆兴和议']},
+  {q:'北宋的变法改革家是', a:'王安石', w:['范仲淹','司马光','苏轼']},
+  {q:'经济重心南移完成于', a:'南宋', w:['北宋','唐朝','隋朝']},
+  {q:'南宋抗金名将是', a:'岳飞', w:['文天祥','韩世忠','戚继光']},
+  {q:'岳飞的罪名是', a:'莫须有', w:['谋反','通敌','贪腐']},
+  {q:'成吉思汗的贡献是', a:'统一蒙古各部', w:['消灭南宋','建立元朝','西征欧洲']},
+  {q:'元朝的建立者是', a:'忽必烈', w:['成吉思汗','窝阔台','蒙哥']},
+  {q:'元朝定都于', a:'大都', w:['上都','中都','中都']},
+  {q:'元朝实行的地方行政制度是', a:'行省制', w:['郡县制','分封制','州县制']},
+  {q:'活字印刷术的发明者是', a:'毕昇', w:['蔡伦','沈括','郭守敬']},
+  {q:'指南针开始应用于航海是在', a:'北宋', w:['唐朝','南宋','元朝']},
+  {q:'火药开始用于军事是在', a:'唐朝末年', w:['宋朝','元朝','明朝']},
+  {q:'元朝时来到中国的意大利旅行家是', a:'马可·波罗', w:['利玛窦','白求恩','郎世宁']},
+];
+// 明清
+const H06 = [
+  {q:'明朝的建立者是', a:'朱元璋', w:['朱棣','朱允炆','朱厚照']},
+  {q:'明朝定都于', a:'南京', w:['北京','开封','洛阳']},
+  {q:'明成祖朱棣迁都到', a:'北京', w:['南京','洛阳','西安']},
+  {q:'明朝七下西洋的航海家是', a:'郑和', w:['郑成功','戚继光','张骞']},
+  {q:'郑和下西洋最远到达', a:'非洲东海岸和红海沿岸', w:['印度','东南亚','欧洲']},
+  {q:'明朝抗击倭寇的民族英雄是', a:'戚继光', w:['郑成功','岳飞','文天祥']},
+  {q:'明朝末年李自成起义军提出的口号是', a:'均田免赋', w:['王侯将相宁有种乎','扶清灭洋','有田同耕']},
+  {q:'清朝的建立者是', a:'皇太极', w:['努尔哈赤','顺治','康熙']},
+  {q:'清朝康熙帝平定的叛乱是', a:'三藩之乱', w:['安史之乱','八王之乱','七国之乱']},
+  {q:'清朝雍正帝设立的强化皇权的机构是', a:'军机处', w:['内阁','六部','司礼监']},
+  {q:'1662年收复台湾的民族英雄是', a:'郑成功', w:['戚继光','郑和','林则徐']},
+  {q:'清朝前期的统治被称为', a:'康乾盛世', w:['文景之治','开元盛世','贞观之治']},
+  {q:'闭关锁国政策的主要表现是', a:'限制对外贸易', w:['禁止一切贸易','只允许广州一口通商','禁止外国人入境']},
+  {q:'明朝时期世界上最宏伟的皇家建筑群是', a:'北京故宫', w:['颐和园','圆明园','承德避暑山庄']},
+  {q:'《本草纲目》的作者是', a:'李时珍', w:['徐光启','宋应星','贾思勰']},
+];
+// 近代列强侵略
+const H07 = [
+  {q:'鸦片战争爆发于', a:'1840年', w:['1839年','1842年','1856年']},
+  {q:'虎门销烟的领导者是', a:'林则徐', w:['魏源','邓世昌','左宗棠']},
+  {q:'鸦片战争后签订的第一个不平等条约是', a:'南京条约', w:['北京条约','马关条约','辛丑条约']},
+  {q:'《南京条约》中割让给英国的是', a:'香港岛', w:['九龙半岛','香港全境','新界']},
+  {q:'第二次鸦片战争中火烧圆明园的是', a:'英法联军', w:['八国联军','日军','英军']},
+  {q:'太平天国运动的领导者是', a:'洪秀全', w:['曾国藩','李鸿章','左宗棠']},
+  {q:'太平天国定都于', a:'天京', w:['北京','武昌','安庆']},
+  {q:'收复新疆的清朝将领是', a:'左宗棠', w:['曾国藩','李鸿章','张之洞']},
+  {q:'甲午中日战争爆发于', a:'1894年', w:['1895年','1904年','1884年']},
+  {q:'黄海海战中壮烈殉国的民族英雄是', a:'邓世昌', w:['丁汝昌','刘步蟾','林永升']},
+  {q:'《马关条约》中割让给日本的领土有', a:'台湾、辽东半岛、澎湖列岛', w:['台湾、香港','台湾全岛','台湾和琉球']},
+  {q:'八国联军侵华的直接原因是', a:'镇压义和团', w:['扩大通商口岸','保护使馆','惩罚清政府']},
+  {q:'《辛丑条约》使中国完全沦为', a:'半殖民地半封建社会', w:['殖民地','半殖民地','封建社会']},
+  {q:'近代中国丧失领土主权开始于', a:'《南京条约》', w:['《北京条约》','《马关条约》','《辛丑条约》']},
+  {q:'中国近代史上第一个不平等条约是', a:'《南京条约》', w:['《虎门条约》','《望厦条约》','《黄埔条约》']},
+];
+// 近代化探索
+const H08 = [
+  {q:'洋务运动的口号是', a:'自强求富', w:['师夷长技','变法图强','民主共和']},
+  {q:'洋务运动的根本目的是', a:'维护清朝统治', w:['发展资本主义','抵抗外国侵略','学习西方制度']},
+  {q:'洋务运动创办的第一个军事工业是', a:'安庆内军械所', w:['江南制造总局','福州船政局','天津机器局']},
+  {q:'戊戌变法又称', a:'百日维新', w:['维新变法','戊戌政变','戊戌变法']},
+  {q:'戊戌变法的领导者是', a:'康有为和梁启超', w:['光绪帝和康有为','孙中山和黄兴','李鸿章和张之洞']},
+  {q:'戊戌变法失败后被杀害的六君子不包括', a:'康有为', w:['谭嗣同','林旭','杨深秀']},
+  {q:'中国同盟会成立于', a:'1905年', w:['1894年','1911年','1912年']},
+  {q:'同盟会的政治纲领是', a:'驱除鞑虏恢复中华创立民国平均地权', w:['驱除鞑虏恢复中华','三民主义','民主共和']},
+  {q:'辛亥革命的指导思想是', a:'三民主义', w:['民主共和','变法图强','自强求富']},
+  {q:'武昌起义爆发于', a:'1911年10月10日', w:['1912年1月1日','1910年10月10日','1911年12月']},
+  {q:'中华民国成立的时间是', a:'1912年1月1日', w:['1911年10月10日','1912年2月12日','1912年元旦']},
+  {q:'辛亥革命的历史意义不包括', a:'改变了中国半殖民地半封建社会性质', w:['推翻了两千多年的封建帝制','使民主共和观念深入人心','建立了中华民国']},
+  {q:'新文化运动的口号是', a:'民主与科学', w:['自由与平等','自强与求富','变法与维新']},
+  {q:'新文化运动的代表人物不包括', a:'孙中山', w:['陈独秀','鲁迅','胡适']},
+  {q:'新文化运动的主要阵地是', a:'《新青年》', w:['《民报》','《时务报》','《申报》']},
+];
+// 五四与中共诞生
+const H09 = [
+  {q:'五四运动爆发于', a:'1919年', w:['1921年','1917年','1920年']},
+  {q:'五四运动的口号是', a:'外争主权内除国贼', w:['废除二十一条','打倒列强','民主共和']},
+  {q:'五四运动中发挥主力作用的是', a:'工人阶级', w:['学生','商人','知识分子']},
+  {q:'五四运动标志着中国什么的开端', a:'新民主主义革命', w:['旧民主主义革命','社会主义革命','资产阶级革命']},
+  {q:'中国共产党成立的时间是', a:'1921年7月', w:['1921年8月','1922年7月','1920年7月']},
+  {q:'中共一大的召开地点最初在', a:'上海', w:['北京','广州','南京']},
+  {q:'中共一大最后一天的会议转移到哪里举行', a:'嘉兴南湖', w:['杭州西湖','宁波','苏州']},
+  {q:'国共第一次合作的基础是', a:'新三民主义', w:['三民主义','共产主义','民主共和']},
+  {q:'黄埔军校的创办者是', a:'孙中山', w:['蒋介石','周恩来','廖仲恺']},
+  {q:'北伐战争的主要对象不包括', a:'张作霖', w:['吴佩孚','孙传芳','段祺瑞']},
+  {q:'四一二反革命政变是谁发动的', a:'蒋介石', w:['汪精卫','张作霖','吴佩孚']},
+  {q:'南昌起义爆发于', a:'1927年8月1日', w:['1927年4月12日','1928年8月1日','1927年9月9日']},
+  {q:'南昌起义的领导人不包括', a:'毛泽东', w:['周恩来','贺龙','叶挺']},
+  {q:'秋收起义的领导者是', a:'毛泽东', w:['朱德','彭德怀','周恩来']},
+  {q:'井冈山革命根据地创建的意义是', a:'开辟了农村包围城市的道路', w:['第一次打响了武装反抗国民党的第一枪','确立了党对军队的绝对领导','标志着抗日战争的开始']},
+];
+// 抗日战争
+const H10 = [
+  {q:'九一八事变发生在', a:'1931年', w:['1937年','1932年','1935年']},
+  {q:'九一八事变后日本占领了', a:'东北三省', w:['华北地区','华东地区','华东三省']},
+  {q:'西安事变的发动者是', a:'张学良和杨虎城', w:['张学良和蒋介石','杨虎城和周恩来','冯玉祥和阎锡山']},
+  {q:'西安事变的和平解决标志着什么基本形成', a:'抗日民族统一战线', w:['国共合作','全国抗战局面','第二次国共合作']},
+  {q:'卢沟桥事变（七七事变）发生在', a:'1937年7月7日', w:['1937年7月8日','1936年7月7日','1938年7月7日']},
+  {q:'卢沟桥事变标志着什么开始', a:'全民族抗战', w:['局部抗战','抗日战争进入相持阶段','抗日战争胜利']},
+  {q:'南京大屠杀发生在', a:'1937年12月', w:['1938年12月','1937年11月','1945年8月']},
+  {q:'百团大战的指挥官是', a:'彭德怀', w:['朱德','林彪','刘伯承']},
+  {q:'台儿庄战役的指挥官是', a:'李宗仁', w:['彭德怀','张自忠','薛岳']},
+  {q:'中共七大在哪召开', a:'延安', w:['瑞金','西柏坡','遵义']},
+  {q:'日本宣布无条件投降的时间是', a:'1945年8月15日', w:['1945年9月2日','1945年9月3日','1945年8月6日']},
+  {q:'抗日战争胜利的根本原因是', a:'全民族抗战', w:['美国投原子弹','苏联出兵东北','国民党正面战场']},
+  {q:'抗战期间日军在中国犯下的暴行不包括', a:'珍珠港事件', w:['南京大屠杀','731部队细菌战','三光政策']},
+  {q:'中国抗日战争历时', a:'14年', w:['8年','10年','12年']},
+  {q:'抗战胜利后台湾回到祖国怀抱是在', a:'1945年', w:['1949年','1943年','1947年']},
+];
+// 解放战争
+const H11 = [
+  {q:'重庆谈判的时间是', a:'1945年8月', w:['1946年6月','1947年3月','1945年12月']},
+  {q:'重庆谈判后国共双方签订了', a:'双十协定', w:['停战协定','和平协议','国共合作宣言']},
+  {q:'全面内战爆发于', a:'1946年6月', w:['1947年3月','1945年10月','1947年6月']},
+  {q:'刘邓大军挺进大别山的意义是', a:'揭开战略进攻的序幕', w:['揭开战略防御的序幕','标志三大战役开始','解放了中原地区']},
+  {q:'三大战役不包括', a:'渡江战役', w:['辽沈战役','淮海战役','平津战役']},
+  {q:'平津战役中和平解放的城市是', a:'北平', w:['天津','张家口','保定']},
+  {q:'渡江战役的意义是', a:'解放南京，推翻国民党统治', w:['解放全中国','渡过长江','占领上海']},
+  {q:'解放南京的时间是', a:'1949年4月', w:['1949年1月','1949年5月','1948年12月']},
+  {q:'三大战役中歼敌数量最多的是', a:'淮海战役', w:['辽沈战役','平津战役','渡江战役']},
+  {q:'《论持久战》的作者是', a:'毛泽东', w:['朱德','周恩来','彭德怀']},
+];
+// 新中国成立与建设
+const H12 = [
+  {q:'开国大典举行的时间是', a:'1949年10月1日', w:['1949年9月21日','1949年10月9日','1950年10月1日']},
+  {q:'新中国的国歌是', a:'《义勇军进行曲》', w:['《东方红》','《国际歌》','《黄河大合唱》']},
+  {q:'西藏和平解放于', a:'1951年', w:['1950年','1952年','1949年']},
+  {q:'抗美援朝战争爆发于', a:'1950年10月', w:['1950年6月','1951年10月','1949年10月']},
+  {q:'上甘岭战役中的战斗英雄是', a:'黄继光', w:['邱少云','杨根思','董存瑞']},
+  {q:'土地改革完成于', a:'1952年', w:['1950年','1953年','1949年']},
+  {q:'一五计划的主要任务是', a:'优先发展重工业', w:['优先发展农业','优先发展轻工业','发展国防工业']},
+  {q:'我国第一部社会主义类型的宪法是', a:'1954年宪法', w:['《共同纲领》','1949年宪法','1975年宪法']},
+  {q:'三大改造指的是对什么的改造', a:'农业手工业和资本主义工商业', w:['农业工业和商业','农业轻工业和重工业','工业和农业']},
+  {q:'社会主义制度在我国基本建立的标志是', a:'三大改造基本完成', w:['新中国成立','一五计划完成','土地改革完成']},
+  {q:'"两弹元勋"指的是', a:'邓稼先', w:['钱学森','钱三强','华罗庚']},
+  {q:'雷锋同志被称为什么', a:'全心全意为人民服务的楷模', w:['人民的好战士','革命烈士','劳动模范']},
+  {q:'文化大革命结束的标志是', a:'粉碎四人帮', w:['粉碎林彪集团','九一三事件','十一届三中全会']},
+  {q:'社会主义建设探索时期涌现的模范人物不包括', a:'鲁迅', w:['王进喜','焦裕禄','雷锋']},
+  {q:'大庆油田的"铁人"是', a:'王进喜', w:['雷锋','焦裕禄','邓稼先']},
+];
+// 改革开放与成就
+const H13 = [
+  {q:'十一届三中全会召开于', a:'1978年', w:['1976年','1979年','1980年']},
+  {q:'十一届三中全会确立了什么的指导方针', a:'解放思想实事求是', w:['以经济建设为中心','改革开放','拨乱反正']},
+  {q:'十一届三中全会做出把工作重心转移到什么上来的决策', a:'经济建设', w:['阶级斗争','文化建设','国防建设']},
+  {q:'家庭联产承包责任制首先在哪实行', a:'安徽凤阳小岗村', w:['四川广汉','江苏华西','河南南街']},
+  {q:'经济特区中最早设立的是', a:'深圳', w:['珠海','汕头','厦门']},
+  {q:'对外开放的格局是', a:'经济特区—沿海开放城市—沿海经济开放区—内地', w:['沿海—沿江—沿边—内地','特区—省会—内地','出口加工区—保税区—开发区']},
+  {q:'加入世界贸易组织（WTO）是在', a:'2001年', w:['1999年','2002年','2000年']},
+  {q:'香港回归是在', a:'1997年7月1日', w:['1999年12月20日','1997年7月2日','1998年7月1日']},
+  {q:'澳门回归是在', a:'1999年12月20日', w:['1997年7月1日','1998年12月20日','2000年12月20日']},
+  {q:'"一国两制"的提出者是', a:'邓小平', w:['毛泽东','周恩来','江泽民']},
+  {q:'2008年我国成功举办了', a:'北京奥运会', w:['上海世博会','广州亚运会','北京亚运会']},
+  {q:'神舟五号载人飞船的航天员是', a:'杨利伟', w:['聂海胜','费俊龙','景海鹏']},
+  {q:'我国第一部社会主义类型的宪法颁布于', a:'1954年', w:['1949年','1982年','1975年']},
+  {q:'社会主义初级阶段基本路线制定于', a:'1987年中共十三大', w:['1978年十一届三中全会','1992年中共十四大','1997年中共十五大']},
+  {q:'袁隆平在农业方面的突出贡献是', a:'培育籼型杂交水稻', w:['培育小麦新品种','发明农业机械','发现转基因技术']},
+];
+// 综合大挑战
+const ALL_HIS_FLAT = (()=>{
+  let all=[]; let sets=[H01,H02,H03,H04,H05,H06,H07,H08,H09,H10,H11,H12,H13];
+  sets.forEach((d,i)=>{d.forEach(q=>{all.push({...q,src:i})})});
+  return all;
+})();
 
+// ========== LEVELS ==========
 const LV = [
-  {l:'先秦时期',desc:'夏·商·西周·春秋',era:'古代',filter:e=>['夏朝','商朝','西周'].includes(e.ans),qs:8,sec:12},
-  {l:'秦汉',desc:'秦·西汉·东汉',era:'古代',filter:e=>['秦朝','秦末','西汉','新朝','东汉','东汉末'].includes(e.ans),qs:8,sec:12},
-  {l:'三国两晋南北朝',desc:'三国·两晋·南北朝',era:'古代',filter:e=>['三国','西晋','南北朝'].includes(e.ans),qs:6,sec:12},
-  {l:'隋唐',desc:'隋·唐',era:'古代',filter:e=>['隋朝','唐朝'].includes(e.ans),qs:8,sec:12},
-  {l:'宋元',desc:'北宋·南宋·元',era:'古代',filter:e=>['北宋','南宋','元朝'].includes(e.ans),qs:8,sec:12},
-  {l:'明清',desc:'明·清',era:'古代',filter:e=>['明朝','明末','清朝'].includes(e.ans),qs:8,sec:12},
-  {l:'近代风云',desc:'晚清·民国·革命',era:'近代',filter:e=>e.era==='近代',qs:8,sec:12},
-  {l:'综合大挑战',desc:'上下五千年混合',era:'全部',filter:e=>true,qs:10,sec:14}
+  {l:'史前·夏商周',desc:'远古人类·禅让·夏商西周春秋',data:H01,qs:8,sec:14},
+  {l:'秦汉时期',desc:'秦统一·西汉·东汉·丝绸之路',data:H02,qs:8,sec:14},
+  {l:'三国两晋南北朝',desc:'赤壁·西晋·孝文帝改革·江南开发',data:H03,qs:8,sec:14},
+  {l:'隋唐时期',desc:'大运河·贞观之治·开元盛世',data:H04,qs:8,sec:14},
+  {l:'宋元时期',desc:'北宋·岳飞·元朝·活字印刷',data:H05,qs:8,sec:14},
+  {l:'明清时期',desc:'郑和·戚继光·康乾盛世',data:H06,qs:8,sec:14},
+  {l:'列强侵略与反抗',desc:'鸦片战争·甲午·八国联军',data:H07,qs:8,sec:14},
+  {l:'近代化探索',desc:'洋务·戊戌·辛亥·新文化',data:H08,qs:8,sec:14},
+  {l:'五四·中共诞生',desc:'五四运动·中共一大·南昌起义',data:H09,qs:8,sec:14},
+  {l:'抗日战争',desc:'九一八·七七事变·百团大战',data:H10,qs:8,sec:14},
+  {l:'解放战争',desc:'重庆谈判·三大战役·渡江战役',data:H11,qs:8,sec:14},
+  {l:'新中国成立与建设',desc:'开国·抗美援朝·三大改造',data:H12,qs:8,sec:14},
+  {l:'改革开放与成就',desc:'十一届三中全会·特区·港澳回归',data:H13,qs:8,sec:14},
+  {l:'综合大挑战',desc:'全部题库混合挑战',data:[],mode:'mix',qs:12,sec:16},
 ];
 
 // ========== GAME STATE ==========
-let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
-
-function save(){localStorage.setItem('his_lv',JSON.stringify(G.stars||[]))}
-function load(){G.stars=JSON.parse(localStorage.getItem('his_lv')||'[]')}
-
+let G={lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+function save(){localStorage.setItem('his_lv2',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('his_lv2')||'[]')}
 function $(id){return document.getElementById(id)}
 function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
 function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
 function showScr(id){hideAll();$(id).classList.add('active')}
-
 let actx=null;
 function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
 function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
@@ -199,62 +345,39 @@ function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
 function sfxBad(){tone(300,.2,.2,'sawtooth')}
 function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
 function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
-
 function buildMap(){
-  load();
-  let g=$('lvGrid'),h='';
+  load(); let g=$('lvGrid'),h='';
   for(let i=0;i<LV.length;i++){
     let l=LV[i],s=G.stars[i]||0,txt='lv-card';
     if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
     if(s>=1)txt+=' done';
-    h+=`<div class="${txt}" data-i="${i}">
-      <div class="num">${i+1}</div>
-      <div class="name">${l.l}</div>
-      <div class="desc">${l.desc}</div>
-      <div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div>
-    </div>`;
+    h+=`<div class="${txt}" data-i="${i}"><div class="num">${i+1}</div><div class="name">${l.l}</div><div class="desc">${l.desc}</div><div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div></div>`;
   }
   g.innerHTML=h;
   g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
 }
-
 function startLv(i){
-  initAudio();
-  G.lv=i;G.qi=0;G.ok=0;
-  let l=LV[i];
-  let pool=HIS.filter(l.filter);
-  let idx=shuffle(pool.map((_,j)=>j));
-  G.qs=Math.min(l.qs,pool.length);
-  let qs=[];
-  for(let j=0;j<G.qs;j++)qs.push(pool[idx[j]]);
-  G.questions=qs;G.total=qs.length;
-  G.tmMax=(l.sec||12)*1000;
-  showScr('gameScr');
-  showQ();
+  initAudio(); G.lv=i; G.qi=0; G.ok=0;
+  let l=LV[i]; let questions=[];
+  if(l.mode==='mix') questions=shuffle([...ALL_HIS_FLAT]).slice(0,l.qs);
+  else questions=shuffle([...l.data]).slice(0,l.qs);
+  G.questions=questions; G.total=questions.length;
+  G.tmMax=(l.sec||14)*1000;
+  showScr('gameScr'); showQ();
 }
-
 function showQ(){
   if(G.qi>=G.total){endLv();return}
-  initAudio();
-  let ev=G.questions[G.qi],correct=ev.ans;
+  let q=G.questions[G.qi];
   $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
   $('progFill').style.width=((G.qi)/G.total*100)+'%';
-  $('qArea').innerHTML=`<div class="q-prompt">
-    <div class="q-label">${ev.era}</div>
-    <div class="q-event">${ev.ev}</div>
-  </div>`;
-  // distractors: same era or random dynasties
-  let pool=DYN.filter(d=>d!==correct);
-  if(pool.length>3)pool=shuffle(pool).slice(0,3);
-  let all=shuffle([correct,...pool]);
-  let h='';
+  $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.q}</div></div>`;
+  let all=shuffle([q.a,...q.w]); let h='';
   for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
   $('opts').innerHTML=h;
   G.locked=false;
-  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,correct)});
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,q.a)});
   startTimer();
 }
-
 function chk(btn,correct){
   if(G.locked)return;
   initAudio();G.locked=true;clearTimeout(G.timer);
@@ -263,10 +386,8 @@ function chk(btn,correct){
   $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
   setTimeout(()=>{G.qi++;showQ()},600);
 }
-
 function startTimer(){
-  clearTimeout(G.timer);
-  let tEl=$('timer');G.tm=G.tmMax;
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
   function tick(){
     let left=Math.max(0,Math.ceil(G.tm/1000));
     tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
@@ -275,14 +396,12 @@ function startTimer(){
   }
   tick();
 }
-
 function endLv(){
   clearTimeout(G.timer);
   let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
   if(!G.stars)G.stars=[];
   let old=G.stars[G.lv]||0;
-  if(stars>old)G.stars[G.lv]=stars;
-  save();
+  if(stars>old)G.stars[G.lv]=stars; save();
   showScr('mapScr');
   $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
   $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
@@ -293,7 +412,6 @@ function endLv(){
   $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
   setTimeout(()=>{$('resOverlay').classList.add('active')},100);
 }
-
 buildMap();
 document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
 </script>
