@@ -153,12 +153,9 @@ window.PointsSystem={
     {id:'checkhw',name:'作业检查 1次',cost:40,icon:'🔍',desc:'老师逐题检查作业并标注错漏',cat:'tutor'},
     {id:'dictation',name:'单词听写辅导 1次',cost:35,icon:'✏️',desc:'老师一对一单词听写+批改',cat:'tutor',tag:'new'},
     {id:'readaloud',name:'朗读纠音辅导 1次',cost:35,icon:'🔊',desc:'英语/语文课文朗读纠音指导',cat:'tutor'},
-    {id:'math_tutor',name:'数学上门辅导 1小时',cost:90,icon:'📐',desc:'数学老师免费上门一对一辅导',cat:'tutor',tag:'hot'},
-    {id:'phys_tutor',name:'物理上门辅导 1小时',cost:90,icon:'⚡',desc:'物理老师免费上门一对一辅导',cat:'tutor',tag:'hot'},
-    {id:'chem_tutor',name:'化学上门辅导 1小时',cost:90,icon:'🧪',desc:'化学老师免费上门一对一辅导',cat:'tutor'},
-    {id:'eng_tutor',name:'英语上门辅导 1小时',cost:90,icon:'🔤',desc:'英语老师免费上门一对一辅导',cat:'tutor',tag:'new'},
-    {id:'chn_tutor',name:'语文上门辅导 1小时',cost:90,icon:'📖',desc:'语文老师免费上门一对一辅导',cat:'tutor'},
-    {id:'bio_tutor',name:'生物上门辅导 1小时',cost:90,icon:'🧬',desc:'生物老师免费上门一对一辅导',cat:'tutor'},
+    {id:'pri_tutor',name:'小学上门辅导 1小时',cost:180,icon:'🧒',desc:'小学全科老师免费上门一对一辅导',cat:'tutor',tag:'hot'},
+    {id:'mid_tutor',name:'初中上门辅导 1小时',cost:290,icon:'🧑‍🎓',desc:'初中全科老师免费上门一对一辅导',cat:'tutor',tag:'hot'},
+    {id:'high_tutor',name:'高中上门辅导 1小时',cost:390,icon:'👩‍🎓',desc:'高中全科老师免费上门一对一辅导',cat:'tutor',tag:'new'},
     {id:'holiday',name:'寒暑假作业辅导',cost:80,icon:'☀️',desc:'寒暑假作业集中辅导一次',cat:'tutor'},
   ]
 };
