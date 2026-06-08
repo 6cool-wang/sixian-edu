@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>数学闯关 · 初中数学知识挑战</title>
+<style>
+:root{--bg:#f0f4f8;--bg2:#f8fafc;--card:#fff;--accent:#2980b9;--accent2:#3498db;--red:#c0392b;--text:#333;--text2:#666;--border:#dce6ee;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr:not(.active){display:none}
+#mapScr.active{display:flex;flex-direction:column;align-items:center}
+#mapScr h1{font-size:24px;margin:12px 0 2px;color:var(--accent);display:flex;align-items:center;gap:6px}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:400px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#2980b933}
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:8px 0 12px}
+.q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
+.q-prompt .q-name{font-size:17px;font-weight:700;color:var(--text);margin:8px 0;line-height:1.5}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:14px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);line-height:1.3}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+@media(max-width:420px){.q-name{font-size:15px!important}.opt{font-size:13px;padding:12px 6px}}
+</style>
+</head>
+<body>
+<div id="mapScr" class="active">
+  <h1>🔢 数学闯关</h1>
+  <p class="sub">初中数学知识全覆盖 · 概念·计算·几何</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header"><span class="qi" id="qIdx"></span><span class="timer" id="timer">0s</span></div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+<script>
+// ========== MATH DATA ==========
+// 有理数
+const M01 = [
+  {q:'-2的相反数是', a:'2', w:['-2','1/2','-1/2']},
+  {q:'| -5 | 等于', a:'5', w:['-5','0','1/5']},
+  {q:'两个负数的和是', a:'负数', w:['正数','0','无法确定']},
+  {q:'(-3)×(-4) 等于', a:'12', w:['-12','7','-7']},
+  {q:'下列各数中是无理数的是', a:'π', w:['1/3','0.25','√4']},
+  {q:'下列运算正确的是', a:'(-2)+(-3)=-5', w:['(-2)+3=-5','(-2)-(-3)=-5','(-2)×(-3)=-6']},
+  {q:'一个数的平方等于它本身，这个数是', a:'0或1', w:['0或-1','1或-1','0或±1']},
+  {q:'近似数3.14精确到', a:'百分位', w:['十分位','千分位','个位']},
+  {q:'下列比较大小正确的是', a:'-3 < -2', w:['-3 > -2','|-3| < |-2|','-(-3) < -(-2)']},
+  {q:'(-1)²⁰²⁴ 等于', a:'1', w:['-1','2024','-2024']},
+];
+// 整式的加减
+const M02 = [
+  {q:'单项式 -3x²y 的系数是', a:'-3', w:['3','-1','x²y']},
+  {q:'单项式 -3x²y 的次数是', a:'3', w:['2','-3','1']},
+  {q:'下列是同类项的是', a:'3x²y和-2x²y', w:['3x²y和2xy²','3x²y和3xy','x²y和xy²']},
+  {q:'去括号 -(a-b) 的结果是', a:'-a+b', w:['-a-b','a-b','a+b']},
+  {q:'合并同类项 3a+2a-5a 的结果是', a:'0', w:['a','10a','-a']},
+  {q:'下列运算中正确的是', a:'2x+3x=5x', w:['2x+3y=5xy','x²+x²=x⁴','2x²- x²=1']},
+  {q:'当 x=2 时，代数式 3x-1 的值是', a:'5', w:['7','3','4']},
+  {q:'整式 2x-3 与 x+4 的和是', a:'3x+1', w:['3x-1','x+7','3x+7']},
+  {q:'若 2xⁿy³ 与 -3x²yᵐ 是同类项，则 m+n=', a:'5', w:['3','2','1']},
+  {q:'一个长方形的长是 2a+b，宽是 a，则周长是', a:'6a+2b', w:['3a+b','2a²+ab','4a+2b']},
+];
+// 一元一次方程
+const M03 = [
+  {q:'方程 2x+3=7 的解是', a:'x=2', w:['x=5','x=-2','x=1']},
+  {q:'移项的依据是', a:'等式的性质', w:['乘法分配律','加法交换律','去括号法则']},
+  {q:'解方程 3(x-2)=6，去括号得', a:'3x-6=6', w:['3x-2=6','3x-6=2','3x-2=2']},
+  {q:'方程 2x-1=3x+2 的解是', a:'x=-3', w:['x=3','x=1','x=-1']},
+  {q:'一件商品原价100元打八折后售价为', a:'80元', w:['20元','120元','60元']},
+  {q:'x的2倍比x的3倍大5，列方程为', a:'2x-3x=5', w:['2x+3x=5','3x-2x=5','2x=3x+5']},
+  {q:'若关于x的方程 2x+a=0 的解是 x=2，则a=', a:'-4', w:['4','-2','2']},
+  {q:'下列等式变形正确的是', a:'若a=b，则a+c=b+c', w:['若a=b，则a/c=b/c','若ac=bc，则a=b','若a²=b²，则a=b']},
+  {q:'某数的一半加上3等于这个数本身，这个数是', a:'6', w:['3','4','12']},
+  {q:'方程 x/2 - 1 = 3 的解是', a:'x=8', w:['x=4','x=6','x=2']},
+];
+// 二元一次方程组
+const M04 = [
+  {q:'二元一次方程 x+y=5 的解有', a:'无数个', w:['1个','2个','没有解']},
+  {q:'方程组 {x+y=5, x-y=1} 的解是', a:'x=3,y=2', w:['x=2,y=3','x=4,y=1','x=1,y=4']},
+  {q:'解二元一次方程组常用的两种方法是', a:'代入消元法和加减消元法', w:['代入法和配方法','公式法和配方法','因式分解法和消元法']},
+  {q:'方程组 {2x+y=7, x-y=2} 的解是', a:'x=3,y=1', w:['x=1,y=5','x=2,y=3','x=4,y=-1']},
+  {q:'鸡兔同笼：头35个，足94只，鸡兔各几只', a:'鸡23兔12', w:['鸡12兔23','鸡20兔15','鸡30兔5']},
+  {q:'已知 {x=1,y=2} 是方程 x+ky=5 的解，则k=', a:'2', w:['-2','3','-3']},
+  {q:'下列哪个是二元一次方程', a:'x+2y=3', w:['x²+y=3','xy=2','x+2=3']},
+  {q:'甲比乙大5岁，5年前甲的年龄是乙的2倍，乙现在', a:'10岁', w:['15岁','8岁','12岁']},
+  {q:'方程组 {3x-y=5, 2x+3y=7} 的解是', a:'x=2,y=1', w:['x=1,y=-2','x=3,y=4','x=0,y=-5']},
+  {q:'将方程 2x+3y=6 写成用x表示y的形式', a:'y=(6-2x)/3', w:['y=(2x-6)/3','y=6-2x/3','y=2x+6/3']},
+];
+// 不等式与不等式组
+const M05 = [
+  {q:'不等式 x+3>5 的解集是', a:'x>2', w:['x>8','x<2','x<8']},
+  {q:'不等式的两边同时乘以负数，不等号方向', a:'改变', w:['不变','不确定','可能变可能不变']},
+  {q:'不等式 -2x > 4 的解集是', a:'x < -2', w:['x > -2','x < 2','x > 2']},
+  {q:'不等式组 {x>1, x<3} 的解集是', a:'1<x<3', w:['x>1','x<3','无解']},
+  {q:'不等式 2x-1 ≤ 5 的正整数解有', a:'1,2,3', w:['1,2','1,2,3,4','0,1,2,3']},
+  {q:'x与3的和不小于x的2倍，列不等式为', a:'x+3 ≥ 2x', w:['x+3 > 2x','x+3 ≤ 2x','x+3 < 2x']},
+  {q:'不等式组 {x>2, x>5} 的解集是', a:'x>5', w:['x>2','2<x<5','无解']},
+  {q:'若 a<b，则下列不等式成立的是', a:'a-3 < b-3', w:['-a < -b','a/3 > b/3','a+5 > b+5']},
+  {q:'不等式 3x-6 > 0 的最小整数解是', a:'3', w:['2','1','0']},
+  {q:'某商品进价50元，售价不低于进价的120%，售价至少', a:'60元', w:['55元','70元','65元']},
+];
+// 平面直角坐标系
+const M06 = [
+  {q:'点(3,-2)在平面直角坐标系中位于', a:'第四象限', w:['第一象限','第二象限','第三象限']},
+  {q:'点(-1,0)在', a:'x轴上', w:['y轴上','第一象限','第二象限']},
+  {q:'点A(2,3)到x轴的距离是', a:'3', w:['2','5','1']},
+  {q:'点P(-2,3)关于x轴对称的点的坐标是', a:'(-2,-3)', w:['(2,3)','(2,-3)','(-2,3)']},
+  {q:'点Q(3,-1)关于y轴对称的点的坐标是', a:'(-3,-1)', w:['(3,1)','(-3,1)','(3,-1)']},
+  {q:'点M(2,3)向右平移3个单位后坐标为', a:'(5,3)', w:['(2,6)','(5,6)','(-1,3)']},
+  {q:'下列各点在第二象限的是', a:'(-1,2)', w:['(1,2)','(-1,-2)','(1,-2)']},
+  {q:'点A(-3,4)到原点的距离是', a:'5', w:['7','1','12']},
+  {q:'若点P(a,b)在第四象限，则', a:'a>0,b<0', w:['a<0,b>0','a>0,b>0','a<0,b<0']},
+  {q:'点(0,-5)在', a:'y轴负半轴上', w:['x轴正半轴上','y轴正半轴上','x轴负半轴上']},
+];
+// 三角形与全等
+const M07 = [
+  {q:'三角形内角和等于', a:'180°', w:['90°','360°','270°']},
+  {q:'三角形的两边长分别为3和5，第三边长可能是', a:'4', w:['1','2','8']},
+  {q:'三角形的一个外角等于', a:'与它不相邻的两个内角之和', w:['与它相邻的内角','两个内角之和','180°减去内角']},
+  {q:'下列长度的线段能组成三角形的是', a:'3,4,5', w:['1,2,3','1,3,5','2,5,8']},
+  {q:'全等三角形的判定方法不包括', a:'AAA', w:['SSS','SAS','ASA']},
+  {q:'等腰三角形的顶角是80°，则底角为', a:'50°', w:['40°','80°','100°']},
+  {q:'直角三角形中，30°角所对的直角边等于斜边的', a:'一半', w:['三分之一','两倍','相等']},
+  {q:'等腰三角形底边上的中线与什么重合', a:'底边上的高和顶角平分线', w:['底边上的高','顶角平分线','对边中位线']},
+  {q:'三角形的高、中线、角平分线都是', a:'线段', w:['直线','射线','曲线']},
+  {q:'三角形的重心是三条什么的交点', a:'中线', w:['高','角平分线','边的垂直平分线']},
+];
+// 轴对称
+const M08 = [
+  {q:'下列图形中是轴对称图形的是', a:'等腰三角形', w:['平行四边形','一般梯形','一般三角形']},
+  {q:'等腰三角形的对称轴有', a:'1条', w:['2条','3条','无数条']},
+  {q:'线段的垂直平分线上的点到', a:'线段两端点距离相等', w:['线段两端点距离不等','线段距离为0','端点距离为0']},
+  {q:'等边三角形的每个内角都是', a:'60°', w:['45°','90°','30°']},
+  {q:'下列图形中对称轴最多的是', a:'圆', w:['正方形','等边三角形','长方形']},
+  {q:'点P(3,4)关于直线y轴对称的点的坐标是', a:'(-3,4)', w:['(3,-4)','(-3,-4)','(4,3)']},
+  {q:'等腰三角形的一个底角是70°，则顶角为', a:'40°', w:['70°','110°','140°']},
+  {q:'下列交通标志中属于轴对称图形的是', a:'Y形路口警告标志', w:['禁止驶入','减速让行','环岛行驶']},
+  {q:'在轴对称图形中，对称轴两侧的对应点到对称轴的距离', a:'相等', w:['不等','成比例','无关']},
+  {q:'等边三角形的对称轴是各边的', a:'垂直平分线', w:['中线','高','角平分线']},
+];
+// 一次函数
+const M09 = [
+  {q:'一次函数 y=kx+b 的图像是一条', a:'直线', w:['射线','线段','曲线']},
+  {q:'一次函数 y=2x+1 与y轴的交点坐标是', a:'(0,1)', w:['(1,0)','(-1/2,0)','(0,-1)']},
+  {q:'正比例函数的图像一定经过', a:'原点', w:['(0,1)','(1,1)','(1,0)']},
+  {q:'下列函数中y随x的增大而减小的是', a:'y=-2x+1', w:['y=2x+1','y=x','y=3x-2']},
+  {q:'一次函数 y=3x-6 与x轴的交点坐标是', a:'(2,0)', w:['(0,-6)','(-2,0)','(0,2)']},
+  {q:'函数 y=2x 的图像经过', a:'第一、三象限', w:['第二、四象限','第一、二象限','第三、四象限']},
+  {q:'一次函数 y=kx+b 中 k>0,b<0 的图像不经过', a:'第二象限', w:['第一象限','第三象限','第四象限']},
+  {q:'直线 y=3x 向上平移2个单位得', a:'y=3x+2', w:['y=3x-2','y=3(x+2)','y=3(x-2)']},
+  {q:'已知点A(1,3)在直线y=kx上，则k=', a:'3', w:['1','-3','1/3']},
+  {q:'两个一次函数 y=2x-1 与 y=2x+3 的图像', a:'平行', w:['相交','重合','垂直']},
+];
+// 二次函数
+const M10 = [
+  {q:'二次函数 y=x² 的图像开口向', a:'上', w:['下','左','右']},
+  {q:'二次函数 y=x² 的对称轴是', a:'y轴', w:['x轴','直线y=x','原点']},
+  {q:'二次函数 y=x²-4x+3 的顶点坐标是', a:'(2,-1)', w:['(2,1)','(-2,3)','(4,3)']},
+  {q:'二次函数 y=(x-1)²+2 的最小值是', a:'2', w:['0','1','-1']},
+  {q:'抛物线 y=-x² 的开口方向和最高点分别是', a:'向下，最高点为(0,0)', w:['向上，最低点为(0,0)','向下，最高点为(1,0)','向上，最低点为(0,1)']},
+  {q:'二次函数 y=x²-2x 与x轴的交点坐标是', a:'(0,0)和(2,0)', w:['(0,0)和(-2,0)','(0,2)和(2,0)','(1,0)和(-1,0)']},
+  {q:'二次函数 y=2x² 与 y=2x²+3 的图像关系是', a:'上下平移', w:['左右平移','旋转','缩放']},
+  {q:'二次函数 y=ax²+bx+c 中 a>0 时图像', a:'开口向上，有最小值', w:['开口向下，有最小值','开口向上，有最大值','开口向下，有最大值']},
+  {q:'把抛物线 y=x² 向左平移1个单位得', a:'y=(x+1)²', w:['y=x²+1','y=(x-1)²','y=x²-1']},
+  {q:'二次函数 y=-2x²+4x 的对称轴是', a:'x=1', w:['x=0','x=2','x=-1']},
+];
+// 反比例函数
+const M11 = [
+  {q:'反比例函数 y=k/x 中 k≠0，它的图像是', a:'双曲线', w:['直线','抛物线','折线']},
+  {q:'反比例函数 y=2/x 的图像在第几象限', a:'一、三象限', w:['二、四象限','一、二象限','三、四象限']},
+  {q:'反比例函数 y=-3/x 的图像在第几象限', a:'二、四象限', w:['一、三象限','一、二象限','三、四象限']},
+  {q:'当k<0时，反比例函数 y=k/x 的图像', a:'分布在二、四象限，在每个象限内y随x增大而增大', w:['分布在一、三象限','y随x增大而减小','图像经过原点']},
+  {q:'点(2,3)在反比例函数 y=k/x 的图像上，则k=', a:'6', w:['5','3/2','2/3']},
+  {q:'反比例函数 y=4/x 中，当x>0时，y随x的增大而', a:'减小', w:['增大','不变','先增后减']},
+  {q:'下列函数中y是x的反比例函数的是', a:'y=5/x', w:['y=5x','y=5x+1','y=x/5']},
+  {q:'函数 y=1/x 的图像关于什么对称', a:'原点', w:['x轴','y轴','直线y=x']},
+  {q:'点A(-1,-2)在反比例函数 y=k/x 图像上，点B(1,2)是否也在该图像上', a:'在', w:['不在','无法确定','只在一个分支上']},
+  {q:'反比例函数 y=6/x 的图像上哪个点到坐标轴的距离相等', a:'(√6,√6)和(-√6,-√6)', w:['(1,6)和(6,1)','(2,3)和(-2,-3)','(3,2)和(-3,-2)']},
+];
+// 圆
+const M12 = [
+  {q:'圆的直径等于半径的', a:'2倍', w:['一半','π倍','4倍']},
+  {q:'圆的周长公式是', a:'C=2πr', w:['C=πr','C=πr²','C=2r']},
+  {q:'圆心角为90°的扇形面积是所在圆面积的', a:'1/4', w:['1/2','1/3','1/8']},
+  {q:'在同圆中相等的圆心角所对的弧', a:'相等', w:['不等','成比例','不一定相等']},
+  {q:'圆的切线垂直于', a:'过切点的半径', w:['直径','弦','圆心']},
+  {q:'垂径定理的内容是垂直于弦的直径', a:'平分弦和弦所对的弧', w:['弦与圆相切','弦是直径','弦与半径垂直']},
+  {q:'圆周角等于它所对弧上的圆心角的', a:'一半', w:['两倍','相等','三分之一']},
+  {q:'直径所对的圆周角是', a:'直角', w:['锐角','钝角','平角']},
+  {q:'圆内接四边形的对角', a:'互补', w:['相等','互余','成比例']},
+  {q:'半径为3的圆内接正三角形的边长是', a:'3√3', w:['3','6','9']},
+];
+// 相似三角形
+const M13 = [
+  {q:'相似三角形的对应角', a:'相等', w:['互补','互余','成比例']},
+  {q:'相似三角形的对应边', a:'成比例', w:['相等','成等差','平方关系']},
+  {q:'两个相似三角形的相似比为2:3，则面积比为', a:'4:9', w:['2:3','√2:√3','8:27']},
+  {q:'两个相似三角形的周长比等于', a:'相似比', w:['相似比的平方','相似比的立方','相似比的开方']},
+  {q:'DE∥BC交AB、AC于D、E，则△ADE与△ABC', a:'相似', w:['全等','等面积','相等']},
+  {q:'平行于三角形一边的直线截其他两边所得的对应线段', a:'成比例', w:['相等','成等差','无关']},
+  {q:'下列条件不能判定两三角形相似的是', a:'两边成比例且其中一边对角相等', w:['两角分别相等','两边成比例且夹角相等','三边成比例']},
+  {q:'相似比为3:1，则对应高的比为', a:'3:1', w:['9:1','√3:1','1:3']},
+  {q:'旗杆的影子长6m，同时1m长的标杆影子长0.5m，旗杆高', a:'12m', w:['6m','3m','8m']},
+  {q:'两个相似三角形面积比为9:4，则周长比为', a:'3:2', w:['9:4','81:16','√9:√4']},
+];
+// 锐角三角函数
+const M14 = [
+  {q:'在Rt△ABC中，sinA等于', a:'对边/斜边', w:['邻边/斜边','对边/邻边','斜边/对边']},
+  {q:'cos30°等于', a:'√3/2', w:['1/2','√2/2','√3']},
+  {q:'tan45°等于', a:'1', w:['0','√3/3','√3']},
+  {q:'sin30°+cos60°等于', a:'1', w:['1/2','√3/2','0']},
+  {q:'在Rt△ABC中，∠C=90°，AB=5，BC=3，则sinA=', a:'3/5', w:['4/5','3/4','5/3']},
+  {q:'下列三角函数值中最大的是', a:'sin90°', w:['sin30°','cos60°','tan0°']},
+  {q:'sin²30°+cos²30°等于', a:'1', w:['1/2','√3/2','0']},
+  {q:'在Rt△ABC中，∠C=90°，tanA=4/3，BC=8，则AC=', a:'6', w:['10','12','4']},
+  {q:'锐角A满足sinA=1/2，则∠A=', a:'30°', w:['45°','60°','90°']},
+  {q:'从地面看山顶，仰角30°，山高300m，则观察点到山脚的距离是', a:'300√3 m', w:['150m','300m','600m']},
+];
+// 综合大挑战
+const ALL_MATH_FLAT = (()=>{
+  let all=[]; let sets=[M01,M02,M03,M04,M05,M06,M07,M08,M09,M10,M11,M12,M13,M14];
+  sets.forEach((d,i)=>{d.forEach(q=>{all.push({...q,src:i})})});
+  return all;
+})();
+
+// ========== LEVELS ==========
+const LV = [
+  {l:'有理数',desc:'相反数·绝对值·四则运算',data:M01,qs:8,sec:14},
+  {l:'整式的加减',desc:'单项式·同类项·去括号',data:M02,qs:8,sec:14},
+  {l:'一元一次方程',desc:'解方程·等式的性质·应用',data:M03,qs:8,sec:14},
+  {l:'二元一次方程组',desc:'消元法·鸡兔同笼·应用',data:M04,qs:8,sec:15},
+  {l:'不等式与不等式组',desc:'不等式的性质·解集·应用',data:M05,qs:8,sec:14},
+  {l:'平面直角坐标系',desc:'象限·坐标变换·距离',data:M06,qs:8,sec:14},
+  {l:'三角形与全等',desc:'内角和·三边关系·全等判定',data:M07,qs:8,sec:14},
+  {l:'轴对称',desc:'等腰三角形·对称轴·等边三角形',data:M08,qs:8,sec:14},
+  {l:'一次函数',desc:'图像性质·k与b·平移',data:M09,qs:8,sec:14},
+  {l:'二次函数',desc:'开口方向·顶点·平移',data:M10,qs:8,sec:15},
+  {l:'反比例函数',desc:'双曲线·k的意义·象限',data:M11,qs:8,sec:14},
+  {l:'圆',desc:'圆周角·垂径定理·切线',data:M12,qs:8,sec:14},
+  {l:'相似三角形',desc:'相似比·判定·面积比',data:M13,qs:8,sec:14},
+  {l:'锐角三角函数',desc:'sin/cos/tan·解直角三角形',data:M14,qs:8,sec:15},
+  {l:'综合大挑战',desc:'全部题库混合挑战',data:[],mode:'mix',qs:12,sec:18},
+];
+
+// ========== GAME ==========
+let G={lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+function save(){localStorage.setItem('math_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('math_lv')||'[]')}
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+function buildMap(){
+  load(); let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}"><div class="num">${i+1}</div><div class="name">${l.l}</div><div class="desc">${l.desc}</div><div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div></div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+function startLv(i){
+  initAudio(); G.lv=i; G.qi=0; G.ok=0;
+  let l=LV[i]; let questions=[];
+  if(l.mode==='mix') questions=shuffle([...ALL_MATH_FLAT]).slice(0,l.qs);
+  else questions=shuffle([...l.data]).slice(0,l.qs);
+  G.questions=questions; G.total=questions.length;
+  G.tmMax=(l.sec||14)*1000;
+  showScr('gameScr'); showQ();
+}
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  let q=G.questions[G.qi];
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+  $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.q}</div></div>`;
+  let all=shuffle([q.a,...q.w]); let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;
+  G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,q.a)});
+  startTimer();
+}
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];
+  let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars; save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>

@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>政治闯关 · 初中道德与法治知识挑战</title>
+<style>
+:root{--bg:#f8f3ee;--bg2:#faf8f5;--card:#fff;--accent:#d35400;--accent2:#e67e22;--red:#c0392b;--text:#333;--text2:#666;--border:#e8ddd5;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr:not(.active){display:none}
+#mapScr.active{display:flex;flex-direction:column;align-items:center}
+#mapScr h1{font-size:24px;margin:12px 0 2px;color:var(--accent);display:flex;align-items:center;gap:6px}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:400px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#d3540033}
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:8px 0 12px}
+.q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
+.q-prompt .q-name{font-size:17px;font-weight:700;color:var(--text);margin:8px 0;line-height:1.5}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:14px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);line-height:1.3}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+@media(max-width:420px){.q-name{font-size:15px!important}.opt{font-size:13px;padding:12px 6px}}
+</style>
+</head>
+<body>
+<div id="mapScr" class="active">
+  <h1>⚖️ 政治闯关</h1>
+  <p class="sub">初中道德与法治全覆盖 · 宪法·法律·国情·道德</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header"><span class="qi" id="qIdx"></span><span class="timer" id="timer">0s</span></div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+<script>
+// ========== POLITICS DATA ==========
+// 成长的节拍（七上）
+const P01 = [
+  {q:'中学时代对我们的成长有什么重要意义', a:'为我们的一生奠定重要基础', w:['决定了一生的成就','只是换个环境学习','和小学没什么区别']},
+  {q:'努力是梦想与现实之间的桥梁，努力需要', a:'坚持和方法', w:['天赋和运气','财力和关系','智力和体力']},
+  {q:'正确认识自己的途径不包括', a:'与他人的任何评价', w:['自我评价','他人评价','从社会关系中认识']},
+  {q:'"知人者智，自知者明"说明', a:'认识自己很重要', w:['要了解别人','要聪明','要谦虚']},
+  {q:'做更好的自己，需要', a:'扬长避短，主动改正缺点', w:['追求完美，不能有缺点','模仿别人，变成他人','只看优点，不看缺点']},
+  {q:'中国梦的基本内涵是', a:'国家富强、民族振兴、人民幸福', w:['实现共产主义','全面实现现代化','建成小康社会']},
+  {q:'学习不仅仅局限在学校，我们的什么也是学习', a:'所见所闻所做', w:['吃饭睡觉','娱乐休闲','体育锻炼']},
+  {q:'下列属于学习的是', a:'参加社会实践活动', w:['只在学校上课','在家看电视','上网玩游戏']},
+  {q:'"活到老，学到老"体现了', a:'终身学习的理念', w:['学习很辛苦','学习不需要方法','学习只在学校']},
+  {q:'潜能需要被激发，下列方法正确的是', a:'在实践和探索中激发', w:['等待别人开发','顺其自然','只做擅长的事']},
+];
+// 友谊与网络（七上）
+const P02 = [
+  {q:'友谊的特质包括', a:'友谊是一种亲密的关系', w:['友谊是一成不变的','友谊以利益为基础','友谊不需要原则']},
+  {q:'建立友谊需要', a:'开放自己和持续行动', w:['被动等待','强迫对方','保持距离']},
+  {q:'呵护友谊需要', a:'尊重对方，正确处理冲突', w:['凡事都听朋友的','朋友犯错也要包庇','不允许朋友有秘密']},
+  {q:'友谊不能没有', a:'原则', w:['利益','顺从','完美']},
+  {q:'网络交往的特点不包括', a:'真实性', w:['虚拟性','平等性','自主性']},
+  {q:'网络交往时我们应该', a:'增强自我保护意识', w:['随意透露个人信息','和网友随便见面','完全相信网友']},
+  {q:'"交友投分，切磨箴规"启示我们', a:'友谊需要互相学习和规劝', w:['朋友越多越好','朋友要门当户对','交友要讲利益']},
+  {q:'网上交友要慎重，因为', a:'网络信息具有虚拟性', w:['网上没有真正的朋友','网络交友都是骗局','网络聊天浪费时间']},
+  {q:'在友谊中什么是误区', a:'友谊就是没有原则', w:['朋友有困难要帮忙','朋友犯错要指出','友谊需要真诚']},
+  {q:'竞争并不必然伤害友谊，关键是', a:'我们对待竞争的态度', w:['谁赢了','竞争是否激烈','有没有裁判']},
+];
+// 师长情谊（七上）
+const P03 = [
+  {q:'教师的工作特点是', a:'教书育人', w:['传授知识','管理学生','批改作业']},
+  {q:'新型师生关系的特点是', a:'教学相长、亦师亦友', w:['师道尊严','学生服从老师','老师说了算']},
+  {q:'面对老师的批评，我们应该', a:'理解老师的良苦用心', w:['反驳和顶撞','毫不在意','消极对待']},
+  {q:'孝亲敬长是中华民族的什么', a:'传统美德', w:['法律义务','道德要求','基本权利']},
+  {q:'当与父母发生冲突时，正确的做法是', a:'沟通交流、换位思考', w:['冷战对抗','离家出走','一味顺从']},
+  {q:'现代家庭的特点不包括', a:'家庭成员越多越好', w:['家庭结构小型化','沟通方式多样化','家庭氛围民主化']},
+  {q:'"亦师亦友"的师生关系要求', a:'师生彼此尊重、相互关心', w:['老师和学生做朋友','学生不需要尊重老师','老师不能批评学生']},
+  {q:'孝敬父母在行动上要', a:'尊敬父母、倾听父母、感恩父母', w::['给父母很多钱','让父母不操心就行','只在节日问候']},
+  {q:'家的意味主要是', a:'身心寄居之所和心灵港湾', w:['吃饭睡觉的地方','有房子就是家','只有血缘关系']},
+  {q:'与父母沟通时要', a:'选择合适的方式和时间', w:['随时想说就说','等父母先开口','发信息代替面谈']},
+];
+// 生命的思考（七上）
+const P04 = [
+  {q:'生命的特点不包括', a:'生命可以永恒', w:['生命来之不易','生命是独特的','生命是不可逆的']},
+  {q:'守护生命首先要关注', a:'身体健康', w:['心理健康','精神需求','财富积累']},
+  {q:'面对挫折，我们应', a:'发掘生命的力量', w:['自暴自弃','逃避困难','依赖他人']},
+  {q:'生命的伟大在于', a:'创造和贡献', w:['寿命长短','财富多少','地位高低']},
+  {q:'"天生我材必有用"说明', a:'生命是有价值的', w:['人不需要努力','每个人都很完美','才能是天生的']},
+  {q:'爱护身体需要', a:'养成健康的生活方式', w:['经常熬夜学习','不吃早餐减肥','过度运动']},
+  {q:'增强生命韧性的方法不包括', a:'逃避困难', w:['培养幽默感','寻求帮助','培养兴趣']},
+  {q:'平凡的生命也能创造价值，因为', a:'做好本职工作就是贡献', w:['只有伟人才有价值','平凡没有意义','只有成名才有价值']},
+  {q:'生命虽然平凡，但也能', a:'创造伟大', w:['没有价值','只能平庸','不需要努力']},
+  {q:'养护精神需要', a:'传承优秀传统文化', w:['追求物质享受','信仰宗教','跟随潮流']},
+];
+// 青春时光（七下）
+const P05 = [
+  {q:'青春期身体变化的主要表现不包括', a:'思维成熟', w:['身体外形变化','内部器官完善','性机能成熟']},
+  {q:'青春期矛盾心理的正确对待方式是', a:'积极面对和调适', w:['压抑和回避','否定和排斥','任其发展']},
+  {q:'思维的独立性要求我们', a:'不人云亦云，有自己的见解', w:['凡事与众不同','不接受他人意见','一切自己做主']},
+  {q:'批判性思维有助于我们', a:'发现问题，解决问题', w:['否定一切','拒绝合作','标新立异']},
+  {q:'与异性交往的原则是', a:'内心坦荡、言谈得体、举止大方', w:['禁止交往','保持距离不说话','秘密交往']},
+  {q:'青春的探索需要', a:'自信和自强', w:['财富和地位','智慧和能力','机遇和运气']},
+  {q:'"行己有耻"要求我们', a:'知廉耻，懂荣辱，有所为有所不为', w:['行为不受约束','只考虑自己','不在乎他人评价']},
+  {q:'"止于至善"是一种', a:'虽不能至心向往之的实践过程', w:['完美无缺的境界','高不可攀的目标','无法达到的理想']},
+  {q:'青春期的情绪特点是', a:'情绪反应强烈且波动大', w:['情绪稳定平和','没有情绪波动','情绪反应迟钝']},
+  {q:'调节情绪的方法不包括', a:'压抑情绪', w:['合理宣泄','转移注意','放松训练']},
+];
+// 情绪与情感（七下）
+const P06 = [
+  {q:'人的基本情绪包括', a:'喜怒哀惧', w:['喜怒哀乐','悲欢离合','爱恨情仇']},
+  {q:'情绪受什么因素影响', a:'个人的生理周期和心理预期', w:['天气温度','衣服颜色','家庭住址']},
+  {q:'情感与情绪的关系是', a:'情感是逐渐积累的稳定倾向', w:['情感和情绪完全一样','情绪是稳定的','情感是短暂的']},
+  {q:'体验负面情感的意义是', a:'可以丰富我们的人生阅历', w:['完全没有好处','要避免一切负面情感','负面情感越少越好']},
+  {q:'传递情感正能量的方式不包括', a:'抱怨和指责', w:['与人交往','帮助他人','关心社会']},
+  {q:'下列属于高级情感的是', a:'道德感', w:['饥饿感','舒适感','恐惧感']},
+  {q:'情感反映我们对人和事的', a:'态度和观念', w:['表面印象','临时想法','外在评价']},
+  {q:'创造美好的情感体验需要', a:'用心去感受和付出', w:['等别人给予','花钱购买','索取他人']},
+  {q:'情绪的表达需要', a:'以恰当的方式表达', w:['完全释放不顾他人','压抑在心里不表达','随意发泄']},
+  {q:'适度的负面情绪可以帮助我们', a:'适应突发事件', w:['更好地学习','提高免疫力','改善人际关系']},
+];
+// 集体生活（七下）
+const P07 = [
+  {q:'集体力量来源于成员', a:'共同的目标和团结协作', w:['数量的多少','个人的能力','领导的水平']},
+  {q:'个人利益与集体利益的关系是', a:'相互依存，在集体中实现个人利益', w:['完全对立','个人利益至上','集体利益可以忽略个人']},
+  {q:'小群体与小团体主义的区别在于', a:'是否坚守集体主义原则', w:['人数多少','关系亲疏','成员性别']},
+  {q:'在集体中我们应该', a:'发挥自己的特长，为集体出力', w:['只关注自己','随波逐流','突出个人英雄主义']},
+  {q:'集体荣誉感会激励我们', a:'努力为集体增光添彩', w:['忽视个人发展','盲目崇拜集体','排斥其他集体']},
+  {q:'美好集体是', a:'善于合作、充满活力的', w:['人人绝对服从的','没有竞争的','只讲合作不讲原则']},
+  {q:'在集体中发展个性需要', a:'学习和借鉴他人的优点', w:['保持完全独立','排斥他人影响','隐藏自己的特点']},
+  {q:'集体生活中我们要学会', a:'包容、理解和尊重', w:['妥协和退让无条件','坚持自己一切','迎合他人']},
+  {q:'集体规则与个人意愿冲突时', a:'通过沟通寻求平衡', w:['必须服从集体','坚持个人意愿','无视规则']},
+  {q:'民主的集体要求', a:'共同商定规则和制度', w:['领导说了算','少数服从多数就可以','不需要规则']},
+];
+// 法治天地（七下）
+const P08 = [
+  {q:'法律的特征不包括', a:'法律仅约束普通人', w:['法律由国家制定','法律由国家强制力保证实施','法律对全体社会成员具有普遍约束力']},
+  {q:'我国保护未成年人的法律不包括', a:'《婚姻法》', w:['《未成年人保护法》','《预防未成年人犯罪法》','《义务教育法》']},
+  {q:'未成年人需要特殊保护的原因不包括', a:'未成年人无需承担责任', w:['身心发育尚不成熟','自我保护能力较弱','容易受不良影响和不法侵害']},
+  {q:'家庭保护是未成年人保护的', a:'基础', w:['关键','最后防线','补充']},
+  {q:'学校保护是未成年人保护的', a:'重要保障', w:['基础','核心','辅助']},
+  {q:'法律最主要特征是', a:'靠国家强制力保证实施', w:['靠社会舆论维持','靠自觉遵守','靠道德约束']},
+  {q:'法治的含义是', a:'依法治理', w:['以人治国','以德治国','依权治国']},
+  {q:'法律与道德的区别是', a:'法律由国家制定，具有强制性', w:['法律靠自觉遵守','道德具有强制性','法律没有强制性']},
+  {q:'未成年人遇到不法侵害时应', a:'机智应对，保护自己', w:['勇敢搏斗','忍气吞声','以暴制暴']},
+  {q:'专门保护未成年人的法律是', a:'《未成年人保护法》', w:['《民法典》','《刑法》','《行政法》']},
+];
+// 宪法至上（八下）
+const P09 = [
+  {q:'我国宪法规定的是什么', a:'国家根本制度和根本任务', w:['具体法律规范','行政处罚细则','民事纠纷处理']},
+  {q:'宪法是国家的', a:'根本大法', w:['普通法律','行政法规','地方法规']},
+  {q:'宪法的最高法律效力体现在', a:'其他法律不得与宪法相抵触', w:['宪法可以修改','宪法字数最多','宪法制定最早']},
+  {q:'我国的国家性质是', a:'人民民主专政的社会主义国家', w:['资本主义国家','封建制国家','君主立宪制国家']},
+  {q:'我国的根本政治制度是', a:'人民代表大会制度', w:['多党合作制度','民族区域自治制度','基层群众自治制度']},
+  {q:'我国宪法的基本原则是', a:'一切权力属于人民', w:['一切权力属于公民','一切权力属于政党','一切权力属于政府']},
+  {q:'宪法监督的主体是', a:'全国人大及其常委会', w:['国务院','最高人民法院','地方人大']},
+  {q:'国家的一切权力属于人民，人民行使权力的机关是', a:'人民代表大会', w:['国务院','人民法院','人民政府']},
+  {q:'尊重和保障人权是我国的', a:'宪法原则', w:['道德要求','政策导向','国际义务']},
+  {q:'设立国家宪法日是', a:'12月4日', w:['10月1日','1月1日','7月1日']},
+];
+// 权利义务（八下）
+const P10 = [
+  {q:'我国公民的基本权利不包括', a:'纳税', w:['选举权和被选举权','人身自由权','受教育权']},
+  {q:'公民最基本的政治权利是', a:'选举权和被选举权', w::['言论自由','宗教信仰自由','人身自由']},
+  {q:'我国公民的基本义务包括', a:'依法纳税', w:['接受义务教育','休息休假','参加选举']},
+  {q:'权利和义务的关系是', a:'权利义务相统一', w:['权利优先于义务','义务优先于权利','权利义务无关系']},
+  {q:'人身自由权是公民', a:'最基本最重要的权利', w:['可有可无的权利','次要权利','政治权利']},
+  {q:'行使权利有界限，不得损害', a:'国家社会集体的利益和其他公民的权利', w:['自身利益','家庭利益','朋友利益']},
+  {q:'维护权利的方式不包括', a:'暴力抗法', w:['协商','调解','仲裁和诉讼']},
+  {q:'受教育的权利和义务表明', a:'权利和义务相辅相成', w:['受教育只是权利','受教育只是义务','公民可以不受教育']},
+  {q:'公民的合法私有财产', a:'不受侵犯', w:['可以任意占有','国家可以无偿征收','他人可以随便使用']},
+  {q:'行使监督权时应该', a:'实事求是，依法行使', w:['随意举报','捏造事实','散布谣言']},
+];
+// 人民当家作主（八下）
+const P11 = [
+  {q:'我国的基本经济制度是', a:'公有制为主体、多种所有制经济共同发展', w:['私有制为主体','计划经济','纯公有制经济']},
+  {q:'我国的国家权力机关是', a:'人民代表大会', w:['国务院','人民政府','人民法院']},
+  {q:'我国的最高行政机关是', a:'国务院', w:['全国人大','国家主席','最高人民法院']},
+  {q:'我国的最高审判机关是', a:'最高人民法院', w:['最高人民检察院','国务院','全国人大']},
+  {q:'民族区域自治制度是我国的', a:'基本政治制度', w:['根本政治制度','根本制度','基本经济制度']},
+  {q:'中国共产党同各民主党派的基本方针是', a:'长期共存互相监督肝胆相照荣辱与共', w:['竞争合作轮流执政','共同执政互相监督','协商一致共同领导']},
+  {q:'公有制经济包括', a:'国有经济和集体经济', w:['外资经济','私营经济','个体经济']},
+  {q:'非公有制经济是社会主义市场经济的', a:'重要组成部分', w:['主体','主导力量','补充部分']},
+  {q:'基层群众自治组织包括', a:'村委会和居委会', w:['乡镇政府','街道办事处','派出所']},
+  {q:'人民政协的职能不包括', a:'制定法律', w:['政治协商','民主监督','参政议政']},
+];
+// 崇尚法治精神（八下）
+const P12 = [
+  {q:'法治与自由的关系是', a:'法治标定了自由的界限', w:['法治限制了所有自由','自由不受任何限制','法治与自由无关']},
+  {q:'公平的含义是', a:'权利公平、机会公平、规则公平', w:['绝对平等','平均主义','结果一样']},
+  {q:'正义要求我们', a:'尊重人的基本权利', w:['以牙还牙','各扫门前雪','弱肉强食']},
+  {q:'维护社会公平正义的最后一道防线是', a:'司法', w:['行政','立法','舆论']},
+  {q:'下列做法体现公平的是', a:'按劳分配', w:['任人唯亲','同工不同酬','歧视对待']},
+  {q:'制度的生命在于', a:'正义', w:['效率','权力','利益']},
+  {q:'珍视自由就要', a:'珍惜宪法和法律赋予的权利', w:['随心所欲','为所欲为','无限自由']},
+  {q:'践行平等需要', a:'反对特权和歧视', w:['追求绝对平等','消除一切差别','否定所有规则']},
+  {q:'守护正义的做法是', a:'面对非正义行为敢于斗争', w:['袖手旁观','逃避退让','以暴制暴']},
+  {q:'在法治社会中，公民应该', a:'自觉守法、遇事找法、解决问题靠法', w:['找人办事','托关系','逃避法律']},
+];
+// 富强与创新（九上）
+const P13 = [
+  {q:'改革开放以来我国取得成就的根本原因是', a:'开辟了中国特色社会主义道路', w:['人口红利','自然资源丰富','外国援助']},
+  {q:'我国社会的主要矛盾是', a:'人民日益增长的美好生活需要和不平衡不充分的发展之间的矛盾', w:['落后的社会生产与人民需求之间的矛盾','经济发展与环境保护的矛盾','城市与农村的矛盾']},
+  {q:'全面深化改革的总目标是', a:'完善和发展中国特色社会主义制度', w:['实现共同富裕','全面建成小康社会','实现现代化']},
+  {q:'创新的目的是', a:'增进人类福祉，让生活更美好', w:['追求利润','提高竞争力','获得专利']},
+  {q:'科教兴国战略的基础是', a:'教育', w:['科技','人才','经济']},
+  {q:'下列属于创新驱动发展战略举措的是', a:'建设国家自主创新示范区', w:['扩大生产规模','增加劳动力','开发房地产']},
+  {q:'共同富裕是中国特色社会主义的', a:'根本原则', w:['最终目标','基本要求','主要特征']},
+  {q:'改革开放是决定当代中国命运的', a:'关键一招', w:['唯一出路','权宜之计','短期政策']},
+  {q:'我国经济发展进入什么阶段', a:'高质量发展阶段', w:['高速增长阶段','低速增长阶段','停滞阶段']},
+  {q:'"大众创业、万众创新"要求', a:'企业和个人都参与创新', w:['政府负责所有创新','只有大企业能创新','创新只能靠科学家']},
+];
+// 民主与法治（九上）
+const P14 = [
+  {q:'社会主义民主政治的本质特征是', a:'人民当家作主', w:['党的领导','依法治国','民主集中制']},
+  {q:'我国社会主义民主的特点不包括', a:'精英民主', w:['最广泛','最真实','最管用']},
+  {q:'公民参与民主生活的形式不包括', a:'暴力示威', w:['民主选举','民主决策','民主监督']},
+  {q:'全面依法治国的总目标是', a:'建设中国特色社会主义法治体系', w:['建设法治政府','提高公民法治意识','完善法律体系']},
+  {q:'法治政府的特点不包括', a:'专制', w:['职能科学','权责法定','执法严明']},
+  {q:'社会主义核心价值观的内容不包括', a:'自由竞争', w:['富强民主','文明和谐','公正法治']},
+  {q:'全面依法治国必须坚持什么为主体', a:'法律', w:['道德','政策','行政命令']},
+  {q:'民主决策的重要形式不包括', a:'领导拍板', w:['社情民意反映制度','专家咨询制度','社会听证制度']},
+  {q:'法治要求实行', a:'良法之治', w:['严刑峻法','以权代法','人治']},
+  {q:'厉行法治要求', a:'全体社会成员共同守法', w:['政府可以不守法','公民只需遵守道德','执法可以随意']},
+];
+// 综合大挑战
+const ALL_POL_FLAT = (()=>{
+  let all=[]; let sets=[P01,P02,P03,P04,P05,P06,P07,P08,P09,P10,P11,P12,P13,P14];
+  sets.forEach((d,i)=>{d.forEach(q=>{all.push({...q,src:i})})});
+  return all;
+})();
+
+// ========== LEVELS ==========
+const LV = [
+  {l:'成长的节拍',desc:'中学时代·学习·认识自己',data:P01,qs:8,sec:14},
+  {l:'友谊与网络',desc:'友谊特质·网络交往·呵护友谊',data:P02,qs:8,sec:14},
+  {l:'师长情谊',desc:'师生关系·孝敬父母·沟通',data:P03,qs:8,sec:14},
+  {l:'生命的思考',desc:'珍爱生命·挫折·生命价值',data:P04,qs:8,sec:14},
+  {l:'青春时光',desc:'青春期变化·独立·止于至善',data:P05,qs:8,sec:14},
+  {l:'情绪与情感',desc:'情绪种类·调节·情感体验',data:P06,qs:8,sec:14},
+  {l:'集体生活',desc:'集体力量·个人与集体·合作',data:P07,qs:8,sec:14},
+  {l:'法治天地',desc:'法律特征·未成年人保护',data:P08,qs:8,sec:14},
+  {l:'坚持宪法至上',desc:'宪法地位·国家性质·人权',data:P09,qs:8,sec:14},
+  {l:'理解权利义务',desc:'基本权利·义务·行使方式',data:P10,qs:8,sec:14},
+  {l:'人民当家作主',desc:'经济制度·权力机关·政治制度',data:P11,qs:8,sec:14},
+  {l:'崇尚法治精神',desc:'自由平等·公平正义·法治',data:P12,qs:8,sec:14},
+  {l:'富强与创新',desc:'改革开放·创新驱动·共同富裕',data:P13,qs:8,sec:14},
+  {l:'民主与法治',desc:'社会主义民主·依法治国·核心价值观',data:P14,qs:8,sec:14},
+  {l:'综合大挑战',desc:'全部题库混合挑战',data:[],mode:'mix',qs:12,sec:16},
+];
+
+// ========== GAME ==========
+let G={lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+function save(){localStorage.setItem('pol_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('pol_lv')||'[]')}
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+function buildMap(){
+  load(); let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}"><div class="num">${i+1}</div><div class="name">${l.l}</div><div class="desc">${l.desc}</div><div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div></div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+function startLv(i){
+  initAudio(); G.lv=i; G.qi=0; G.ok=0;
+  let l=LV[i]; let questions=[];
+  if(l.mode==='mix') questions=shuffle([...ALL_POL_FLAT]).slice(0,l.qs);
+  else questions=shuffle([...l.data]).slice(0,l.qs);
+  G.questions=questions; G.total=questions.length;
+  G.tmMax=(l.sec||14)*1000;
+  showScr('gameScr'); showQ();
+}
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  let q=G.questions[G.qi];
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+  $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.q}</div></div>`;
+  let all=shuffle([q.a,...q.w]); let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;
+  G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,q.a)});
+  startTimer();
+}
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];
+  let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars; save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>
