@@ -1,0 +1,6 @@
+��习资料U盘 1个',cost:60,icon:'💾',desc:'精选学习资料U盘',cat:'study'},
+    {id:'t15',name:'免费答疑 15分钟',cost:70,icon:'📚',desc:'线上一对一答疑辅导',cat:'tutor'},
+    {id:'holiday',name:'寒暑假作业辅导',cost:80,icon:'☀️',desc:'寒暑假作业集中辅导一次',cat:'tutor'},
+  ]
+};
+})();
