@@ -10,6 +10,18 @@ function data(){
 }
 function save(d){localStorage.setItem(KEY,JSON.stringify(d))}
 function hash(s){var h=0;for(var i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return Math.abs(h).toString(36).slice(0,8)}
+// 浏览器兼容的 base64 编解码
+function _btoa(s){
+  if(typeof btoa!=='undefined')return btoa(s);
+  try{return Buffer.from(s,'utf-8').toString('base64')}catch(e){}
+  return null;
+}
+function _atob(s){
+  if(typeof atob!=='undefined')return atob(s);
+  try{return decodeURIComponent(escape(atob(s)))}catch(e){}
+  try{return Buffer.from(s,'base64').toString()}catch(e){}
+  return null;
+}
 
 window.PointsSystem={
   get:function(){return data().total},
@@ -34,15 +46,20 @@ window.PointsSystem={
   // 生成核销码：base64(itemId|ts|nonce|签名)
   genCode:function(itemId){
     var ts=Date.now(),nonce=Math.random().toString(36).slice(2,8);
-    return btoa(itemId+'|'+ts+'|'+nonce+'|'+hash(itemId+'|'+ts+'|'+nonce+':'+SECRET));
+    var raw=itemId+'|'+ts+'|'+nonce+'|'+hash(itemId+'|'+ts+'|'+nonce+':'+SECRET);
+    return _btoa(raw);
   },
   // 验证核销码（老师密钥优先，降级到内置密钥）
   verifyCode:function(code,teacherSecret){
     try{
-      var raw=atob(code),p=raw.split('|');
-      if(p.length!==4)return{ok:false,reason:'格式错误'};
+      // 清理输入：去空格去换行
+      code=(code||'').replace(/[\s\r\n]+/g,'');
+      if(!code)return{ok:false,reason:'码为空'};
+      var raw=_atob(code);
+      if(!raw)return{ok:false,reason:'格式错误(base64)'};
+      var p=raw.split('|');
+      if(p.length!==4)return{ok:false,reason:'格式错误(分段)'};
       var sig=p.pop(),payload=p.join('|');
-      // 先用老师密钥验证，失败后用内置密钥
       var ok=(teacherSecret&&sig===hash(payload+':'+teacherSecret))||sig===hash(payload+':'+SECRET);
       if(!ok)return{ok:false,reason:'无效核销码'};
       var itemId=p[0],ts=+p[1];
@@ -50,7 +67,7 @@ window.PointsSystem={
       var used=JSON.parse(localStorage.getItem(CODE_KEY)||'[]');
       if(used.indexOf(code)>=0)return{ok:false,reason:'此码已被核销'};
       return{ok:true,itemId:itemId,ts:ts};
-    }catch(e){return{ok:false,reason:'格式错误'}}
+    }catch(e){return{ok:false,reason:'格式错误('+e.message+')'}}
   },
   markUsed:function(code){
     var used=JSON.parse(localStorage.getItem(CODE_KEY)||'[]');
