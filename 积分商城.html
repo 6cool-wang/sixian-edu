@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>积分商城 · 思贤学习站</title>
+<script src="js/points.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f3ee;color:#333;min-height:100dvh;padding:20px}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-size:22px;color:#b8860b}
+.header .pts{font-size:36px;font-weight:700;color:#d35400;margin:6px 0}
+.header .pts-label{font-size:13px;color:#999}
+.shop{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;margin:0 auto}
+.card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);text-align:center}
+.card .icon{font-size:28px;margin-bottom:4px}
+.card h3{font-size:14px;font-weight:600;margin:4px 0 2px}
+.card .desc{font-size:11px;color:#999;margin-bottom:6px}
+.card .cost{font-size:13px;color:#d35400;font-weight:600}
+.card .btn{display:block;margin-top:8px;padding:8px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+.card .btn.ok{background:#b8860b;color:#fff}
+.card .btn.ok:active{opacity:.8}
+.card .btn.dis{background:#ddd;color:#999;cursor:default}
+#sec2{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:20px}
+#sec2.show{display:flex}
+.modal{background:#fff;border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.modal h2{font-size:18px;margin-bottom:8px}
+.modal .code{font-size:13px;background:#f5f3ee;padding:12px;border-radius:8px;word-break:break-all;margin:12px 0;font-family:monospace;color:#333;user-select:all}
+.modal .tip{font-size:12px;color:#999;margin-bottom:12px}
+.modal .btn{display:block;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-bottom:6px}
+.modal .btn.pri{background:#b8860b;color:#fff}
+.modal .btn.sec{background:#eee;color:#666}
+@media(max-width:420px){.shop{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🎁 积分商城</h1>
+  <div class="pts" id="ptsDisplay">0</div>
+  <div class="pts-label">当前可用积分</div>
+</div>
+<div class="shop" id="shopList"></div>
+<div id="sec2">
+  <div class="modal">
+    <h2 id="modalTitle">兑换成功！</h2>
+    <p style="font-size:13px;color:#666" id="modalItem"></p>
+    <div class="code" id="modalCode"></div>
+    <p class="tip">出示此核销码给老师兑换</p>
+    <button class="btn pri" onclick="copyCode()">📋 复制核销码</button>
+    <button class="btn sec" onclick="closeModal()">完成</button>
+  </div>
+</div>
+<script>
+var ITEMS=window.PointsSystem?PointsSystem.shop:[];
+function refresh(){
+  if(!window.PointsSystem)return;
+  var pts=PointsSystem.get();
+  document.getElementById('ptsDisplay').textContent=pts;
+  var h='';
+  ITEMS.forEach(function(it){
+    var en=pts>=it.cost;
+    h+='<div class="card"><div class="icon">'+it.icon+'</div><h3>'+it.name+'</h3><div class="desc">'+it.desc+'</div><div class="cost">'+it.cost+' 积分</div><button class="btn '+(en?'ok':'dis')+'" data-id="'+it.id+'" data-cost="'+it.cost+'"'+(en?'':' disabled')+'>'+(en?'兑换':'积分不足')+'</button></div>';
+  });
+  document.getElementById('shopList').innerHTML=h;
+  document.querySelectorAll('.btn.ok').forEach(function(b){
+    b.onclick=function(){
+      var id=this.dataset.id,cost=+this.dataset.cost;
+      if(!PointsSystem.spend(cost))return;
+      var code=PointsSystem.genCode(id);
+      document.getElementById('modalItem').textContent=ITEMS.find(function(x){return x.id===id}).name;
+      document.getElementById('modalCode').textContent=code;
+      document.getElementById('sec2').classList.add('show');
+      refresh();
+    };
+  });
+}
+function closeModal(){document.getElementById('sec2').classList.remove('show')}
+function copyCode(){
+  var c=document.getElementById('modalCode');
+  if(navigator.clipboard){navigator.clipboard.writeText(c.textContent).then(function(){c.textContent='✓ 已复制'})}
+}
+refresh();
+</script>
+</body>
+</html>

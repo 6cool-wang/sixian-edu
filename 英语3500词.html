@@ -55,6 +55,7 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 .res-btn.sec{background:var(--border);color:var(--text)}
 @media(max-width:420px){.q-word{font-size:30px!important}.opt{font-size:14px;padding:10px 6px}}
 </style>
+<script src="js/points.js"></script>
 </head>
 <body>
 <div id="mapScr" class="active">
@@ -290,6 +291,7 @@ function endLv(){
   let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
   if(!G.stars)G.stars=[];let old=G.stars[G.lv]||0;
   if(stars>old)G.stars[G.lv]=stars;save();
+  if(typeof PointsSystem!=='undefined')PointsSystem.add(G.ok,stars>=3?2:0);
   showScr('mapScr');
   $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
   $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>核销工具 · 思贤学习站</title>
+<script src="js/points.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f3ee;color:#333;min-height:100dvh;padding:20px}
+.hide{display:none!important}
+.card{background:#fff;border-radius:14px;padding:20px;max-width:400px;margin:20px auto;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.card h2{font-size:16px;margin-bottom:12px;text-align:center}
+label{display:block;font-size:13px;color:#666;margin-bottom:4px}
+input{width:100%;padding:10px;border:2px solid #e8ddd5;border-radius:8px;font-size:14px;margin-bottom:12px;outline:0}
+input:focus{border-color:#b8860b}
+.btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:6px}
+.btn.pri{background:#b8860b;color:#fff}
+.btn.pri:active{opacity:.8}
+.btn.sec{background:#eee;color:#666}
+.result{padding:12px;border-radius:8px;margin-top:12px;text-align:center;font-size:14px;font-weight:600}
+.result.ok{background:#d4edda;color:#155724}
+.result.fail{background:#f8d7da;color:#721c24}
+.header{text-align:center;margin-bottom:10px}
+.header h1{font-size:20px;color:#b8860b}
+.header p{font-size:12px;color:#999;margin-top:4px}
+.log-list{font-size:12px;color:#666;margin-top:12px}
+.log-list div{padding:4px 0;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🔐 核销工具</h1>
+  <p>仅限思贤老师使用</p>
+</div>
+
+<!-- 登录 -->
+<div id="loginBox" class="card">
+  <h2>身份验证</h2>
+  <label>管理密码</label>
+  <input type="password" id="pwdInput" placeholder="请输入管理密码">
+  <button class="btn pri" onclick="login()">进入</button>
+</div>
+
+<!-- 核销 -->
+<div id="verifyBox" class="card hide">
+  <h2>核销兑换码</h2>
+  <label>学生核销码</label>
+  <input type="text" id="codeInput" placeholder="粘贴学生出示的核销码" style="font-family:monospace;font-size:12px">
+  <button class="btn pri" onclick="verify()">🔍 验证核销码</button>
+  <div id="vResult"></div>
+
+  <div style="margin-top:16px;padding-top:12px;border-top:1px solid #eee">
+    <button class="btn sec" onclick="showLog()">📋 查看核销记录</button>
+    <button class="btn sec" onclick="resetPwd()">⚙️ 修改密码</button>
+    <button class="btn sec" onclick="logout()">退出</button>
+  </div>
+</div>
+
+<!-- 核销记录 -->
+<div id="logBox" class="card hide">
+  <h2>核销记录</h2>
+  <div id="logList" class="log-list"></div>
+  <button class="btn sec" onclick="backVerify()" style="margin-top:12px">返回</button>
+</div>
+
+<script>
+var shop=window.PointsSystem?PointsSystem.shop:[];
+var ITEMS={};
+shop.forEach(function(x){ITEMS[x.id]=x});
+
+function getPwd(){return localStorage.getItem('sx_admin_pwd')||'sixian'}
+function setPwd(v){localStorage.setItem('sx_admin_pwd',v)}
+function getKey(){return localStorage.getItem('sx_verify_key')||''}
+
+function login(){
+  var pwd=document.getElementById('pwdInput').value;
+  if(pwd!==getPwd()){alert('密码错误');return}
+  document.getElementById('loginBox').classList.add('hide');
+  document.getElementById('verifyBox').classList.remove('hide');
+}
+function logout(){
+  document.getElementById('verifyBox').classList.add('hide');
+  document.getElementById('loginBox').classList.remove('hide');
+  document.getElementById('pwdInput').value='';
+}
+function resetPwd(){
+  var p=prompt('请输入新密码（至少4位）:');
+  if(!p||p.length<4)return;
+  setPwd(p);
+  alert('密码已修改');
+}
+function verify(){
+  if(!window.PointsSystem)return;
+  var code=document.getElementById('codeInput').value.trim();
+  if(!code){alert('请粘贴核销码');return}
+  var teacherKey=getKey();
+  var res=PointsSystem.verifyCode(code,teacherKey||null);
+  var el=document.getElementById('vResult');
+  if(res.ok){
+    var item=ITEMS[res.itemId]||{name:'未知商品'};
+    var t=new Date(res.ts);
+    el.innerHTML='<div class="result ok">✅ 验证通过<br><span style="font-size:13px;font-weight:400">'+item.name+' · '+t.toLocaleString()+'</span></div>';
+    PointsSystem.markUsed(code);
+    // 记录日志
+    var log=JSON.parse(localStorage.getItem('sx_verify_log')||'[]');
+    log.push({code:code,item:res.itemId,ts:Date.now()});
+    localStorage.setItem('sx_verify_log',JSON.stringify(log));
+  } else {
+    el.innerHTML='<div class="result fail">❌ '+res.reason+'</div>';
+  }
+}
+function showLog(){
+  document.getElementById('verifyBox').classList.add('hide');
+  document.getElementById('logBox').classList.remove('hide');
+  var log=JSON.parse(localStorage.getItem('sx_verify_log')||'[]');
+  var el=document.getElementById('logList');
+  if(!log.length){el.innerHTML='<div style="color:#999;text-align:center">暂无记录</div>';return}
+  var h='<div style="font-weight:600;color:#333">共 '+log.length+' 条</div>';
+  log.slice().reverse().forEach(function(l){
+    var item=ITEMS[l.item]||{name:'未知'},t=new Date(l.ts);
+    h+='<div><span>'+item.name+'</span><span style="color:#999">'+t.toLocaleString()+'</span></div>';
+  });
+  el.innerHTML=h;
+}
+function backVerify(){
+  document.getElementById('logBox').classList.add('hide');
+  document.getElementById('verifyBox').classList.remove('hide');
+}
+</script>
+</body>
+</html>
