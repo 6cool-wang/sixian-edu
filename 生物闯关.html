@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>生物闯关 · 初中生物知识挑战</title>
+<style>
+:root{--bg:#f0f4f0;--bg2:#f6f9f6;--card:#fff;--accent:#27ae60;--accent2:#2d7d46;--red:#c0392b;--text:#333;--text2:#666;--border:#dce8dc;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
+.h{display:none}.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
+#mapScr{padding:20px;min-height:100dvh}
+#mapScr:not(.active){display:none}
+#mapScr.active{display:flex;flex-direction:column;align-items:center}
+#mapScr h1{font-size:24px;margin:12px 0 2px;color:var(--accent);display:flex;align-items:center;gap:6px}
+#mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:400px}
+.lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
+.lv-card:active{transform:scale(.96);border-color:var(--accent)}
+.lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
+.lv-card .name{font-size:13px;color:var(--text);margin:4px 0 2px}
+.lv-card .desc{font-size:11px;color:var(--text2)}
+.lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
+.lv-card.locked{opacity:.5;pointer-events:none}
+.lv-card.locked .num::after{content:' 🔒';font-size:14px}
+.lv-card.done{border-color:#27ae6033}
+#gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
+.q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
+.q-header .qi{font-weight:600;color:var(--accent)}
+.q-header .timer{font-weight:600}
+.q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
+@keyframes pulse{50%{opacity:.5}}
+.q-prompt{text-align:center;margin:8px 0 12px}
+.q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
+.q-prompt .q-name{font-size:18px;font-weight:700;color:var(--text);margin:8px 0;line-height:1.5}
+.q-prompt .q-feat{font-size:14px;color:var(--text2)}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:14px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);line-height:1.3}
+.opt:active{transform:scale(.95)}
+.opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
+.opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
+.opt.disabled{pointer-events:none}
+.q-prop{display:inline-block;font-size:11px;color:var(--accent);background:#27ae6015;padding:2px 10px;border-radius:10px;margin:4px 0}
+.progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
+.progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
+#resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+#resOverlay.active{display:flex}
+.res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.res-card h2{font-size:22px;margin-bottom:8px}
+.res-stars{font-size:36px;margin:8px 0}
+.res-msg{font-size:15px;color:var(--text2);margin-bottom:4px}
+.res-detail{font-size:13px;color:var(--text2);margin-bottom:16px}
+.res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
+.res-btn:active{opacity:.8}
+.res-btn.sec{background:var(--border);color:var(--text)}
+@media(max-width:420px){.q-name{font-size:16px!important}.opt{font-size:13px;padding:12px 6px}}
+</style>
+</head>
+<body>
+
+<div id="mapScr" class="active">
+  <h1>🧬 生物闯关</h1>
+  <p class="sub">初中生物知识点全覆盖 · 七上至八下</p>
+  <div class="lv-grid" id="lvGrid"></div>
+</div>
+
+<div id="gameScr" class="h">
+  <div class="progress-bar"><div class="fill" id="progFill"></div></div>
+  <div class="q-header">
+    <span class="qi" id="qIdx"></span>
+    <span class="timer" id="timer">0s</span>
+  </div>
+  <div id="qArea"></div>
+  <div class="opts" id="opts"></div>
+</div>
+
+<div id="resOverlay">
+  <div class="res-card">
+    <h2 id="resTitle">太棒了！</h2>
+    <div class="res-stars" id="resStars"></div>
+    <div class="res-msg" id="resMsg"></div>
+    <div class="res-detail" id="resDetail"></div>
+    <button class="res-btn" id="resNext">下一关</button>
+    <button class="res-btn sec" id="resMap">返回关卡</button>
+  </div>
+</div>
+
+<script>
+// ========== BIOLOGY DATA ==========
+// Level 1: 认识生物
+const BIO1 = [
+  {q:'生物体结构和功能的基本单位是', a:'细胞', w:['组织','器官','分子']},
+  {q:'下列属于生物基本特征的是', a:'能繁殖', w:['能运动','能发光','能长大']},
+  {q:'含羞草叶片被触碰后会合拢，说明生物能', a:'对外界刺激作出反应', w:['进行光合作用','吸收水分','消耗能量']},
+  {q:'生物体最基本的生命特征是', a:'新陈代谢', w:['遗传变异','生殖发育','生长现象']},
+  {q:'除病毒外，生物体都是由什么构成的', a:'细胞', w:['蛋白质','核酸','糖类']},
+  {q:'"种瓜得瓜，种豆得豆"说明生物具有', a:'遗传', w:['变异','进化','适应']},
+  {q:'"一母生九子，连母十个样"说明生物具有', a:'变异', w:['遗传','退化','进化']},
+  {q:'下列不属于生物的是', a:'钟乳石', w:['银杏树','大肠杆菌','衣藻']},
+  {q:'生物既能适应环境，也能', a:'影响环境', w:['改变遗传','消灭天敌','无限繁殖']},
+  {q:'向日葵的花盘随太阳转动，体现的生物特征是', a:'应激性', w:['生长','繁殖','新陈代谢']},
+];
+// Level 2: 细胞的结构
+const BIO2 = [
+  {q:'植物细胞有而动物细胞没有的结构是', a:'细胞壁', w:['细胞膜','细胞核','线粒体']},
+  {q:'被称为细胞"控制中心"的结构是', a:'细胞核', w:['细胞膜','细胞质','线粒体']},
+  {q:'细胞膜的功能是', a:'控制物质进出', w:['制造有机物','储存遗传信息','进行呼吸作用']},
+  {q:'植物细胞中与光合作用有关的细胞器是', a:'叶绿体', w:['线粒体','液泡','细胞核']},
+  {q:'能为细胞生命活动提供能量的结构是', a:'线粒体', w:['叶绿体','液泡','细胞壁']},
+  {q:'西瓜的甜味物质主要储存在哪个结构中', a:'液泡', w:['细胞核','叶绿体','线粒体']},
+  {q:'能使植物细胞保持一定形态的结构是', a:'细胞壁', w:['细胞膜','细胞质','细胞核']},
+  {q:'观察洋葱表皮细胞时，在载玻片上滴加的是', a:'清水', w:['生理盐水','碘液','葡萄糖溶液']},
+  {q:'观察人的口腔上皮细胞时，在载玻片上滴加的是', a:'生理盐水', w:['清水','碘液','酒精']},
+  {q:'染色时常用的染色剂是', a:'碘液', w:['清水','酒精','生理盐水']},
+];
+// Level 3: 细胞的生活
+const BIO3 = [
+  {q:'细胞中控制遗传和发育的物质是', a:'DNA', w:['蛋白质','糖类','脂肪']},
+  {q:'细胞中的线粒体被称为细胞的', a:'动力车间', w:['控制中心','营养工厂','物质仓库']},
+  {q:'叶绿体将光能转化为化学能，储存在什么中', a:'有机物', w:['无机盐','水','氧气']},
+  {q:'细胞的生活需要物质和能量，其中有机物包括', a:'糖类', w:['水','无机盐','氧气']},
+  {q:'细胞分裂时，什么的变化最明显', a:'染色体', w:['细胞膜','叶绿体','液泡']},
+  {q:'细胞分裂过程中，首先分裂的是', a:'细胞核', w:['细胞质','细胞膜','细胞壁']},
+  {q:'一个细胞连续分裂3次，能形成多少个细胞', a:'8个', w:['3个','6个','9个']},
+  {q:'细胞体积不能无限长大的主要原因是', a:'相对表面积变小', w:['细胞核太小','营养不足','分裂太快']},
+  {q:'细胞分化的结果是形成', a:'组织', w:['器官','系统','个体']},
+  {q:'细胞内每时每刻都在进行的能量转换过程是', a:'呼吸作用', w:['光合作用','蒸腾作用','吸收作用']},
+];
+// Level 4: 生物体的结构层次
+const BIO4 = [
+  {q:'人体中具有保护和分泌功能的上皮组织分布于', a:'皮肤表面', w:['骨骼','血液','肌肉']},
+  {q:'植物体内运输水分和无机盐的结构是', a:'导管', w:['筛管','气孔','叶脉']},
+  {q:'植物体内运输有机物的结构是', a:'筛管', w:['导管','气孔','花柱']},
+  {q:'人体中能收缩舒张、产生运动的组织是', a:'肌肉组织', w:['神经组织','结缔组织','上皮组织']},
+  {q:'人体中具有接受刺激、产生兴奋功能的是', a:'神经组织', w:['肌肉组织','结缔组织','上皮组织']},
+  {q:'血液属于什么组织', a:'结缔组织', w:['上皮组织','肌肉组织','神经组织']},
+  {q:'绿色开花植物有六大器官，其中营养器官包括', a:'根茎叶', w:['花果实种子','根花叶','茎叶果实']},
+  {q:'人体中最大的器官是', a:'皮肤', w:['肝脏','心脏','肺']},
+  {q:'植物体中起支持作用的组织是', a:'机械组织', w:['分生组织','保护组织','营养组织']},
+  {q:'人体中属于消化腺的器官是', a:'肝脏', w:['心脏','肺','肾脏']},
+];
+// Level 5: 绿色植物
+const BIO5 = [
+  {q:'没有根茎叶分化的植物类群是', a:'藻类植物', w:['苔藓植物','蕨类植物','种子植物']},
+  {q:'葫芦藓属于哪类植物', a:'苔藓植物', w:['藻类植物','蕨类植物','被子植物']},
+  {q:'能作为监测空气污染程度指示植物的是', a:'苔藓植物', w:['藻类植物','蕨类植物','裸子植物']},
+  {q:'肾蕨属于哪类植物', a:'蕨类植物', w:['藻类植物','苔藓植物','裸子植物']},
+  {q:'藻类、苔藓、蕨类植物共同的生殖方式是', a:'孢子生殖', w:['种子生殖','分裂生殖','出芽生殖']},
+  {q:'松树属于哪类种子植物', a:'裸子植物', w:['被子植物','蕨类植物','藻类植物']},
+  {q:'小麦、水稻等农作物属于', a:'被子植物', w:['裸子植物','蕨类植物','藻类植物']},
+  {q:'种子植物比孢子植物更适应陆地环境的原因是', a:'产生种子', w:['有根茎叶','有维管组织','光合作用强']},
+  {q:'蕨类植物具有真正的根茎叶，还出现了什么组织', a:'输导组织', w:['分生组织','保护组织','营养组织']},
+  {q:'被子植物比裸子植物更进化的特征是', a:'种子有果皮包被', w:['种子裸露','有输导组织','根系发达']},
+];
+// Level 6: 光合作用与呼吸作用
+const BIO6 = [
+  {q:'光合作用的原料是', a:'二氧化碳和水', w:['氧气和水','二氧化碳和氧气','有机物和氧气']},
+  {q:'光合作用的产物是', a:'有机物和氧气', w:['二氧化碳和水','二氧化碳和有机物','水和无机盐']},
+  {q:'光合作用的场所是', a:'叶绿体', w:['线粒体','细胞核','液泡']},
+  {q:'呼吸作用的场所是', a:'线粒体', w:['叶绿体','细胞核','细胞膜']},
+  {q:'呼吸作用的实质是', a:'分解有机物释放能量', w:['合成有机物储存能量','吸收二氧化碳','释放氧气']},
+  {q:'植物蒸腾作用的主要器官是', a:'叶', w:['根','茎','花']},
+  {q:'植物吸收水分的主要器官是', a:'根', w:['叶','茎','花']},
+  {q:'叶片中实现气体交换的结构是', a:'气孔', w:['叶脉','导管','筛管']},
+  {q:'气孔是由什么围成的', a:'保卫细胞', w:['表皮细胞','叶肉细胞','导管细胞']},
+  {q:'在光下检测植物释放氧气，常选用的材料是', a:'金鱼藻', w:['洋葱','菠菜','葫芦藓']},
+];
+// Level 7: 人体的营养与消化
+const BIO7 = [
+  {q:'人体最主要的供能物质是', a:'糖类', w:['蛋白质','脂肪','维生素']},
+  {q:'构成人体细胞的基本物质是', a:'蛋白质', w:['糖类','脂肪','无机盐']},
+  {q:'人体内备用的能源物质是', a:'脂肪', w:['糖类','蛋白质','维生素']},
+  {q:'缺乏维生素A易患', a:'夜盲症', w:['坏血病','佝偻病','贫血']},
+  {q:'缺乏维生素C易患', a:'坏血病', w:['夜盲症','佝偻病','脚气病']},
+  {q:'人体消化食物和吸收营养物质的主要器官是', a:'小肠', w:['胃','大肠','食道']},
+  {q:'人体内初步消化蛋白质的器官是', a:'胃', w:['口腔','小肠','肝脏']},
+  {q:'人体内最大的消化腺是', a:'肝脏', w:['胰腺','唾液腺','胃腺']},
+  {q:'不含消化酶的消化液是', a:'胆汁', w:['唾液','胃液','胰液']},
+  {q:'能消化淀粉、蛋白质和脂肪的消化液是', a:'胰液', w:['唾液','胃液','胆汁']},
+];
+// Level 8: 人体的呼吸
+const BIO8 = [
+  {q:'呼吸系统的主要器官是', a:'肺', w:['气管','支气管','喉']},
+  {q:'气体交换的场所是', a:'肺泡', w:['气管','支气管','鼻腔']},
+  {q:'呼出的气体与吸入的气体相比，含量增加的是', a:'二氧化碳', w:['氧气','氮气','水蒸气']},
+  {q:'吸气时，膈肌和肋间肌', a:'收缩', w:['舒张','不变','先收缩后舒张']},
+  {q:'人体内二氧化碳浓度最高的部位是', a:'组织细胞', w:['肺泡','动脉血','静脉血']},
+  {q:'能使吸入气体变得温暖、湿润、清洁的结构是', a:'鼻腔', w:['咽','喉','气管']},
+  {q:'声音是由下列哪个器官发出的', a:'喉', w:['咽','气管','口腔']},
+  {q:'肺泡壁由几层上皮细胞构成', a:'一层', w:['两层','三层','多层']},
+  {q:'煤气中毒是由于哪种物质与血红蛋白结合', a:'一氧化碳', w:['二氧化碳','氧气','氮气']},
+  {q:'人体呼吸作用产生二氧化碳的场所是', a:'线粒体', w:['肺泡','细胞质','血红蛋白']},
+];
+// Level 9: 血液循环
+const BIO9 = [
+  {q:'人体内运输氧气的细胞是', a:'红细胞', w:['白细胞','血小板','神经细胞']},
+  {q:'人体内具有吞噬病菌功能的血细胞是', a:'白细胞', w:['红细胞','血小板','血浆']},
+  {q:'具有止血和凝血功能的血细胞是', a:'血小板', w:['红细胞','白细胞','血浆']},
+  {q:'血液中运输营养物质和代谢废物的成分是', a:'血浆', w:['红细胞','白细胞','血小板']},
+  {q:'心脏的四个腔中，壁最厚的是', a:'左心室', w:['右心室','左心房','右心房']},
+  {q:'体循环的起点是', a:'左心室', w:['右心室','左心房','右心房']},
+  {q:'肺循环的终点是', a:'左心房', w:['右心室','左心室','右心房']},
+  {q:'瓣膜的作用是', a:'防止血液倒流', w:['加快血流速度','过滤血液','储存血液']},
+  {q:'与左心房相连的血管是', a:'肺静脉', w:['肺动脉','主动脉','上腔静脉']},
+  {q:'人体内数量最多、分布最广的血管是', a:'毛细血管', w:['动脉','静脉','淋巴管']},
+];
+// Level 10: 废物排出与调节
+const BIO10 = [
+  {q:'人体形成尿液的器官是', a:'肾脏', w:['膀胱','输尿管','尿道']},
+  {q:'肾脏结构和功能的基本单位是', a:'肾单位', w:['肾小球','肾小管','肾小囊']},
+  {q:'原尿与血液相比，不含有的成分是', a:'大分子蛋白质和血细胞', w:['葡萄糖和无机盐','水和无机盐','葡萄糖和尿素']},
+  {q:'尿液与原尿相比，不含有的成分是', a:'葡萄糖', w:['无机盐','尿素','水']},
+  {q:'汗腺分泌汗液，排出的主要途径是', a:'皮肤', w:['肾脏','肺','大肠']},
+  {q:'神经系统结构和功能的基本单位是', a:'神经元', w:['神经纤维','神经末梢','脑']},
+  {q:'人体调节生命活动的基本方式是', a:'反射', w:['反应','冲动','兴奋']},
+  {q:'完成反射的神经结构是', a:'反射弧', w:['神经元','神经中枢','效应器']},
+  {q:'人的"盲点"是因为哪里没有感光细胞', a:'视神经乳头', w:['视网膜','晶状体','角膜']},
+  {q:'人体内胰岛素分泌不足会导致', a:'糖尿病', w:['侏儒症','甲亢','夜盲症']},
+];
+// Level 11: 无脊椎动物
+const BIO11 = [
+  {q:'身体呈辐射对称，有口无肛门的动物类群是', a:'腔肠动物', w:['扁形动物','线形动物','环节动物']},
+  {q:'水螅属于哪类动物', a:'腔肠动物', w:['扁形动物','线形动物','软体动物']},
+  {q:'身体呈两侧对称，背腹扁平的动物类群是', a:'扁形动物', w:['腔肠动物','环节动物','节肢动物']},
+  {q:'猪肉绦虫属于哪类动物', a:'扁形动物', w:['线形动物','环节动物','腔肠动物']},
+  {q:'身体细长，有口有肛门，体表有角质层的动物是', a:'线形动物', w:['环节动物','扁形动物','腔肠动物']},
+  {q:'身体由许多体节构成，靠刚毛或疣足运动的是', a:'环节动物', w:['线形动物','软体动物','节肢动物']},
+  {q:'蚯蚓属于哪类动物', a:'环节动物', w:['线形动物','软体动物','节肢动物']},
+  {q:'身体柔软、有外套膜，大多有贝壳的动物是', a:'软体动物', w:['环节动物','节肢动物','腔肠动物']},
+  {q:'昆虫属于哪类动物', a:'节肢动物', w:['环节动物','软体动物','线形动物']},
+  {q:'身体分节、体表有外骨骼、足和触角分节的是', a:'节肢动物', w:['环节动物','软体动物','腔肠动物']},
+];
+// Level 12: 脊椎动物
+const BIO12 = [
+  {q:'终生生活在水中、用鳃呼吸的脊椎动物是', a:'鱼类', w:['两栖类','爬行类','哺乳类']},
+  {q:'幼体用鳃呼吸、成体用肺呼吸的脊椎动物是', a:'两栖动物', w:['鱼类','爬行类','鸟类']},
+  {q:'青蛙属于哪类动物', a:'两栖动物', w:['爬行动物','鱼类','哺乳动物']},
+  {q:'体表覆盖角质鳞片或甲、在陆地产卵的脊椎动物是', a:'爬行动物', w:['两栖动物','鱼类','鸟类']},
+  {q:'蜥蜴属于哪类动物', a:'爬行动物', w:['两栖动物','哺乳动物','鸟类']},
+  {q:'体表被羽、前肢变为翼、体温恒定的脊椎动物是', a:'鸟类', w:['哺乳类','爬行类','两栖类']},
+  {q:'家鸽的呼吸方式是什么', a:'双重呼吸', w:['单重呼吸','腹式呼吸','胸式呼吸']},
+  {q:'体表被毛、胎生哺乳的脊椎动物是', a:'哺乳动物', w:['鸟类','爬行类','两栖类']},
+  {q:'真正适应陆地生活的脊椎动物是从哪一类开始的', a:'爬行动物', w:['两栖动物','鸟类','哺乳动物']},
+  {q:'体温恒定、大脑发达、胚胎在母体内发育的是', a:'哺乳动物', w:['鸟类','爬行类','两栖类']},
+];
+// Level 13: 微生物
+const BIO13 = [
+  {q:'细菌的细胞结构中没有', a:'成形的细胞核', w:['细胞壁','细胞膜','细胞质']},
+  {q:'细菌的生殖方式是', a:'分裂生殖', w:['孢子生殖','出芽生殖','有性生殖']},
+  {q:'真菌的细胞结构中有', a:'成形的细胞核', w:['叶绿体','无细胞核','细胞壁']},
+  {q:'酵母菌属于', a:'真菌', w:['细菌','病毒','藻类']},
+  {q:'蘑菇属于', a:'真菌', w:['细菌','植物','病毒']},
+  {q:'病毒的结构特点是', a:'无细胞结构', w:['有细胞壁','有细胞核','有叶绿体']},
+  {q:'病毒不能独立生活，必须寄生在', a:'活细胞中', w:['空气中','土壤中','死细胞中']},
+  {q:'青霉的生殖方式是', a:'孢子生殖', w:['分裂生殖','出芽生殖','种子生殖']},
+  {q:'细菌在自然界中的作用主要是作为', a:'分解者', w:['生产者','消费者','寄生者']},
+  {q:'抗生素是由什么产生的', a:'真菌', w:['细菌','病毒','植物']},
+];
+// Level 14: 生物的生殖与发育
+const BIO14 = [
+  {q:'植物的有性生殖过程包括', a:'开花传粉受精结果', w:['发芽生长开花结果','传粉受精开花结果','开花结果传粉受精']},
+  {q:'雌蕊受精后，胚珠发育成', a:'种子', w:['果实','果皮','种皮']},
+  {q:'雌蕊受精后，子房发育成', a:'果实', w:['种子','胚','胚乳']},
+  {q:'扦插、嫁接等繁殖方式属于', a:'无性生殖', w:['有性生殖','分裂生殖','孢子生殖']},
+  {q:'家蚕的发育过程属于', a:'完全变态发育', w:['不完全变态发育','无变态发育','直接发育']},
+  {q:'蝗虫的发育过程属于', a:'不完全变态发育', w:['完全变态发育','无变态发育','直接发育']},
+  {q:'青蛙的发育方式属于', a:'变态发育', w:['完全变态','不完全变态','直接发育']},
+  {q:'鸟卵中能发育成雏鸟的结构是', a:'胚盘', w:['卵黄','卵白','系带']},
+  {q:'受精的鸡蛋在什么条件下才能孵化', a:'适宜的温度', w:['充足的光照','适量的水分','充足的空气']},
+  {q:'植物的组织培养属于', a:'无性生殖', w:['有性生殖','分裂生殖','孢子生殖']},
+];
+// Level 15: 遗传与变异
+const BIO15 = [
+  {q:'遗传信息的载体是', a:'DNA', w:['蛋白质','糖类','脂肪']},
+  {q:'DNA分子上具有特定遗传效应的片段叫', a:'基因', w:['染色体','蛋白质','核苷酸']},
+  {q:'染色体是由什么组成的', a:'DNA和蛋白质', w:['DNA和糖类','RNA和蛋白质','DNA和脂肪']},
+  {q:'在体细胞中，染色体是', a:'成对存在的', w:['单个存在的','成单存在的','随机存在的']},
+  {q:'人类体细胞中有多少对染色体', a:'23对', w:['22对','24对','46对']},
+  {q:'人的性别由什么决定', a:'性染色体', w:['常染色体','基因','DNA']},
+  {q:'男性体细胞中的性染色体组成是', a:'XY', w:['XX','X','Y']},
+  {q:'高茎豌豆（Dd）与矮茎豌豆（dd）杂交，矮茎后代出现的概率是', a:'50%', w:['25%','75%','100%']},
+  {q:'由遗传物质改变引起的变异属于', a:'可遗传的变异', w:['不可遗传的变异','有利变异','不利变异']},
+  {q:'近亲结婚后代患遗传病概率增大的原因是', a:'有共同的致病基因', w:['基因突变增多','染色体异常','环境影响']},
+];
+// Level 16: 生态系统与生物圈
+const BIO16 = [
+  {q:'生态系统的组成包括', a:'生物部分和非生物部分', w:['植物和动物','生产者和消费者','人类和环境']},
+  {q:'生态系统中能自己制造有机物的生物叫', a:'生产者', w:['消费者','分解者','寄生者']},
+  {q:'食物链的起始环节是', a:'生产者', w:['消费者','分解者','阳光']},
+  {q:'生态系统中能量流动的特点是', a:'单向流动逐级递减', w:['双向流动逐级递增','循环流动保持不变','单向流动逐级递增']},
+  {q:'生物圈的范围包括', a:'大气圈底部水圈大部岩石圈表面', w:['整个大气圈全部水圈整个岩石圈','大气圈中部水圈全部岩石圈表面','大气圈顶部水圈底部岩石圈深处']},
+  {q:'有"地球之肺"之称的生态系统是', a:'森林生态系统', w:['草原生态系统','湿地生态系统','海洋生态系统']},
+  {q:'有"地球之肾"之称的生态系统是', a:'湿地生态系统', w:['森林生态系统','草原生态系统','农田生态系统']},
+  {q:'生态系统中，各种生物的数量和比例保持相对稳定，称为', a:'生态平衡', w:['生态稳定','生态循环','生态变化']},
+  {q:'动物在生态系统中的作用是作为', a:'消费者', w:['生产者','分解者','非生物部分']},
+  {q:'细菌和真菌在生态系统中的作用是作为', a:'分解者', w:['生产者','消费者','非生物部分']},
+];
+// Level 17: 健康与免疫
+const BIO17 = [
+  {q:'传染病流行的三个基本环节是', a:'传染源传播途径易感人群', w:['病原体宿主环境','病毒细菌寄生虫','空气水食物']},
+  {q:'引起传染病的细菌、病毒等称为', a:'病原体', w:['传染源','抗体','疫苗']},
+  {q:'流行性感冒的传播途径主要是', a:'空气飞沫传播', w:['饮食传播','接触传播','血液传播']},
+  {q:'人体的第一道防线是', a:'皮肤和黏膜', w:['吞噬细胞','杀菌物质','免疫器官']},
+  {q:'人体的第二道防线包括', a:'杀菌物质和吞噬细胞', w:['皮肤和黏膜','免疫器官','免疫细胞']},
+  {q:'接种疫苗获得的免疫属于', a:'特异性免疫', w:['非特异性免疫','先天性免疫','自然免疫']},
+  {q:'抗体是一种特殊的', a:'蛋白质', w:['糖类','脂肪','维生素']},
+  {q:'下列属于计划免疫的是', a:'接种卡介苗', w:['注射抗生素','服用维生素','输葡萄糖']},
+  {q:'下列属于非特异性免疫的是', a:'吞噬细胞吞噬病菌', w:['接种疫苗产生抗体','患过水痘不再复发','花粉过敏']},
+  {q:'艾滋病的传播途径不包括', a:'蚊虫叮咬', w:['性传播','血液传播','母婴传播']},
+];
+// Level 18: 综合大挑战
+const ALL_BIO_FLAT = (()=>{
+  let all = [];
+  let datasets = [BIO1,BIO2,BIO3,BIO4,BIO5,BIO6,BIO7,BIO8,BIO9,BIO10,BIO11,BIO12,BIO13,BIO14,BIO15,BIO16,BIO17];
+  datasets.forEach((d,i)=>{
+    d.forEach(q=>{all.push({...q, src:i})});
+  });
+  return all;
+})();
+
+// ========== LEVELS ==========
+const LV = [
+  {l:'认识生物',desc:'生物的共同特征',data:BIO1,mode:'bio',qs:8,sec:14},
+  {l:'细胞的结构',desc:'动植物细胞结构',data:BIO2,mode:'bio',qs:8,sec:14},
+  {l:'细胞的生活',desc:'细胞功能与分裂',data:BIO3,mode:'bio',qs:8,sec:14},
+  {l:'结构层次',desc:'组织·器官·系统',data:BIO4,mode:'bio',qs:8,sec:14},
+  {l:'绿色植物',desc:'植物类群与进化',data:BIO5,mode:'bio',qs:8,sec:14},
+  {l:'光合与呼吸',desc:'光合作用·呼吸作用·蒸腾',data:BIO6,mode:'bio',qs:8,sec:14},
+  {l:'人体营养',desc:'消化系统与营养',data:BIO7,mode:'bio',qs:8,sec:14},
+  {l:'人体呼吸',desc:'呼吸系统与气体交换',data:BIO8,mode:'bio',qs:8,sec:14},
+  {l:'血液循环',desc:'血液血管与心脏',data:BIO9,mode:'bio',qs:8,sec:14},
+  {l:'废物排出与调节',desc:'泌尿与神经调节',data:BIO10,mode:'bio',qs:8,sec:14},
+  {l:'无脊椎动物',desc:'腔肠·扁形·环节·节肢等',data:BIO11,mode:'bio',qs:8,sec:14},
+  {l:'脊椎动物',desc:'鱼·两栖·爬行·鸟·哺乳',data:BIO12,mode:'bio',qs:8,sec:14},
+  {l:'微生物',desc:'细菌·真菌·病毒',data:BIO13,mode:'bio',qs:8,sec:14},
+  {l:'生殖发育',desc:'有性·无性生殖与发育',data:BIO14,mode:'bio',qs:8,sec:14},
+  {l:'遗传变异',desc:'DNA·基因·遗传规律',data:BIO15,mode:'bio',qs:8,sec:14},
+  {l:'生态系统',desc:'生态平衡与生物圈',data:BIO16,mode:'bio',qs:8,sec:14},
+  {l:'健康免疫',desc:'传染病与免疫防线',data:BIO17,mode:'bio',qs:8,sec:14},
+  {l:'综合大挑战',desc:'全部题库混合挑战',data:[],mode:'mix',qs:12,sec:15},
+];
+
+// ========== GAME STATE ==========
+let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+
+function save(){localStorage.setItem('bio_lv',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('bio_lv')||'[]')}
+
+function $(id){return document.getElementById(id)}
+function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
+function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
+function showScr(id){hideAll();$(id).classList.add('active')}
+
+let actx=null;
+function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
+function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
+function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
+function sfxBad(){tone(300,.2,.2,'sawtooth')}
+function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
+function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
+
+function buildMap(){
+  load();
+  let g=$('lvGrid'),h='';
+  for(let i=0;i<LV.length;i++){
+    let l=LV[i],s=G.stars[i]||0,txt='lv-card';
+    if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
+    if(s>=1)txt+=' done';
+    h+=`<div class="${txt}" data-i="${i}">
+      <div class="num">${i+1}</div>
+      <div class="name">${l.l}</div>
+      <div class="desc">${l.desc}</div>
+      <div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div>
+    </div>`;
+  }
+  g.innerHTML=h;
+  g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
+}
+
+function startLv(i){
+  initAudio();
+  G.lv=i;G.qi=0;G.ok=0;
+  let l=LV[i];
+  let questions=[];
+
+  if(l.mode==='bio'){
+    questions=shuffle([...l.data]).slice(0,l.qs);
+  } else if(l.mode==='mix'){
+    questions=shuffle([...ALL_BIO_FLAT]).slice(0,l.qs);
+  }
+
+  G.questions=questions;G.total=questions.length;
+  G.tmMax=(l.sec||12)*1000;
+  showScr('gameScr');
+  showQ();
+}
+
+function showQ(){
+  if(G.qi>=G.total){endLv();return}
+  let q=G.questions[G.qi];
+  $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
+  $('progFill').style.width=((G.qi)/G.total*100)+'%';
+  let prompt=`<div class="q-name">${q.q}</div>`;
+  $('qArea').innerHTML=`<div class="q-prompt">${prompt}</div>`;
+  let all=shuffle([q.a,...q.w]);
+  let h='';
+  for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
+  $('opts').innerHTML=h;
+  G.locked=false;
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,q.a)});
+  startTimer();
+}
+
+function chk(btn,correct){
+  if(G.locked)return;
+  initAudio();G.locked=true;clearTimeout(G.timer);
+  let val=btn.dataset.v,isOk=val===correct;
+  if(isOk){G.ok++;sfxOk()}else{sfxBad()}
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
+  setTimeout(()=>{G.qi++;showQ()},600);
+}
+
+function startTimer(){
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
+  function tick(){
+    let left=Math.max(0,Math.ceil(G.tm/1000));
+    tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
+    if(left<=0){G.locked=true;sfxDrop();$('opts').querySelectorAll('.opt').forEach(b=>b.classList.add('disabled'));setTimeout(()=>{G.qi++;showQ()},500);return}
+    G.tm-=100;G.timer=setTimeout(tick,100);
+  }
+  tick();
+}
+
+function endLv(){
+  clearTimeout(G.timer);
+  let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
+  if(!G.stars)G.stars=[];
+  let old=G.stars[G.lv]||0;
+  if(stars>old)G.stars[G.lv]=stars;
+  save();
+  showScr('mapScr');
+  $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
+  $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
+  $('resMsg').textContent=`答对 ${G.ok}/${total}`;
+  if(stars>=3)sfxPass();
+  let lv=G.lv;
+  $('resNext').onclick=()=>{if(lv<LV.length-1&&(G.stars[lv]||0)>=1)startLv(lv+1);else{buildMap();$('resOverlay').classList.remove('active')}};
+  $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
+  setTimeout(()=>{$('resOverlay').classList.add('active')},100);
+}
+
+buildMap();
+document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
+</script>
+</body>
+</html>

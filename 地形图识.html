@@ -182,6 +182,149 @@ const TERRAIN = [
 ];
 const ALL_TERRAIN = [...new Set(TERRAIN.map(t=>t.a))];
 
+// 世界国家特征
+const COUNTRY_FEAT = [
+  {q:'横跨欧亚大陆，世界上面积最大的国家',a:'俄罗斯'},
+  {q:'人口最多的国家，有长城、故宫、熊猫',a:'中国'},
+  {q:'世界第三人口大国，拥有泰姬陵和恒河',a:'印度'},
+  {q:'国土面积世界第三，有黄石公园和好莱坞',a:'美国'},
+  {q:'国土面积世界第四，以枫叶和冰球闻名',a:'加拿大'},
+  {q:'被称为"骑在羊背上的国家"，有悉尼歌剧院和大堡礁',a:'澳大利亚'},
+  {q:'南美洲最大的国家，有桑巴舞、足球和亚马逊雨林',a:'巴西'},
+  {q:'以埃菲尔铁塔和卢浮宫闻名于世，欧洲浪漫之都',a:'法国'},
+  {q:'有古罗马斗兽场和水城威尼斯的历史文化大国',a:'意大利'},
+  {q:'被称为"樱花之国"，动漫和电子科技发达',a:'日本'},
+  {q:'以啤酒、香肠和新天鹅堡闻名的欧洲大国',a:'德国'},
+  {q:'有伦敦塔桥和大本钟，工业革命的发源地',a:'英国'},
+  {q:'被称为"泡菜之国"，K-pop和三星电子闻名全球',a:'韩国'},
+  {q:'拥有金字塔和狮身人面像的文明古国',a:'埃及'},
+  {q:'有吴哥窟古迹，东南亚著名的旅游国家',a:'柬埔寨'},
+  {q:'被称为"千岛之国"，世界最大的群岛国家',a:'印度尼西亚'},
+  {q:'以郁金香、风车和奶酪闻名，欧洲低地国家',a:'荷兰'},
+  {q:'有伊瓜苏瀑布和探戈舞，南美洲足球强国',a:'阿根廷'},
+  {q:'被称为"彩虹之国"，拥有人类摇篮遗址',a:'南非'},
+  {q:'拥有火山、温泉和极光，北欧能源大国',a:'冰岛'},
+  {q:'以瑞士军刀、手表和巧克力闻名，永久中立国',a:'瑞士'},
+  {q:'有圣家堂和斗牛文化，地中海阳光之国',a:'西班牙'},
+  {q:'连接欧亚大陆的横跨国家，拥有圣索菲亚大教堂',a:'土耳其'},
+  {q:'拥有吴哥窟的高棉古国，东南亚佛教国家',a:'柬埔寨'},
+  {q:'有双胞胎塔双子塔，东南亚新兴工业国',a:'马来西亚'},
+];
+const ALL_CF = COUNTRY_FEAT.map(c=>c.a);
+
+// 世界著名地标
+const LANDMARKS = [
+  {q:'埃菲尔铁塔位于哪个国家',a:'法国'},
+  {q:'自由女神像位于哪个国家',a:'美国'},
+  {q:'悉尼歌剧院位于哪个国家',a:'澳大利亚'},
+  {q:'泰姬陵位于哪个国家',a:'印度'},
+  {q:'大本钟位于哪个国家',a:'英国'},
+  {q:'卢浮宫位于哪个国家',a:'法国'},
+  {q:'金字塔和狮身人面像位于哪个国家',a:'埃及'},
+  {q:'富士山位于哪个国家',a:'日本'},
+  {q:'长城位于哪个国家',a:'中国'},
+  {q:'基督像（里约）位于哪个国家',a:'巴西'},
+  {q:'大峡谷位于哪个国家',a:'美国'},
+  {q:'圣家堂位于哪个国家',a:'西班牙'},
+  {q:'罗马斗兽场位于哪个国家',a:'意大利'},
+  {q:'吴哥窟位于哪个国家',a:'柬埔寨'},
+  {q:'克里姆林宫位于哪个国家',a:'俄罗斯'},
+  {q:'黄金海岸位于哪个国家',a:'澳大利亚'},
+  {q:'马尔代夫位于哪个国家',a:'马尔代夫'},
+  {q:'尼亚加拉大瀑布位于哪两个国家之间',a:'加拿大和美国'},
+  {q:'蓝毗尼（释迦牟尼诞生地）位于哪个国家',a:'尼泊尔'},
+  {q:'死海位于哪两个国家之间',a:'以色列和约旦'},
+];
+const ALL_LM = [...new Set(LANDMARKS.map(l=>l.a))];
+
+// 中国风景名胜
+const SCENIC = [
+  {q:'西湖位于哪个省（市）',a:'浙江'},
+  {q:'黄山位于哪个省',a:'安徽'},
+  {q:'故宫位于哪个城市',a:'北京'},
+  {q:'桂林山水位于哪个自治区',a:'广西'},
+  {q:'张家界位于哪个省',a:'湖南'},
+  {q:'九寨沟位于哪个省',a:'四川'},
+  {q:'鼓浪屿位于哪个省',a:'福建'},
+  {q:'外滩位于哪个城市',a:'上海'},
+  {q:'西湖位于哪个城市',a:'杭州'},
+  {q:'兵马俑位于哪个省',a:'陕西'},
+  {q:'敦煌莫高窟位于哪个省',a:'甘肃'},
+  {q:'丽江古城位于哪个省',a:'云南'},
+  {q:'天池位于哪个省',a:'吉林'},
+  {q:'崂山位于哪个省',a:'山东'},
+  {q:'庐山位于哪个省',a:'江西'},
+  {q:'黄果树瀑布位于哪个省',a:'贵州'},
+  {q:'那拉提草原位于哪个自治区',a:'新疆'},
+  {q:'布达拉宫位于哪个城市',a:'拉萨'},
+  {q:'日月潭位于哪个省',a:'台湾'},
+  {q:'维多利亚港位于哪个特别行政区',a:'香港'},
+];
+const ALL_SC = [...new Set(SCENIC.map(s=>s.a))];
+
+// 少数民族
+const MINORITIES = [
+  {q:'藏族主要分布在哪个自治区',a:'西藏'},
+  {q:'蒙古族主要分布在哪个自治区',a:'内蒙古'},
+  {q:'维吾尔族主要分布在哪个自治区',a:'新疆'},
+  {q:'壮族主要分布在哪个自治区',a:'广西'},
+  {q:'回族主要分布在哪个自治区',a:'宁夏'},
+  {q:'苗族主要分布在哪个省',a:'贵州'},
+  {q:'满族主要分布在哪个省',a:'辽宁'},
+  {q:'彝族主要分布在哪个省',a:'四川'},
+  {q:'傣族主要分布在哪个省',a:'云南'},
+  {q:'朝鲜族主要分布在哪个省',a:'吉林'},
+  {q:'高山族主要分布在哪个省',a:'台湾'},
+  {q:'土家族主要分布在哪个省',a:'湖南'},
+  {q:'藏族人口最多的城市是哪个',a:'拉萨'},
+  {q:'壮族是中国人口最多的少数民族，主要分布在',a:'广西'},
+  {q:'内蒙古的那达慕大会是哪个民族的传统节日',a:'蒙古族'},
+  {q:'泼水节是哪个民族的传统节日',a:'傣族'},
+  {q:'雪顿节是哪个民族的传统节日',a:'藏族'},
+];
+const ALL_MI = [...new Set(MINORITIES.map(m=>m.a))];
+
+// 气候与自然带
+const CLIMATES = [
+  {q:'全年高温多雨，分布在赤道附近，典型植被是热带雨林',a:'热带雨林气候'},
+  {q:'全年高温，干湿季分明，植被以草原为主',a:'热带草原气候'},
+  {q:'全年炎热干燥，分布在南北回归线附近大陆中部和西岸',a:'热带沙漠气候'},
+  {q:'夏季炎热干燥，冬季温和多雨，分布在地中海沿岸',a:'地中海气候'},
+  {q:'全年温和湿润，分布在南纬40°-60°大陆西岸',a:'温带海洋性气候'},
+  {q:'夏季高温多雨，冬季寒冷干燥，分布在亚洲东部',a:'温带季风气候'},
+  {q:'夏季高温多雨，冬季温和少雨，分布在秦岭-淮河以南',a:'亚热带季风气候'},
+  {q:'冬季漫长严寒，夏季短促凉爽，分布在高纬度地区',a:'亚寒带针叶林气候'},
+  {q:'全年严寒，有极昼极夜现象，植被以苔藓地衣为主',a:'寒带苔原气候'},
+  {q:'终年冰雪覆盖，气温极低，分布在南极洲和格陵兰岛',a:'寒带冰原气候'},
+  {q:'冬冷夏热，降水稀少，气温年较差大，分布在内陆地区',a:'温带大陆性气候'},
+  {q:'高海拔地区，气温随海拔升高而降低，垂直变化大',a:'高原山地气候'},
+  {q:'我国东部秦岭-淮河以北的主要气候类型',a:'温带季风气候'},
+  {q:'我国东部秦岭-淮河以南的主要气候类型',a:'亚热带季风气候'},
+  {q:'我国西北地区的主要气候类型',a:'温带大陆性气候'},
+];
+const ALL_CL = [...new Set(CLIMATES.map(c=>c.a))];
+
+// 中国人文地理
+const HUMAINS = [
+  {q:'世界上使用人数最多的语言',a:'汉语'},
+  {q:'世界上使用范围最广的语言',a:'英语'},
+  {q:'联合国六种工作语言中不包括以下哪种',a:'德语'},
+  {q:'信仰人数最多的宗教',a:'基督教'},
+  {q:'世界人口最多的国家',a:'中国'},
+  {q:'世界人口第二多的国家',a:'印度'},
+  {q:'亚洲人口最稠密的地区',a:'东亚和南亚'},
+  {q:'世界上城市化水平最高的大洲',a:'北美洲'},
+  {q:'世界三大人种不包括',a:'棕种人'},
+  {q:'北非和西亚地区主要信仰的宗教',a:'伊斯兰教'},
+  {q:'东南亚地区主要信仰的宗教',a:'佛教'},
+  {q:'拉丁美洲主要使用的语言',a:'西班牙语'},
+  {q:'非洲南部主要使用的人种',a:'黑种人'},
+  {q:'发达国家最集中的大洲',a:'欧洲'},
+  {q:'"金砖国家"不包括以下哪个国家',a:'日本'},
+  {q:'世界上人口密度最大的国家',a:'摩纳哥'},
+];
+const ALL_HU = [...new Set(HUMAINS.map(h=>h.a))];
+
 // ========== LEVELS ==========
 const LV = [
   {l:'省会配对·上',desc:'省份→省会',data:[0,1,2,3,4,5,6,7,8,9,10,11,12,13],mode:'cap',qs:8,sec:12},
@@ -191,7 +334,16 @@ const LV = [
   {l:'世界首都',desc:'国家→首都',data:WORLD.map((_,i)=>i),mode:'world',qs:8,sec:14},
   {l:'地理之最',desc:'世界&中国地理之最',data:RECORDS.map((_,i)=>i),mode:'record',qs:8,sec:14},
   {l:'山河地形',desc:'山脉·河流·湖泊识别',data:TERRAIN.map((_,i)=>i),mode:'terrain',qs:8,sec:14},
-  {l:'综合大挑战',desc:'省会·简称·特征·世界地理混合',data:[],mode:'mix',qs:10,sec:15}
+  {l:'综合大挑战',desc:'省会·简称·特征·世界地理混合',data:[],mode:'mix',qs:10,sec:15},
+  {l:'省会反向',desc:'省会→猜省份',data:CAPS.map((_,i)=>i),mode:'cap_rev',qs:8,sec:12},
+  {l:'简称反向',desc:'简称→猜省份',data:ABBRS.map((_,i)=>i),mode:'abbr_rev',qs:8,sec:12},
+  {l:'国家特征',desc:'描述→猜国家',data:COUNTRY_FEAT.map((_,i)=>i),mode:'cfeat',qs:8,sec:15},
+  {l:'世界地标',desc:'著名景点→猜国家',data:LANDMARKS.map((_,i)=>i),mode:'landmark',qs:8,sec:14},
+  {l:'中国名胜',desc:'风景名胜→猜省份',data:SCENIC.map((_,i)=>i),mode:'scenic',qs:8,sec:14},
+  {l:'少数民族',desc:'民族特征→猜分布地',data:MINORITIES.map((_,i)=>i),mode:'minority',qs:8,sec:14},
+  {l:'气候与自然带',desc:'气候特征→猜类型',data:CLIMATES.map((_,i)=>i),mode:'climate',qs:8,sec:16},
+  {l:'人文地理',desc:'语言·宗教·人口分布',data:HUMAINS.map((_,i)=>i),mode:'human',qs:8,sec:14},
+  {l:'综合大挑战·高级',desc:'全部题库混合挑战',data:[],mode:'mix2',qs:12,sec:15}
 ];
 
 // ========== GAME STATE ==========
@@ -240,16 +392,26 @@ function startLv(i){
 
   if(mode==='cap'){
     questions=shuffle([...l.data]).slice(0,l.qs).map(j=>CAPS[j]);
+  } else if(mode==='cap_rev'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>{let c=CAPS[j];return {mode:'cap_rev',q:c.a,a:c.q}});
   } else if(mode==='abbr'){
     questions=shuffle([...l.data]).slice(0,l.qs).map(j=>ABBRS[j]);
+  } else if(mode==='abbr_rev'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>{let a=ABBRS[j];return {mode:'abbr_rev',q:a.a,a:a.q}});
   } else if(mode==='feat'){
     questions=shuffle([...l.data]).slice(0,l.qs).map(j=>FEAT[j]);
-  } else if(mode==='world'){
-    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>WORLD[j]);
-  } else if(mode==='record'){
-    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>RECORDS[j]);
-  } else if(mode==='terrain'){
-    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>TERRAIN[j]);
+  } else if(mode==='cfeat'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>COUNTRY_FEAT[j]);
+  } else if(mode==='landmark'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>LANDMARKS[j]);
+  } else if(mode==='scenic'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>SCENIC[j]);
+  } else if(mode==='minority'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>MINORITIES[j]);
+  } else if(mode==='climate'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>CLIMATES[j]);
+  } else if(mode==='human'){
+    questions=shuffle([...l.data]).slice(0,l.qs).map(j=>HUMAINS[j]);
   } else if(mode==='mix'){
     let types=['cap','abbr','feat','world','record','terrain'];
     for(let j=0;j<l.qs;j++){
@@ -260,6 +422,23 @@ function startLv(i){
       else if(t==='world'){let p=WORLD[rand(0,WORLD.length-1)];questions.push({mode:'world',q:p.q,a:p.a})}
       else if(t==='record'){let p=RECORDS[rand(0,RECORDS.length-1)];questions.push({mode:'record',q:p.q,a:p.a})}
       else if(t==='terrain'){let p=TERRAIN[rand(0,TERRAIN.length-1)];questions.push({mode:'terrain',q:p.q,a:p.a})}
+    }
+  } else if(mode==='mix2'){
+    let types=['cap','abbr','feat','world','record','terrain','cfeat','landmark','scenic','minority','climate','human'];
+    for(let j=0;j<l.qs;j++){
+      let t=types[rand(0,types.length-1)];
+      if(t==='cap'){let p=CAPS[rand(0,CAPS.length-1)];questions.push({mode:'cap',q:p.q,a:p.a})}
+      else if(t==='abbr'){let p=ABBRS[rand(0,ABBRS.length-1)];questions.push({mode:'abbr',q:p.q,a:p.a})}
+      else if(t==='feat'){let p=FEAT[rand(0,FEAT.length-1)];questions.push({mode:'feat',q:p.q,a:p.a})}
+      else if(t==='world'){let p=WORLD[rand(0,WORLD.length-1)];questions.push({mode:'world',q:p.q,a:p.a})}
+      else if(t==='record'){let p=RECORDS[rand(0,RECORDS.length-1)];questions.push({mode:'record',q:p.q,a:p.a})}
+      else if(t==='terrain'){let p=TERRAIN[rand(0,TERRAIN.length-1)];questions.push({mode:'terrain',q:p.q,a:p.a})}
+      else if(t==='cfeat'){let p=COUNTRY_FEAT[rand(0,COUNTRY_FEAT.length-1)];questions.push({mode:'cfeat',q:p.q,a:p.a})}
+      else if(t==='landmark'){let p=LANDMARKS[rand(0,LANDMARKS.length-1)];questions.push({mode:'landmark',q:p.q,a:p.a})}
+      else if(t==='scenic'){let p=SCENIC[rand(0,SCENIC.length-1)];questions.push({mode:'scenic',q:p.q,a:p.a})}
+      else if(t==='minority'){let p=MINORITIES[rand(0,MINORITIES.length-1)];questions.push({mode:'minority',q:p.q,a:p.a})}
+      else if(t==='climate'){let p=CLIMATES[rand(0,CLIMATES.length-1)];questions.push({mode:'climate',q:p.q,a:p.a})}
+      else if(t==='human'){let p=HUMAINS[rand(0,HUMAINS.length-1)];questions.push({mode:'human',q:p.q,a:p.a})}
     }
   }
 
@@ -285,11 +464,21 @@ function showQ(){
     label='的省会是哪个？';
     correct=q.a;
     pool=ALL_CAPS.filter(c=>c!==correct);
+  } else if(mode==='cap_rev'){
+    prompt=`<div class="q-name">${q.q}</div>`;
+    label='是哪个省的省会？';
+    correct=q.a;
+    pool=CAPS.map(c=>c.q).filter(n=>n!==correct);
   } else if(mode==='abbr'){
     prompt=`<div class="q-name">${q.q}</div>`;
     label='的简称是哪个？';
     correct=q.a;
     pool=ALL_ABBRS.filter(c=>c!==correct);
+  } else if(mode==='abbr_rev'){
+    prompt=`<div class="q-name">${q.q}</div>`;
+    label='是哪个省份的简称？';
+    correct=q.a;
+    pool=ABBRS.map(a=>a.q).filter(n=>n!==correct);
   } else if(mode==='feat'){
     prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
     label='以上描述的是哪个省份？';
@@ -310,6 +499,36 @@ function showQ(){
     label='';
     correct=q.a;
     pool=ALL_TERRAIN.filter(c=>c!==correct);
+  } else if(mode==='cfeat'){
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='以上描述的是哪个国家？';
+    correct=q.a;
+    pool=ALL_CF.filter(c=>c!==correct);
+  } else if(mode==='landmark'){
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='';
+    correct=q.a;
+    pool=ALL_LM.filter(c=>c!==correct);
+  } else if(mode==='scenic'){
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='';
+    correct=q.a;
+    pool=ALL_SC.filter(c=>c!==correct);
+  } else if(mode==='minority'){
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='';
+    correct=q.a;
+    pool=ALL_MI.filter(c=>c!==correct);
+  } else if(mode==='climate'){
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='以上描述的是什么气候类型？';
+    correct=q.a;
+    pool=ALL_CL.filter(c=>c!==correct);
+  } else if(mode==='human'){
+    prompt=`<div class="q-name" style="font-size:16px;line-height:1.5">${q.q}</div>`;
+    label='';
+    correct=q.a;
+    pool=ALL_HU.filter(c=>c!==correct);
   }
 
   $('qArea').innerHTML=`<div class="q-prompt">${prompt}<div class="q-label">${label}</div></div>`;

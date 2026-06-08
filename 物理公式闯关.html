@@ -3,20 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>物理公式闯关 · 思贤学习站</title>
+<title>物理闯关 · 初中物理知识挑战</title>
 <style>
-:root{--bg:#f5f3ee;--bg2:#fafaf8;--card:#fff;--accent:#b8860b;--red:#c0392b;--text:#333;--text2:#666;--border:#e8e5df;--shadow:0 2px 12px rgba(0,0,0,0.06)}
+:root{--bg:#f5f0ee;--bg2:#faf8f6;--card:#fff;--accent:#c0392b;--accent2:#e74c3c;--red:#c0392b;--text:#333;--text2:#666;--border:#e8ddd5;--shadow:0 2px 12px rgba(0,0,0,0.06)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;user-select:none}
-.h{display:none}
-.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
-
+.h{display:none}.h.active{display:flex;flex-direction:column;align-items:center;justify-content:center}
 #mapScr{padding:20px;min-height:100dvh}
 #mapScr:not(.active){display:none}
 #mapScr.active{display:flex;flex-direction:column;align-items:center}
-#mapScr h1{font-size:24px;margin:12px 0 4px;color:var(--accent)}
+#mapScr h1{font-size:24px;margin:12px 0 2px;color:var(--accent);display:flex;align-items:center;gap:6px}
 #mapScr .sub{font-size:13px;color:var(--text2);margin-bottom:12px}
-.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:360px}
+.lv-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:400px}
 .lv-card{background:var(--card);border-radius:12px;padding:14px;box-shadow:var(--shadow);text-align:center;cursor:pointer;transition:.15s;border:2px solid transparent}
 .lv-card:active{transform:scale(.96);border-color:var(--accent)}
 .lv-card .num{font-size:20px;font-weight:700;color:var(--accent)}
@@ -25,27 +23,24 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 .lv-card .stars{font-size:12px;color:#f5a623;margin-top:4px}
 .lv-card.locked{opacity:.5;pointer-events:none}
 .lv-card.locked .num::after{content:' 🔒';font-size:14px}
-.lv-card.done{border-color:#b8860b33}
-
+.lv-card.done{border-color:#c0392b33}
 #gameScr{width:100%;max-width:420px;margin:0 auto;padding:16px;min-height:100dvh}
 .q-header{display:flex;justify-content:space-between;width:100%;padding:4px 0 10px;font-size:13px;color:var(--text2)}
 .q-header .qi{font-weight:600;color:var(--accent)}
 .q-header .timer{font-weight:600}
 .q-header .timer.warn{color:var(--red);animation:pulse .5s infinite}
 @keyframes pulse{50%{opacity:.5}}
-.q-prompt{text-align:center;margin:12px 0 20px}
-.q-prompt .q-label{font-size:14px;color:var(--text2);margin-bottom:6px}
-.q-prompt .q-main{font-size:26px;font-weight:700;color:var(--text);line-height:1.3}
-.q-prompt .q-field{display:inline-block;font-size:11px;color:var(--accent);background:#b8860b15;padding:2px 10px;border-radius:10px;margin-top:6px}
+.q-prompt{text-align:center;margin:8px 0 12px}
+.q-prompt .q-label{font-size:13px;color:var(--text2);margin-bottom:4px}
+.q-prompt .q-name{font-size:17px;font-weight:700;color:var(--text);margin:8px 0;line-height:1.5}
 .opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
-.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:16px 8px;text-align:center;font-size:16px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);font-family:"Times New Roman","STIX",serif}
+.opt{background:var(--card);border:2px solid var(--border);border-radius:12px;padding:14px 8px;text-align:center;font-size:14px;cursor:pointer;transition:.1s;box-shadow:var(--shadow);line-height:1.3}
 .opt:active{transform:scale(.95)}
 .opt.correct{background:#d4edda;border-color:#28a745;color:#155724}
 .opt.wrong{background:#f8d7da;border-color:#dc3545;color:#721c24}
 .opt.disabled{pointer-events:none}
 .progress-bar{width:100%;height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:12px}
 .progress-bar .fill{height:100%;background:var(--accent);border-radius:2px;transition:width .3s}
-
 #resOverlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
 #resOverlay.active{display:flex}
 .res-card{background:var(--card);border-radius:16px;padding:28px 24px;text-align:center;max-width:340px;width:100%;box-shadow:0 8px 40px rgba(0,0,0,.15)}
@@ -56,31 +51,21 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
 .res-btn{background:var(--accent);border:none;border-radius:10px;padding:12px 0;font-size:16px;color:#fff;font-weight:600;cursor:pointer;width:100%;margin-bottom:8px}
 .res-btn:active{opacity:.8}
 .res-btn.sec{background:var(--border);color:var(--text)}
-
-@media(max-width:420px){
-  .q-main{font-size:22px!important}
-  .opt{font-size:14px;padding:12px 6px}
-}
+@media(max-width:420px){.q-name{font-size:15px!important}.opt{font-size:13px;padding:12px 6px}}
 </style>
 </head>
 <body>
-
 <div id="mapScr" class="active">
-  <h1>物理公式闯关</h1>
-  <p class="sub">看物理量选公式 · 选单位</p>
+  <h1>⚡ 物理闯关</h1>
+  <p class="sub">初中物理知识全覆盖 · 概念原理应用</p>
   <div class="lv-grid" id="lvGrid"></div>
 </div>
-
 <div id="gameScr" class="h">
   <div class="progress-bar"><div class="fill" id="progFill"></div></div>
-  <div class="q-header">
-    <span class="qi" id="qIdx"></span>
-    <span class="timer" id="timer">0s</span>
-  </div>
+  <div class="q-header"><span class="qi" id="qIdx"></span><span class="timer" id="timer">0s</span></div>
   <div id="qArea"></div>
   <div class="opts" id="opts"></div>
 </div>
-
 <div id="resOverlay">
   <div class="res-card">
     <h2 id="resTitle">太棒了！</h2>
@@ -91,69 +76,225 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
     <button class="res-btn sec" id="resMap">返回关卡</button>
   </div>
 </div>
-
 <script>
-// ========== DATA ==========
-const PHYS = [
-  {q:'速度',fmt:'v = s / t',uni:'m/s',field:'力学'},
-  {q:'密度',fmt:'ρ = m / V',uni:'kg/m³',field:'力学'},
-  {q:'压强',fmt:'p = F / S',uni:'Pa',field:'力学'},
-  {q:'液体压强',fmt:'p = ρgh',uni:'Pa',field:'力学'},
-  {q:'浮力（阿基米德）',fmt:'F浮 = ρgV排',uni:'N',field:'力学'},
-  {q:'重力',fmt:'G = mg',uni:'N',field:'力学'},
-  {q:'功',fmt:'W = Fs',uni:'J',field:'力学'},
-  {q:'功率',fmt:'P = W / t',uni:'W',field:'力学'},
-  {q:'机械效率',fmt:'η = W有/W总',uni:'—',field:'力学'},
-  {q:'杠杆平衡',fmt:'F₁L₁ = F₂L₂',uni:'N·m',field:'力学'},
-  {q:'速度（匀速）',fmt:'v = s / t',uni:'m/s',field:'力学'},
-  {q:'质量',fmt:'m = ρV',uni:'kg',field:'力学'},
-  {q:'摩擦力',fmt:'f = μN',uni:'N',field:'力学'},
-  {q:'动能',fmt:'Ek = ½mv²',uni:'J',field:'力学'},
-  {q:'势能',fmt:'Ep = mgh',uni:'J',field:'力学'},
-  {q:'欧姆定律',fmt:'I = U / R',uni:'A',field:'电学'},
-  {q:'电功',fmt:'W = UIt',uni:'J',field:'电学'},
-  {q:'电功率',fmt:'P = UI',uni:'W',field:'电学'},
-  {q:'电阻',fmt:'R = U / I',uni:'Ω',field:'电学'},
-  {q:'焦耳定律',fmt:'Q = I²Rt',uni:'J',field:'电学'},
-  {q:'串联电流',fmt:'I = I₁ = I₂',uni:'A',field:'电学'},
-  {q:'并联电压',fmt:'U = U₁ = U₂',uni:'V',field:'电学'},
-  {q:'比热容',fmt:'Q = cmΔt',uni:'J/(kg·℃)',field:'热学'},
-  {q:'热值',fmt:'Q = qm',uni:'J/kg',field:'热学'},
-  {q:'温度',fmt:'t = T - 273',uni:'℃',field:'热学'},
-  {q:'光速',fmt:'c = 3×10⁸m/s',uni:'m/s',field:'光学'},
-  {q:'折射率',fmt:'n = c / v',uni:'—',field:'光学'},
-  {q:'焦距',fmt:'1/f=1/u+1/v',uni:'m',field:'光学'},
-  {q:'声音速度',fmt:'v = s / t',uni:'m/s',field:'声学'},
-  {q:'频率',fmt:'f = 1 / T',uni:'Hz',field:'声学'},
+// ========== PHYSICS DATA ==========
+// 运动与力
+const P01 = [
+  {q:'正在运动的物体如果不受外力作用，将', a:'做匀速直线运动', w:['慢慢停下来','立即停下来','做加速运动']},
+  {q:'乘客看到路边的树木向后运动，他选的参照物是', a:'自己乘坐的火车', w:['地面','路边的山','树木本身']},
+  {q:'一辆汽车以20m/s的速度匀速行驶，2min通过的路程是', a:'2400m', w:['1200m','40m','240m']},
+  {q:'力的单位是', a:'牛顿', w:['千克','帕斯卡','焦耳']},
+  {q:'关于力的说法正确的是', a:'力不能离开物体而存在', w:['力只能产生在接触的物体之间','一个物体就能产生力','力的作用效果只与大小有关']},
+  {q:'牛顿第一定律的发现所运用的主要方法是', a:'实验加推理', w:['直接实验验证','数学推导','生活经验总结']},
+  {q:'跳远时助跑是利用了', a:'惯性', w:['摩擦力','重力','弹力']},
+  {q:'天花板上的电灯所受重力与哪个力平衡', a:'电线对灯的拉力', w:['灯对电线的拉力','地球对灯的引力','天花板对电线的拉力']},
+  {q:'甲乙速度之比3:2，路程之比2:3，则时间之比为', a:'4:9', w:['1:1','9:4','2:3']},
+  {q:'物体重100N放水平桌面，用30N竖直向上提，物体对桌面压力为', a:'70N', w:['130N','100N','30N']},
 ];
+// 重力弹力摩擦力
+const P02 = [
+  {q:'g=9.8N/kg表示的物理意义是', a:'质量为1kg的物体重9.8N', w:['1kg=9.8N','重力为1N的物体质量9.8kg','物体重力与质量成正比']},
+  {q:'下列哪个不是弹力', a:'重力', w:['拉力','支持力','压力']},
+  {q:'弹簧测力计的原理是', a:'弹簧的伸长量与拉力成正比', w:['弹簧的长度与拉力成正比','弹簧的伸长量与拉力成反比','弹簧的粗细与拉力成正比']},
+  {q:'滑动摩擦力的大小与什么因素有关', a:'压力和接触面粗糙程度', w:['重力和接触面积','速度和接触面积','质量和接触面粗糙程度']},
+  {q:'用水平力推桌子没推动，此时摩擦力', a:'等于推力', w:['大于推力','小于推力','为零']},
+  {q:'下列做法中增大摩擦的是', a:'鞋底刻花纹', w:['给车轮轴承加润滑油','行李箱装轮子','磁悬浮列车悬浮行驶']},
+  {q:'月球上的物体所受重力约为地球的1/6，一个60kg的宇航员到月球上', a:'质量60kg重力约98N', w:['质量10kg重力约98N','质量60kg重力约588N','质量10kg重力约588N']},
+  {q:'重力的方向总是', a:'竖直向下', w:['垂直向下','指向地心','垂直于地面']},
+  {q:'关于重心说法正确的是', a:'形状规则质量均匀的物体重心在几何中心', w:['重心一定在物体上','物体的重心不会改变','只有密度均匀的物体才有重心']},
+  {q:'一物体重50N，用10N的水平推力使其在墙上静止，墙对物体的摩擦力为', a:'50N', w:['10N','40N','60N']},
+];
+// 压强
+const P03 = [
+  {q:'压强的定义式是', a:'p=F/S', w:['p=FS','p=S/F','p=FV']},
+  {q:'书包带做得很宽是为了', a:'减小压强', w:['增大压强','增大压力','减小压力']},
+  {q:'液体压强随深度增加而', a:'增大', w:['减小','不变','先增大后减小']},
+  {q:'液体压强公式p=ρgh中h表示', a:'液体的深度', w:['液柱的高度','容器的深度','液体到容器底的距离']},
+  {q:'连通器的原理是', a:'同种液体静止时液面相平', w:['不同液体液面相平','同种液体液面总相平','液体越多液面越高']},
+  {q:'1标准大气压相当于多高的水银柱产生的压强', a:'760mm', w:['76mm','760cm','76cm']},
+  {q:'用吸管喝饮料是利用了', a:'大气压', w:['液体压强','重力','惯性']},
+  {q:'青藏高原上使用高压锅是因为', a:'气压低沸点低', w:['气压高沸点高','气压低沸点高','气压高沸点低']},
+  {q:'如图，A、B两容器底面积相同，装同种液体深度相同，容器底受压强', a:'pA=pB', w:['pA>pB','pA<pB','无法比较']},
+  {q:'刀刃磨得很薄是为了', a:'增大压强', w:['减小压强','增大压力','减小压力']},
+];
+// 浮力
+const P04 = [
+  {q:'阿基米德原理的内容是', a:'F浮=ρ液gV排', w:['F浮=ρ物gV物','F浮=mg','F浮=ρ液gV物']},
+  {q:'同一艘轮船从河里驶入海里，它受到的浮力', a:'不变', w:['变大','变小','无法确定']},
+  {q:'潜水艇下潜过程中所受浮力', a:'不变', w:['变大','变小','先变大后不变']},
+  {q:'物体浮沉条件是：物体密度大于液体密度时', a:'下沉', w:['上浮','悬浮','漂浮']},
+  {q:'一块木头漂浮在水面上，浸入水中的体积是总体积的3/5，木头密度为', a:'0.6×10³kg/m³', w:['0.4×10³kg/m³','0.5×10³kg/m³','0.7×10³kg/m³']},
+  {q:'铁块沉入水底是因为', a:'铁块密度大于水密度', w:['铁块不受浮力','铁块质量太大','铁块体积太小']},
+  {q:'同一物体浸没在水中和盐水中，哪个浮力大', a:'盐水中', w:['水中','一样大','无法确定']},
+  {q:'潜水艇实现上浮和下潜是通过改变什么来实现的', a:'自身重力', w:['浮力','体积','深度']},
+  {q:'一艘轮船的排水量为10000t，它满载时受到的浮力为', a:'10⁸N', w:['10⁷N','10⁹N','10⁵N']},
+  {q:'热气球在空中受到的浮力大于什么才能上升', a:'重力', w:['压力','升力','拉力']},
+];
+// 简单机械
+const P05 = [
+  {q:'杠杆平衡的条件是', a:'F₁L₁=F₂L₂', w:['F₁=F₂','L₁=L₂','F₁/L₁=F₂/L₂']},
+  {q:'下列物体属于省力杠杆的是', a:'撬棍', w:['钓鱼竿','筷子','镊子']},
+  {q:'定滑轮的本质是', a:'等臂杠杆', w:['省力杠杆','费力杠杆','轮轴']},
+  {q:'动滑轮的实质是', a:'动力臂为阻力臂2倍的杠杆', w:['阻力臂为动力臂2倍','等臂杠杆','省距离杠杆']},
+  {q:'用定滑轮提起重物，拉力与物重的关系是', a:'F=G', w:['F=G/2','F=2G','F<G']},
+  {q:'使用滑轮组提升重物时，有几段绳子承担物重，拉力就是物重的', a:'几分之一', w:['几倍','三分之一','二分之一']},
+  {q:'斜面是一种简单机械，它的优点是', a:'省力', w:['省距离','省功','既省力又省距离']},
+  {q:'下列工具中属于费力杠杆的是', a:'镊子', w:['起子','老虎钳','扳手']},
+  {q:'轮轴是一种省力机械，以下属于轮轴的是', a:'方向盘', w:['筷子','剪刀','镊子']},
+  {q:'使用简单机械时，下列说法正确的是', a:'可以省力但不能省功', w:['可以省功','可以同时省力和省距离','省力一定费距离']},
+];
+// 功和能
+const P06 = [
+  {q:'功的计算公式是', a:'W=Fs', w:['W=Fs/t','W=F/s','W=Fv']},
+  {q:'功率的物理意义是表示', a:'做功的快慢', w:['做功的多少','力的大小','能量的大小']},
+  {q:'功率的单位是', a:'瓦特', w:['焦耳','牛顿','帕斯卡']},
+  {q:'机械效率是指', a:'有用功与总功的比值', w:['总功与有用功的比值','有用功与额外功的比值','额外功与总功的比值']},
+  {q:'动能的大小与哪些因素有关', a:'质量和速度', w:['质量和高度','速度和高度','质量和形状']},
+  {q:'重力势能的大小与哪些因素有关', a:'质量和高度', w:['质量和速度','速度和高度','质量和体积']},
+  {q:'跳伞运动员在空中匀速下落时，机械能', a:'减小', w:['增大','不变','先增后减']},
+  {q:'下列过程中机械能守恒的是', a:'自由落体', w:['跳伞匀速下落','汽车刹车','滚摆上升过程']},
+  {q:'用20N的力将重30N的物体沿水平面推动5m，做功为', a:'100J', w:['150J','250J','50J']},
+  {q:'功率为1kW的机器工作1h做的功是', a:'3.6×10⁶J', w:['1000J','3600J','10⁶J']},
+];
+// 声现象
+const P07 = [
+  {q:'声音是由物体的什么产生的', a:'振动', w:['运动','碰撞','摩擦']},
+  {q:'声音在哪种介质中传播最快', a:'固体', w:['液体','气体','真空']},
+  {q:'声音不能在什么中传播', a:'真空', w:['固体','液体','气体']},
+  {q:'音调的高低由什么决定', a:'频率', w:['振幅','响度','音色']},
+  {q:'响度的大小由什么决定', a:'振幅', w:['频率','音调','音色']},
+  {q:'区分不同乐器发出的声音依靠的是', a:'音色', w:['音调','响度','频率']},
+  {q:'人耳能听到的声音频率范围是', a:'20Hz~20000Hz', w:['2Hz~2000Hz','200Hz~20000Hz','20Hz~2000Hz']},
+  {q:'在公路上设立"禁止鸣笛"标志是在什么处控制噪声', a:'声源处', w:['传播过程中','人耳处','接收处']},
+  {q:'回声到达人耳比原声晚多少以上人耳才能区分', a:'0.1s', w:['0.01s','1s','0.05s']},
+  {q:'将耳朵贴在长铁管一端，在另一端敲一下，能听到几次声音', a:'两次', w:['一次','三次','四次']},
+];
+// 光现象
+const P08 = [
+  {q:'光在均匀介质中沿什么传播', a:'直线', w:['曲线','折线','弧线']},
+  {q:'光的反射定律中，反射角与入射角的关系是', a:'反射角等于入射角', w:['反射角大于入射角','反射角小于入射角','反射角与入射角互补']},
+  {q:'镜面反射和漫反射都遵循', a:'光的反射定律', w:['不同规律','折射定律','各自规律']},
+  {q:'人站在平面镜前2m处，镜中的像距人', a:'4m', w:['2m','1m','3m']},
+  {q:'平面镜所成的像是', a:'虚像', w:['实像','倒立的像','放大的像']},
+  {q:'光从空气斜射入水中时，折射角与入射角的关系是', a:'折射角小于入射角', w:['折射角大于入射角','折射角等于入射角','不一定']},
+  {q:'海市蜃楼现象属于光的', a:'折射', w:['反射','直线传播','色散']},
+  {q:'太阳光经过三棱镜分解成七种色光，这叫光的', a:'色散', w:['反射','折射','散射']},
+  {q:'红外线的应用不包括', a:'消毒杀菌', w:['遥控器','红外线夜视仪','自动感应门']},
+  {q:'紫外线的应用是', a:'消毒杀菌', w:['遥控器','加热','照明']},
+];
+// 透镜成像
+const P09 = [
+  {q:'凸透镜对光线的作用是', a:'会聚作用', w:['发散作用','无作用','反射作用']},
+  {q:'凹透镜对光线的作用是', a:'发散作用', w:['会聚作用','无作用','折射作用']},
+  {q:'物体在凸透镜二倍焦距以外时成像的特点是', a:'倒立缩小的实像', w:['倒立放大的实像','正立放大的虚像','正立缩小的实像']},
+  {q:'投影仪利用凸透镜成什么像', a:'倒立放大的实像', w:['正立放大的虚像','倒立缩小的实像','正立缩小的实像']},
+  {q:'放大镜利用凸透镜成什么像', a:'正立放大的虚像', w:['倒立放大的实像','正立缩小的实像','倒立缩小的实像']},
+  {q:'近视眼的成因及矫正方法是', a:'晶状体曲度过大配凹透镜', w:['晶状体曲度过小配凹透镜','晶状体曲度过大配凸透镜','晶状体曲度过小配凸透镜']},
+  {q:'远视眼应配戴什么透镜矫正', a:'凸透镜', w:['凹透镜','平面镜','三棱镜']},
+  {q:'照相机成像时，物体位于', a:'二倍焦距以外', w:['一倍焦距以内','一倍和二倍焦距之间','焦点上']},
+  {q:'物体从远处靠近凸透镜时，像的变化是', a:'逐渐变大', w:['逐渐变小','先变大后变小','不变']},
+  {q:'凸透镜成实像时，像与物在透镜的', a:'两侧', w:['同侧','不一定','同一位置']},
+];
+// 电路基础
+const P10 = [
+  {q:'电路的三种状态不包括', a:'通路', w:['短路','断路','开路']},
+  {q:'串联电路中电流的特点是', a:'各处电流相等', w:['电流逐级减小','电流逐级增大','干路电流等于支路电流之和']},
+  {q:'并联电路中电压的特点是', a:'各支路电压相等', w:['各支路电压之和等于总电压','电压逐级减小','靠近电源的支路电压大']},
+  {q:'电流表应该怎样接入电路', a:'串联', w:['并联','混联','与用电器并联']},
+  {q:'电压表应该怎样接入电路', a:'并联', w:['串联','与用电器串联','接在电源两端']},
+  {q:'导体容易导电是因为导体内有大量的', a:'自由电荷', w:['正电荷','负电荷','电子']},
+  {q:'绝缘体不容易导电的原因是', a:'几乎没有自由电荷', w:['没有电荷','电荷被束缚不能自由移动','电荷数量太少']},
+  {q:'家庭电路中各用电器之间的连接方式是', a:'并联', w:['串联','混联','视情况而定']},
+  {q:'三孔插座中接地的孔与什么相连', a:'大地', w:['零线','火线','用电器外壳']},
+  {q:'手电筒中两节干电池的连接方式是', a:'串联', w:['并联','混联','反接']},
+];
+// 欧姆定律
+const P11 = [
+  {q:'欧姆定律的表达式是', a:'I=U/R', w:['R=UI','U=I/R','I=UR']},
+  {q:'导体的电阻由什么决定', a:'材料长度横截面积和温度', w:['电压和电流','电流和电压','电源和导线']},
+  {q:'一段导体两端电压为4V时电流为0.2A，电阻为', a:'20Ω', w:['0.8Ω','5Ω','40Ω']},
+  {q:'串联电路中总电阻的特点是', a:'总电阻等于各电阻之和', w:['总电阻等于各电阻倒数之和','总电阻比任何一个都小','总电阻等于各电阻之积']},
+  {q:'并联电路中总电阻的特点是', a:'总电阻比任何一个分电阻都小', w:['总电阻等于各电阻之和','总电阻比任何一个都大','总电阻等于各电阻平均值']},
+  {q:'两个10Ω的电阻串联后的总电阻为', a:'20Ω', w:['5Ω','10Ω','100Ω']},
+  {q:'两个10Ω的电阻并联后的总电阻为', a:'5Ω', w:['10Ω','20Ω','100Ω']},
+  {q:'当某段导体两端电压增大2倍时，通过它的电流', a:'增大2倍', w:['减小2倍','不变','增大4倍']},
+  {q:'滑动变阻器改变电阻的原理是', a:'改变接入电路中的电阻丝长度', w:['改变电阻丝的材料','改变电阻丝的粗细','改变电阻丝的温度']},
+  {q:'在串联电路中，各电阻两端电压之比等于', a:'电阻之比', w:['电流之比','功率之比','反比']},
+];
+// 电功率
+const P12 = [
+  {q:'电功率的公式是', a:'P=UI', w:['P=U/I','P=I²R','P=U/R']},
+  {q:'电功的公式是', a:'W=UIt', w:['W=UIt²','W=Pt','W=IRt']},
+  {q:'额定电压下用电器的功率叫', a:'额定功率', w:['实际功率','最大功率','最小功率']},
+  {q:'标有"220V 100W"的灯泡正常工作时电流约为', a:'0.45A', w:['2.2A','0.22A','0.1A']},
+  {q:'焦耳定律Q=I²Rt中，电流通过导体产生的热量与什么成正比', a:'电流的平方', w:['电流','电压','电阻的平方']},
+  {q:'电功率为1000W的电器工作1h消耗的电能为', a:'1kWh', w:['1000kWh','0.1kWh','10kWh']},
+  {q:'家庭电路中，下列操作正确的是', a:'不接触低压带电体不靠近高压带电体', w:['用湿手拔插头','在电线上晾衣服','用铜丝代替保险丝']},
+  {q:'造成家庭电路电流过大的原因不包括', a:'电路断路', w:['短路','总功率过大','同时使用多个大功率电器']},
+  {q:'用电器的电阻不变，电压减半时其功率变为原来的', a:'1/4', w:['1/2','1倍','2倍']},
+  {q:'电饭锅工作时将电能转化为', a:'内能', w:['机械能','光能','化学能']},
+];
+// 热学
+const P13 = [
+  {q:'温度是表示物体什么的物理量', a:'冷热程度', w:['热量多少','内能大小','热运动快慢']},
+  {q:'液体温度计的原理是', a:'液体的热胀冷缩', w:['固体的热胀冷缩','气体的热胀冷缩','液体的蒸发吸热']},
+  {q:'晶体熔化的特点', a:'温度保持不变但要继续吸热', w:['温度不断升高','温度保持不变但不吸热','温度先升高后不变']},
+  {q:'下列属于熔化现象的是', a:'冰化成水', w:['水变成水蒸气','水蒸气变成霜','湿衣服晾干']},
+  {q:'使气体液化的两种途径是', a:'降温和压缩体积', w:['升温和膨胀','降温和膨胀','升温和压缩体积']},
+  {q:'内能是指物体内部什么的总和', a:'所有分子热运动的动能和分子势能', w:['所有分子热运动的动能','分子势能','热量']},
+  {q:'改变物体内能的两种方式是', a:'做功和热传递', w:['做功和加热','热传递和摩擦','加热和冷却']},
+  {q:'比热容的单位是', a:'J/(kg·℃)', w:['J/kg','J/℃','J/(kg)']},
+  {q:'水的比热容较大，下列不是利用这一特性的是', a:'用水冷却发动机', w:['北方用暖气用水供暖','沙漠地区昼夜温差大','沿海地区昼夜温差小']},
+  {q:'热机是将什么能转化为机械能的机器', a:'内能', w:['化学能','电能','光能']},
+];
+// 磁与电磁
+const P14 = [
+  {q:'磁体的两个磁极是', a:'南极和北极', w:['正极和负极','东极和西极','上和下']},
+  {q:'磁极间的相互作用规律是', a:'同名相斥异名相吸', w:['同名相吸异名相斥','只有相吸','只有相斥']},
+  {q:'地球的磁场中，指南针的N极指向地理的', a:'北极附近', w:['南极附近','正北方','正南方']},
+  {q:'通电导体周围存在磁场是谁发现的', a:'奥斯特', w:['法拉第','牛顿','安培']},
+  {q:'电磁铁磁性强弱与什么因素有关', a:'电流大小和线圈匝数', w:['电流方向和线圈长度','电压和电流','电流方向和线圈匝数']},
+  {q:'电磁感应现象是谁发现的', a:'法拉第', w:['奥斯特','安培','伏特']},
+  {q:'发电机工作时将什么能转化为电能', a:'机械能', w:['内能','化学能','光能']},
+  {q:'电动机的工作原理是', a:'通电导体在磁场中受力', w:['电磁感应','电流的热效应','磁极相互作用']},
+  {q:'电铃内主要的工作元件是', a:'电磁铁', w:['电动机','发电机','变压器']},
+  {q:'要增强电磁铁的磁性，可以', a:'增大电流', w:['减少线圈匝数','改变电流方向','去掉铁芯']},
+];
+// 综合大挑战 - using all pools
+const ALL_PHYS_FLAT = (()=>{
+  let all=[]; let sets=[P01,P02,P03,P04,P05,P06,P07,P08,P09,P10,P11,P12,P13,P14];
+  sets.forEach((d,i)=>{d.forEach(q=>{all.push({...q,src:i})})});
+  return all;
+})();
 
-const FIELDS = ['力学','电学','热学','光学','声学'];
-
+// ========== LEVELS ==========
 const LV = [
-  {l:'力学公式',desc:'速度·密度·压强等',data:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],mode:'f',qs:8,sec:12},
-  {l:'电学公式',desc:'欧姆·电功·电功率等',data:[15,16,17,18,19,20,21],mode:'f',qs:7,sec:12},
-  {l:'热·光·声',desc:'热值·光速·频率等',data:[22,23,24,25,26,27,28,29],mode:'f',qs:8,sec:12},
-  {l:'力学单位',desc:'物理量→单位',data:[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14],mode:'u',qs:8,sec:12},
-  {l:'电学单位',desc:'物理量→单位',data:[15,16,17,18,19,20,21],mode:'u',qs:7,sec:12},
-  {l:'热光声单位',desc:'物理量→单位',data:[22,23,24,25,26,27,28,29],mode:'u',qs:8,sec:12},
-  {l:'混合公式',desc:'力热电光声混合',data:PHYS.map((_,i)=>i),mode:'f',qs:10,sec:14},
-  {l:'综合大挑战',desc:'公式+单位混合',data:PHYS.map((_,i)=>i),mode:'mix',qs:10,sec:14}
+  {l:'运动与力',desc:'参照物·速度·惯性·二力平衡',data:P01,mode:'phy',qs:8,sec:15},
+  {l:'重力弹力摩擦力',desc:'重力·弹力·摩擦力的分析',data:P02,mode:'phy',qs:8,sec:15},
+  {l:'压强',desc:'固体液体大气压',data:P03,mode:'phy',qs:8,sec:15},
+  {l:'浮力',desc:'阿基米德·浮沉条件',data:P04,mode:'phy',qs:8,sec:15},
+  {l:'简单机械',desc:'杠杆·滑轮·斜面',data:P05,mode:'phy',qs:8,sec:15},
+  {l:'功和能',desc:'功·功率·机械能',data:P06,mode:'phy',qs:8,sec:15},
+  {l:'声现象',desc:'声音的产生传播·噪声',data:P07,mode:'phy',qs:8,sec:12},
+  {l:'光现象',desc:'反射·折射·色散',data:P08,mode:'phy',qs:8,sec:14},
+  {l:'透镜成像',desc:'凸透镜·成像规律·眼睛',data:P09,mode:'phy',qs:8,sec:15},
+  {l:'电路基础',desc:'串并联·电流电压·安全用电',data:P10,mode:'phy',qs:8,sec:14},
+  {l:'欧姆定律',desc:'电阻·欧姆定律·串并联计算',data:P11,mode:'phy',qs:8,sec:16},
+  {l:'电功率',desc:'电功电热·额定功率·家庭电路',data:P12,mode:'phy',qs:8,sec:16},
+  {l:'热学',desc:'物态变化·内能·比热容·热机',data:P13,mode:'phy',qs:8,sec:14},
+  {l:'磁与电磁',desc:'磁现象·电磁感应·电动机',data:P14,mode:'phy',qs:8,sec:14},
+  {l:'综合大挑战',desc:'全部题库混合挑战',data:[],mode:'mix',qs:12,sec:16},
 ];
 
 // ========== GAME STATE ==========
-let G = {lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
-
-// ========== SAVE ==========
-function save(){localStorage.setItem('phys_lv',JSON.stringify(G.stars||[]))}
-function load(){G.stars=JSON.parse(localStorage.getItem('phys_lv')||'[]')}
-
+let G={lv:0,qi:0,qs:0,ok:0,total:0,tm:0,tmMax:0,questions:[],timer:null,locked:false};
+function save(){localStorage.setItem('phy_lv2',JSON.stringify(G.stars||[]))}
+function load(){G.stars=JSON.parse(localStorage.getItem('phy_lv2')||'[]')}
 function $(id){return document.getElementById(id)}
 function rand(a,b){return a+Math.floor(Math.random()*(b-a+1))}
 function shuffle(a){for(let i=a.length-1;i>0;i--){let j=rand(0,i);[a[i],a[j]]=[a[j],a[i]]}return a}
 function hideAll(){document.querySelectorAll('#mapScr,#gameScr').forEach(e=>e.classList.remove('active'))}
 function showScr(id){hideAll();$(id).classList.add('active')}
-
-// ========== AUDIO ==========
 let actx=null;
 function initAudio(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)||new AudioContext}
 function tone(f,v,d,t){try{if(!actx)return;var o=actx.createOscillator(),g=actx.createGain();o.type=t||'sine';o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);g.gain.exponentialRampToValueAtTime(.001,actx.currentTime+d);o.connect(g);g.connect(actx.destination);o.start();o.stop(actx.currentTime+d)}catch(e){}}
@@ -161,85 +302,39 @@ function sfxOk(){tone(523,.15,.12);setTimeout(()=>tone(659,.15,.12),80)}
 function sfxBad(){tone(300,.2,.2,'sawtooth')}
 function sfxPass(){tone(523,.15,.1);setTimeout(()=>tone(659,.15,.1),100);setTimeout(()=>tone(784,.15,.15),200)}
 function sfxDrop(){tone(880,.15,.08);setTimeout(()=>tone(660,.12,.08),60);setTimeout(()=>tone(440,.1,.12),120)}
-
-// ========== MAP ==========
 function buildMap(){
-  load();
-  let g=$('lvGrid'),h='';
+  load(); let g=$('lvGrid'),h='';
   for(let i=0;i<LV.length;i++){
     let l=LV[i],s=G.stars[i]||0,txt='lv-card';
     if(i>0&&!(G.stars[i-1]&&G.stars[i-1]>=1))txt+=' locked';
     if(s>=1)txt+=' done';
-    h+=`<div class="${txt}" data-i="${i}">
-      <div class="num">${i+1}</div>
-      <div class="name">${l.l}</div>
-      <div class="desc">${l.desc}</div>
-      <div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div>
-    </div>`;
+    h+=`<div class="${txt}" data-i="${i}"><div class="num">${i+1}</div><div class="name">${l.l}</div><div class="desc">${l.desc}</div><div class="stars">${'★'.repeat(Math.min(s||0,3))}${'☆'.repeat(3-Math.min(s||0,3))}</div></div>`;
   }
   g.innerHTML=h;
   g.querySelectorAll('.lv-card:not(.locked)').forEach(c=>c.onclick=()=>startLv(+c.dataset.i));
 }
 function startLv(i){
-  initAudio();
-  G.lv=i;G.qi=0;G.ok=0;
-  let l=LV[i];
-  G.qs=Math.min(l.qs||8,l.data.length);
+  initAudio(); G.lv=i; G.qi=0; G.ok=0;
+  let l=LV[i]; let questions=[];
+  if(l.mode==='phy') questions=shuffle([...l.data]).slice(0,l.qs);
+  else if(l.mode==='mix') questions=shuffle([...ALL_PHYS_FLAT]).slice(0,l.qs);
+  G.questions=questions; G.total=questions.length;
   G.tmMax=(l.sec||12)*1000;
-  let pool=shuffle([...l.data]),qs=[];
-  for(let j=0;j<G.qs;j++)qs.push(pool[j]);
-  G.questions=qs;G.total=qs.length;
-  showScr('gameScr');
-  showQ();
+  showScr('gameScr'); showQ();
 }
-
-// ========== QUESTION ==========
 function showQ(){
   if(G.qi>=G.total){endLv();return}
-  initAudio();
-  let l=LV[G.lv],idx=G.questions[G.qi],p=PHYS[idx];
-  let mode=l.mode;
-  if(mode==='mix')mode=Math.random()<.5?'f':'u';
-
+  let q=G.questions[G.qi];
   $('qIdx').textContent=`第${G.qi+1}/${G.total}题`;
   $('progFill').style.width=((G.qi)/G.total*100)+'%';
-
-  let correct,label,qLabel;
-  if(mode==='f'){
-    label=p.fmt;
-    correct=label;
-    qLabel='公式';
-  } else {
-    label=p.uni;
-    correct=label;
-    qLabel='单位';
-  }
-
-  $('qArea').innerHTML=`<div class="q-prompt">
-    <div class="q-label">${qLabel} · ${p.field}</div>
-    <div class="q-main">${p.q}</div>
-    <div class="q-field">${p.field}</div>
-  </div>`;
-
-  // build distractors
-  let pool;
-  if(mode==='f'){
-    pool=PHYS.map(e=>e.fmt).filter(x=>x!==correct);
-  } else {
-    pool=PHYS.map(e=>e.uni).filter(x=>x!==correct && x!=='—');
-  }
-  // add extra unique distractor pool
-  pool=shuffle([...new Set(pool)]).slice(0,3);
-  let all=shuffle([correct,...pool]);
-  let h='';
+  $('qArea').innerHTML=`<div class="q-prompt"><div class="q-name">${q.q}</div></div>`;
+  let all=shuffle([q.a,...q.w]); let h='';
   for(let o of all)h+=`<div class="opt" data-v="${o}">${o}</div>`;
   $('opts').innerHTML=h;
-
   G.locked=false;
-  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,correct)});
+  $('opts').querySelectorAll('.opt').forEach(b=>{b.onclick=()=>chk(b,q.a)});
   startTimer();
 }
-
 function chk(btn,correct){
   if(G.locked)return;
   initAudio();G.locked=true;clearTimeout(G.timer);
@@ -248,11 +343,8 @@ function chk(btn,correct){
   $('opts').querySelectorAll('.opt').forEach(b=>{b.classList.add('disabled');if(b.dataset.v===correct)b.classList.add('correct');if(b.dataset.v===val&&!isOk)b.classList.add('wrong')});
   setTimeout(()=>{G.qi++;showQ()},600);
 }
-
 function startTimer(){
-  clearTimeout(G.timer);
-  let tEl=$('timer');
-  G.tm=G.tmMax;
+  clearTimeout(G.timer);let tEl=$('timer');G.tm=G.tmMax;
   function tick(){
     let left=Math.max(0,Math.ceil(G.tm/1000));
     tEl.textContent=left+'s';tEl.classList.toggle('warn',left<=3);
@@ -261,14 +353,12 @@ function startTimer(){
   }
   tick();
 }
-
 function endLv(){
   clearTimeout(G.timer);
   let total=G.total,pct=G.ok/total,stars=pct>=.88?3:pct>=.63?2:pct>=.38?1:0;
   if(!G.stars)G.stars=[];
   let old=G.stars[G.lv]||0;
-  if(stars>old)G.stars[G.lv]=stars;
-  save();
+  if(stars>old)G.stars[G.lv]=stars; save();
   showScr('mapScr');
   $('resTitle').textContent=stars>=3?'🌟 完美通关！':stars>=2?'👏 表现不错！':stars>=1?'💪 继续加油！':'😅 再试一次吧';
   $('resStars').textContent='★'.repeat(stars)+'☆'.repeat(3-stars);
@@ -279,8 +369,6 @@ function endLv(){
   $('resMap').onclick=()=>{buildMap();$('resOverlay').classList.remove('active')};
   setTimeout(()=>{$('resOverlay').classList.add('active')},100);
 }
-
-// ========== INIT ==========
 buildMap();
 document.addEventListener('touchend',function(e){var now=Date.now();if(now-(document.lastTouch||0)<300)e.preventDefault();document.lastTouch=now});
 </script>
