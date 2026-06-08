@@ -7,40 +7,156 @@
 <script src="js/points.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f3ee;color:#333;min-height:100dvh;padding:20px}
-.header{text-align:center;margin-bottom:20px}
-.header h1{font-size:22px;color:#b8860b}
-.header .pts{font-size:36px;font-weight:700;color:#d35400;margin:6px 0}
-.header .pts-label{font-size:13px;color:#999}
-.shop{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:420px;margin:0 auto}
-.card{background:#fff;border-radius:12px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,.06);text-align:center}
-.card .icon{font-size:28px;margin-bottom:4px}
-.card h3{font-size:14px;font-weight:600;margin:4px 0 2px}
-.card .desc{font-size:11px;color:#999;margin-bottom:6px}
-.card .cost{font-size:13px;color:#d35400;font-weight:600}
-.card .btn{display:block;margin-top:8px;padding:8px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;width:100%}
+body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;background:#f5f3ee;color:#333;min-height:100dvh}
+
+/* ====== Hero ====== */
+.hero{background:linear-gradient(135deg,#1a1a2e,#16213e);color:#fff;padding:24px 16px 20px;text-align:center}
+.hero h1{font-size:24px;font-weight:800;letter-spacing:1px}
+.hero h1 span{color:#b8860b}
+.hero .pts{font-size:40px;font-weight:900;color:#ffd700;margin:4px 0 2px}
+.hero .pts-label{font-size:13px;color:rgba(255,255,255,.5);margin-bottom:12px}
+.hero .status-row{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-size:12px;color:rgba(255,255,255,.6)}
+.hero .status-row .item{display:flex;align-items:center;gap:4px}
+.hero .status-row .val{color:#fff;font-weight:600}
+
+/* ====== Hero 内签到条 ====== */
+.sign-bar{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;margin:10px auto 0;max-width:400px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sign-bar .l{display:flex;align-items:center;gap:8px;font-size:13px}
+.sign-bar .l .streak{font-weight:700;color:#ffd700}
+.sign-bar .dots{display:flex;gap:3px}
+.sign-bar .dot{width:16px;height:16px;border-radius:50%;background:rgba(255,255,255,.15);font-size:7px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.3);transition:all .3s}
+.sign-bar .dot.on{background:#b8860b;color:#fff}
+.sign-bar .dot.today{box-shadow:0 0 0 1.5px #ffd700}
+.sign-bar .btn{flex-shrink:0;padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.sign-bar .btn:active{opacity:.7}
+.sign-bar .btn-gold{background:#b8860b;color:#fff}
+.sign-bar .btn-gray{background:rgba(255,255,255,.15);color:rgba(255,255,255,.5);cursor:default}
+
+/* ====== Hero 内分享条 ====== */
+.share-bar{background:rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;margin:8px auto 0;max-width:400px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.share-bar .l{display:flex;align-items:center;gap:8px;font-size:13px}
+.share-bar .btn{flex-shrink:0;padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.share-bar .btn:active{opacity:.7}
+.share-bar .btn-gold{background:#b8860b;color:#fff}
+.share-bar .btn-gray{background:rgba(255,255,255,.15);color:rgba(255,255,255,.5);cursor:default}
+
+/* ====== Share Overlay ====== */
+#shareOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px}
+#shareOverlay.active{display:flex}
+.share-modal{background:#fff;border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.15)}
+.share-modal .share-icon{font-size:32px;margin-bottom:8px}
+.share-modal h3{font-size:17px;margin-bottom:4px}
+.share-modal .share-desc{font-size:13px;color:#999;margin-bottom:12px}
+.share-modal .share-msg-box{background:#f5f3ee;border-radius:8px;padding:12px;margin-bottom:10px;text-align:left;font-size:13px;line-height:1.6;color:#555;word-break:break-all}
+.share-modal .share-msg-box p{margin:0}
+.share-modal .copy-btn{display:block;width:100%;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:#b8860b;color:#fff;transition:opacity .15s;margin-bottom:4px}
+.share-modal .copy-btn:active{opacity:.7}
+.share-modal .copy-btn.copied{background:#27ae60}
+.share-modal .copy-hint{font-size:12px;color:#999;margin-bottom:8px;min-height:18px}
+.share-modal .shared-btn{display:block;width:100%;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:#1a1a2e;color:#fff;transition:all .15s}
+.share-modal .shared-btn:disabled{background:#e0e0e0;color:#aaa;cursor:default}
+
+/* ====== 分类 Tab ====== */
+.tab-wrap{background:#fff;position:sticky;top:0;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.tabs{display:flex;gap:0;overflow-x:auto;padding:0 8px;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:12px 14px;font-size:13px;color:#999;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab.active{color:#b8860b;border-color:#b8860b;font-weight:600}
+.tab:active{opacity:.6}
+
+/* ====== 商品网格 ====== */
+.main{max-width:520px;margin:0 auto;padding:12px 12px 80px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid.cols-1{grid-template-columns:1fr}
+.card{background:#fff;border-radius:12px;padding:14px 12px 12px;box-shadow:0 2px 12px rgba(0,0,0,.06);position:relative;transition:box-shadow .2s}
+.card:active{box-shadow:0 2px 6px rgba(0,0,0,.04)}
+.card .icon{font-size:30px;margin-bottom:4px;display:block}
+.card .tag{position:absolute;top:8px;right:8px;font-size:10px;padding:2px 6px;border-radius:4px;font-weight:700}
+.card .tag.hot{background:#fff1f0;color:#e74c3c}
+.card .tag.new{background:#f0f5ff;color:#2980b9}
+.card h3{font-size:14px;font-weight:600;margin-bottom:2px;padding-right:32px}
+.card .desc{font-size:11px;color:#999;margin-bottom:6px;line-height:1.3}
+.card .price{font-size:16px;font-weight:800;color:#d35400}
+.card .price small{font-size:11px;font-weight:400;color:#999}
+.card .btn{display:block;margin-top:8px;padding:8px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;width:100%;text-align:center;transition:opacity .15s}
+.card .btn:active{opacity:.7}
 .card .btn.ok{background:#b8860b;color:#fff}
-.card .btn.ok:active{opacity:.8}
-.card .btn.dis{background:#ddd;color:#999;cursor:default}
+.card .btn.dis{background:#f0f0f0;color:#bbb;cursor:default}
+
+/* ====== 空状态 ====== */
+.empty{text-align:center;padding:40px 20px;color:#ccc;font-size:14px;grid-column:1/-1}
+
+/* ====== Modal ====== */
 #sec2{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:20px}
 #sec2.show{display:flex}
 .modal{background:#fff;border-radius:16px;padding:24px;max-width:340px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.15)}
 .modal h2{font-size:18px;margin-bottom:8px}
 .modal .code{font-size:13px;background:#f5f3ee;padding:12px;border-radius:8px;word-break:break-all;margin:12px 0;font-family:monospace;color:#333;user-select:all}
 .modal .tip{font-size:12px;color:#999;margin-bottom:12px}
-.modal .btn{display:block;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-bottom:6px}
+.modal .btn{display:block;padding:10px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;margin-bottom:6px;transition:opacity .15s}
+.modal .btn:active{opacity:.7}
 .modal .btn.pri{background:#b8860b;color:#fff}
 .modal .btn.sec{background:#eee;color:#666}
-@media(max-width:420px){.shop{grid-template-columns:1fr}}
+
+/* ====== Toast ====== */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.75);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+
+/* ====== Footer ====== */
+.footer{text-align:center;padding:20px;font-size:12px;color:#999;line-height:1.6}
 </style>
 </head>
 <body>
-<div class="header">
-  <h1>🎁 积分商城</h1>
+
+<!-- ====== Hero ====== -->
+<div class="hero">
+  <h1>🎁 <span>思贤</span>积分商城</h1>
   <div class="pts" id="ptsDisplay">0</div>
   <div class="pts-label">当前可用积分</div>
+  <div class="status-row">
+    <span class="item">🔄 重玩 <span class="val" id="replayNum">3</span>/3</span>
+    <span class="item">⚡ 双倍 <span class="val" id="doubleNum">0</span>次</span>
+  </div>
+  <div class="sign-bar" id="signBar">
+    <div class="l">
+      <span>📅</span>
+      <span>连续 <span class="streak" id="signStreak">0</span> 天</span>
+      <span class="dots" id="signDots"></span>
+    </div>
+    <button class="btn btn-gold" id="signBtn">签到</button>
+  </div>
+  <div class="share-bar" id="shareBar">
+    <div class="l">
+      <span>📢</span>
+      <span>每日分享</span>
+      <span style="font-size:12px;color:rgba(255,255,255,.5)">推广思贤得 <b style="color:#ffd700">+2</b> 积分</span>
+    </div>
+    <button class="btn btn-gold" id="shareBtn">分享推广</button>
+  </div>
 </div>
-<div class="shop" id="shopList"></div>
+
+<!-- ====== 分类 ====== -->
+<div class="tab-wrap">
+  <div class="tabs" id="tabs">
+    <div class="tab active" data-cat="all">🎯 全部</div>
+    <div class="tab" data-cat="study">🎒 学习用品</div>
+    <div class="tab" data-cat="tutor">👨‍🏫 答疑辅导</div>
+    <div class="tab" data-cat="privilege">👑 特权福利</div>
+    <div class="tab" data-cat="food">🍪 零食特产</div>
+  </div>
+</div>
+
+<!-- ====== 商品 ====== -->
+<div class="main">
+  <div class="grid" id="shopGrid"></div>
+</div>
+
+<!-- ====== Footer ====== -->
+<div class="footer">
+  思贤学习站 · 济南市商河县 · 155-6412-8008
+</div>
+
+<!-- ====== Modal ====== -->
 <div id="sec2">
   <div class="modal">
     <h2 id="modalTitle">兑换成功！</h2>
@@ -51,34 +167,189 @@ body{font-family:-apple-system,"Microsoft YaHei","PingFang SC",sans-serif;backgr
     <button class="btn sec" onclick="closeModal()">完成</button>
   </div>
 </div>
+
+<!-- ====== Share Overlay ====== -->
+<div id="shareOverlay">
+  <div class="share-modal">
+    <div class="share-icon">📢</div>
+    <h3>分享给好友，赚取积分</h3>
+    <p class="share-desc">每天分享一次得 2 积分，让更多同学一起进步</p>
+    <div class="share-msg-box"><p id="shareText"></p></div>
+    <button class="copy-btn" id="shareCopyBtn">📋 复制分享文案</button>
+    <p class="copy-hint" id="shareCopyHint">复制后粘贴发送给微信好友或发到朋友圈</p>
+    <button class="shared-btn" id="shareDoneBtn" disabled>我已分享，领取 2 积分 →</button>
+  </div>
+</div>
+
+<!-- ====== Toast ====== -->
+<div class="toast" id="toast"></div>
+
 <script>
-var ITEMS=window.PointsSystem?PointsSystem.shop:[];
+var ALL=window.PointsSystem?PointsSystem.shop:[];
+var CAT='all';
+
+// ====== 分类名 ======
+var CAT_NAMES={all:'全部',study:'学习用品',tutor:'答疑辅导',privilege:'特权福利',food:'零食特产'};
+
 function refresh(){
   if(!window.PointsSystem)return;
+  document.getElementById('ptsDisplay').textContent=PointsSystem.get();
+  var n=PointsSystem.replayLeft();
+  document.getElementById('replayNum').textContent=n;
+  document.getElementById('doubleNum').textContent=PointsSystem.doubleLeft();
+  renderSign();
+  renderShare();
+  renderGrid();
+}
+function renderGrid(){
   var pts=PointsSystem.get();
-  document.getElementById('ptsDisplay').textContent=pts;
+  var items=CAT==='all'?ALL:ALL.filter(function(x){return x.cat===CAT});
   var h='';
-  ITEMS.forEach(function(it){
+  items.forEach(function(it){
     var en=pts>=it.cost;
-    h+='<div class="card"><div class="icon">'+it.icon+'</div><h3>'+it.name+'</h3><div class="desc">'+it.desc+'</div><div class="cost">'+it.cost+' 积分</div><button class="btn '+(en?'ok':'dis')+'" data-id="'+it.id+'" data-cost="'+it.cost+'"'+(en?'':' disabled')+'>'+(en?'兑换':'积分不足')+'</button></div>';
+    var tagHtml='';
+    if(it.tag==='hot')tagHtml='<span class="tag hot">🔥 热门</span>';
+    else if(it.tag==='new')tagHtml='<span class="tag new">🆕 上新</span>';
+    h+='<div class="card">'+tagHtml+'<span class="icon">'+it.icon+'</span><h3>'+it.name+'</h3><div class="desc">'+it.desc+'</div><div class="price">'+it.cost+' <small>积分</small></div><button class="btn '+(en?'ok':'dis')+'" data-id="'+it.id+'" data-cost="'+it.cost+'"'+(en?'':' disabled')+'>'+(en?'立即兑换':'积分不足')+'</button></div>';
   });
-  document.getElementById('shopList').innerHTML=h;
+  if(!items.length)h='<div class="empty">该分类暂无商品</div>';
+  document.getElementById('shopGrid').innerHTML=h;
   document.querySelectorAll('.btn.ok').forEach(function(b){
     b.onclick=function(){
       var id=this.dataset.id,cost=+this.dataset.cost;
       if(!PointsSystem.spend(cost))return;
+      if(id==='double'){
+        PointsSystem.activateDouble();
+        showToast('⚡ 双倍卡已激活！下次闯关积分翻倍');
+        refresh();
+        return;
+      }
       var code=PointsSystem.genCode(id);
-      document.getElementById('modalItem').textContent=ITEMS.find(function(x){return x.id===id}).name;
+      document.getElementById('modalItem').textContent=ALL.find(function(x){return x.id===id}).name;
       document.getElementById('modalCode').textContent=code;
       document.getElementById('sec2').classList.add('show');
       refresh();
     };
   });
 }
+
+// ====== 分类切换 ======
+document.getElementById('tabs').addEventListener('click',function(e){
+  var tab=e.target.closest('.tab');
+  if(!tab)return;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  tab.classList.add('active');
+  CAT=tab.dataset.cat;
+  renderGrid();
+});
+
+// ====== 签到 ======
+function renderSign(){
+  var s=PointsSystem.signStatus();
+  document.getElementById('signStreak').textContent=s.streak;
+  var btn=document.getElementById('signBtn');
+  if(s.checkedIn){
+    btn.textContent='✅ 已签到';
+    btn.className='btn btn-gray';
+    btn.onclick=null;
+  } else {
+    btn.textContent='📌 签到 +'+s.todayBonus;
+    btn.className='btn btn-gold';
+    btn.onclick=doSign;
+  }
+  var h='';
+  for(var i=0;i<7;i++){
+    var cls='dot';
+    if(i<s.streak)cls+=' on';
+    if(i===s.streak-1&&s.checkedIn)cls+=' today';
+    h+='<div class="'+cls+'">'+(i+1)+'</div>';
+  }
+  document.getElementById('signDots').innerHTML=h;
+}
+function doSign(){
+  var r=PointsSystem.checkIn();
+  if(!r.ok){showToast(r.msg);return}
+  showToast('✅ 签到成功 +'+r.points+' 分');
+  refresh();
+}
+
+// ====== 每日分享 ======
+var shareUrl = window.location.origin + window.location.pathname;
+var shareTxt = '📚 思贤学习站——积分奖励学习 · 闯关答题赚积分 · 免费兑换学习用品和零食小礼。一起努力，一起成长！ ' + shareUrl;
+
+function renderShare(){
+  var s = PointsSystem.shareStatus();
+  var btn = document.getElementById('shareBtn');
+  if(s.shared){
+    btn.textContent = '✅ 已分享';
+    btn.className = 'btn btn-gray';
+    btn.onclick = null;
+  } else {
+    btn.textContent = '📢 分享 +2';
+    btn.className = 'btn btn-gold';
+    btn.onclick = openShareWall;
+  }
+}
+
+function openShareWall(){
+  if(window._shareTimer) clearTimeout(window._shareTimer);
+  document.getElementById('shareText').textContent = shareTxt;
+  document.getElementById('shareOverlay').classList.add('active');
+  window._shareCopied = false;
+  document.getElementById('shareDoneBtn').disabled = true;
+  var cb = document.getElementById('shareCopyBtn');
+  cb.textContent = '📋 复制分享文案';
+  cb.className = 'copy-btn';
+  document.getElementById('shareCopyHint').textContent = '复制后粘贴发送给微信好友或发到朋友圈';
+
+  var t = localStorage.getItem('sx_share_copy');
+  if(t && Date.now() - Number(t) >= 10000){
+    window._shareCopied = true;
+    document.getElementById('shareDoneBtn').disabled = false;
+    cb.textContent = '✅ 已复制';
+    cb.className = 'copy-btn copied';
+    document.getElementById('shareCopyHint').textContent = '✅ 点击下方按钮领取积分';
+  }
+}
+function closeShareWall(){document.getElementById('shareOverlay').classList.remove('active')}
+document.getElementById('shareOverlay').addEventListener('click', function(e){
+  if(e.target === this) closeShareWall();
+});
+
+document.getElementById('shareCopyBtn').addEventListener('click', function(){
+  var ta = document.createElement('textarea');
+  ta.value = document.getElementById('shareText').textContent;
+  document.body.appendChild(ta);
+  ta.select();
+  try{document.execCommand('copy')}catch(e){}
+  document.body.removeChild(ta);
+  localStorage.setItem('sx_share_copy', String(Date.now()));
+  window._shareCopied = true;
+  document.getElementById('shareDoneBtn').disabled = false;
+  this.textContent = '✅ 已复制';
+  this.className = 'copy-btn copied';
+  document.getElementById('shareCopyHint').textContent = '✅ 点击下方按钮领取积分';
+});
+
+document.getElementById('shareDoneBtn').addEventListener('click', function(){
+  var r = PointsSystem.doShare();
+  if(!r.ok){showToast(r.msg);closeShareWall();return}
+  showToast('✅ 分享成功 +2 积分');
+  closeShareWall();
+  refresh();
+});
+
+// ====== 通用 ======
 function closeModal(){document.getElementById('sec2').classList.remove('show')}
 function copyCode(){
   var c=document.getElementById('modalCode');
-  if(navigator.clipboard){navigator.clipboard.writeText(c.textContent).then(function(){c.textContent='✓ 已复制'})}
+  if(navigator.clipboard)navigator.clipboard.writeText(c.textContent).then(function(){showToast('已复制到剪贴板')});
+  else{showToast('请长按手动复制');window.getSelection().selectAllChildren(c)}
+}
+function showToast(msg){
+  var el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast show';
+  clearTimeout(el._t);el._t=setTimeout(function(){el.classList.remove('show')},2000);
 }
 refresh();
 </script>

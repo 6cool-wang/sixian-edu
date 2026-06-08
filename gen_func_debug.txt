@@ -1,0 +1,11 @@
+Generating func_01_linear.svg ... OK
+Generating func_02_proportional.svg ... OK
+Generating func_03_inverse.svg ... OK
+Generating func_04_quadratic.svg ... OK
+Generating func_05_vertex.svg ... OK
+Generating func_06_intersect.svg ... OK
+Generating func_07_discriminant.svg ... OK
+Generating func_08_translate.svg ... OK
+Generating func_09_linear_k.svg ... OK
+Generating func_10_inverse_k.svg ... OK
+All 10 function graphs generated.

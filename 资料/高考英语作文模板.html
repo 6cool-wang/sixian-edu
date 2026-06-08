@@ -621,5 +621,7 @@ Li Hua</div>
 window.addEventListener('scroll',function(){document.querySelector('.back-to-top').classList.toggle('show',window.scrollY>300)});
 function toggleSol(btn){var a=btn.parentElement;var sol=a.querySelectorAll('.a');for(var i=0;i<sol.length;i++){if(sol[i].style.display==='none'){sol[i].style.display='';btn.textContent='收起'}else if(sol[i]!==a.querySelector('.a:first-child')||btn.textContent==='看解析'||btn.textContent==='看答案'||btn.textContent==='看要点'||btn.textContent==='看参考'){sol[i].style.display='none';btn.textContent='看解析'}}}
 </script>
+<script src="../js/points.js"></script>
+<script src="../js/learn-reward.js" data-page="高考英语作文模板"></script>
 </body>
 </html>
